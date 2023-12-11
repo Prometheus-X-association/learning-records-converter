@@ -4,8 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+fastapi = "==0.104.1"
 
 [dev-packages]
+black = "*"
+flake8 = "*"
+isort = "*"
+mypy = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.12"
