@@ -22,6 +22,7 @@ from app.xapi_converter.transformer import *
 # TODO: Documenter et test unitaire du code
 
 
+# TODO: Move?
 class FinalMappingModel(BaseModel):
     output_field: str | None
     value: Any
@@ -276,7 +277,7 @@ class MappingInput:
 
         # Check if input_trace match input_format (model validation)
         # An exception will be raised of not correct model
-        self.input_format.value(**input_trace)
+        self.input_format.value(**input_trace)  # TODO: To test
 
         # Mapping
         output_trace = {}
@@ -288,6 +289,6 @@ class MappingInput:
 
         # Output format (always xAPI non?)
         # An exception will be raised of not correct model
-        self.output_format.value(**output_trace)
+        self.output_format.value(**output_trace)  # TODO: To test
         # Check if output_trace match output_format (model validation)
         return output_trace
