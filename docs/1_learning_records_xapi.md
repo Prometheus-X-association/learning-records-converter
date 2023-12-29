@@ -13,8 +13,8 @@ The aim of this part is to convert a Learning Record to XAPI. In order to do thi
         - [Mapping](#yaml-mapping)
         - [Default](#yaml-default)
         - [Metadata](#yaml-metadata)
-    - Python mapping
-    - How to create my own YAML file?
+    - [Python mapping](#python-mapping)
+    - [How to create my own YAML file?](#create-own-yaml)
 
 
 # Input Data Validation <a name="input-data-validation"></a>
@@ -132,9 +132,14 @@ metadata:
     update: "2023-02-01"
 ```
 
-## Python mapping
+## Python mapping <a name="python-mapping"></a>
+The main mapping is done using the `app.xapi_converter.mapping_input.MappingInput` class. To initiate it, an input format, output format and the corresponding mappping configuration is needed. This class is complexe enough, it will not determine he correction mapping configuration to use depending on the input and output format, not will it guess the input format format the input trace. However, other methods will be created to help with these problems. Once all the information are gathered, the mapping class will handle the rest.
 
-## How to create my own YAML file?
+In terms of organization in the `MappingInput` class, each YAML bloc is handled by a python function. This allows the code to easily understand the config file however it is written.
+
+In addtion, a `config_runnable_function.py` file in present in the module. It utilies all methods the config file can call. Additional methods can be implemeted here.
+
+## How to create my own YAML file? <a name="create-own-yaml"></a>
 
 
 
