@@ -1,0 +1,12 @@
+{
+    "scorm": {
+        "actor": {"value": null},
+        "object": {"value": null},
+        "author": {"firstname": null, "lastname": null, "age": null},
+        "context": {
+            "where": null,
+            "why": null,
+            "additional_field": null
+        }
+    }
+}

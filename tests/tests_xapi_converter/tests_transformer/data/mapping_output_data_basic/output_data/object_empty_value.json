@@ -4,10 +4,8 @@
             "full_content": "No full content in context provided"
         },
         "actor": {
-            "type": "No actor type provided"
-        },
-        "object": {
-            "value": null
+            "type": "No actor type provided",
+            "empty_val": "anything"
         },
         "default": {
             "dict": {"a": "b", "empty": null, "list": ["a", "b", "c"]},

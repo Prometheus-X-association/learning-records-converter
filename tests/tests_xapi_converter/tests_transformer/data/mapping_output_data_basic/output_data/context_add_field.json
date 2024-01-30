@@ -2,10 +2,11 @@
     "xapi": {
         "context": {
             "full_content": "Additional Where",
-            "description": "Additional where additional why ADDITIONAL WHERE ADDITIONAL WHY - length of 8"
+            "description": "additional where additional why ADDITIONAL WHERE ADDITIONAL WHY - length of 8"
         },
         "actor": {
-            "type": "No actor type provided"
+            "type": "No actor type provided",
+            "empty_val": "anything"
         },
         "default": {
             "dict": {"a": "b", "empty": null, "list": ["a", "b", "c"]},

@@ -1,8 +1,5 @@
 {
     "xapi": {
-        "author": {
-            "description": "My name is John DOE, I am 30 years old."
-        },
         "actor": {
             "type": "No actor type provided",
             "empty_val": "anything"

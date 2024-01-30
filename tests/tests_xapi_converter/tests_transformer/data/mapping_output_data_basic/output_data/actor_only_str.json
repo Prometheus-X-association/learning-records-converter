@@ -1,14 +1,13 @@
 {
     "xapi": {
-        "author": {
-            "description": "My name is John DOE, I am 30 years old."
-        },
         "actor": {
-            "type": "No actor type provided",
-            "empty_val": "anything"
-        },
-        "context": {
-            "full_content": "No full content in context provided"
+            "type": "MyName",
+            "default": {
+                "str": "default"
+            },
+            "value": {
+                "int": 0
+            }
         },
         "default": {
             "dict": {"a": "b", "empty": null, "list": ["a", "b", "c"]},
@@ -18,6 +17,10 @@
             "str": "string here",
             "boolean": false,
             "empty":  null
+        },
+        "context": {
+            "full_content": "No full content in context provided"
         }
     }
 }
+
