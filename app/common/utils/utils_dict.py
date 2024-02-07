@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union, overload
 
+import yaml
 from utils.utils_general import is_empty
 
 
@@ -55,13 +56,11 @@ def get_flat_from_nested(
 
 
 @overload
-def remove_empty_elements(dictionnary: list) -> list:
-    ...
+def remove_empty_elements(dictionnary: list) -> list: ...
 
 
 @overload
-def remove_empty_elements(dictionnary: dict) -> dict:
-    ...
+def remove_empty_elements(dictionnary: dict) -> dict: ...
 
 
 def remove_empty_elements(dictionnary: Union[list, dict]) -> Union[list, dict]:
@@ -137,15 +136,13 @@ def get_value_from_flat_key(
 @overload
 def set_value_from_flat_key(
     dict_list_element: dict, flat_key: str, value: Any, overwrite: bool = True
-) -> dict:
-    ...
+) -> dict: ...
 
 
 @overload
 def set_value_from_flat_key(
     dict_list_element: list, flat_key: str, value: Any, overwrite: bool = True
-) -> list:
-    ...
+) -> list: ...
 
 
 def set_value_from_flat_key(
@@ -408,3 +405,23 @@ def get_value_from_first_key_available(
                 current_key = ""
                 value = ""
     return value, current_key
+
+
+def convert_yaml_file_to_json(yaml_path: str) -> dict:
+    """Convert a YAML file into a dict.
+    The path to the YAML file is passed to the function and is loaded afterwards
+
+    Args:
+        yaml_path (str): File path to YAML file
+
+    Raises:
+        ValueError: empty path
+
+    Returns:
+        dict: Converted YAML
+    """
+    if yaml_path:
+        with open(yaml_path, "r") as file:
+            return yaml.safe_load(file)
+    else:
+        raise ValueError("'yaml_path' cannot be empty")
