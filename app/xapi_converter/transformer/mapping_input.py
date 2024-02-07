@@ -2,9 +2,14 @@ from collections.abc import Iterable
 from inspect import signature
 from typing import Any
 
-import yaml
-from enums import TraceFormatEnum, TraceFormatMappingEnum, TraceFormatModelEnum
-from models.mapping_config import (
+from enums import (
+    CustomTraceFormatModelEnum,
+    CustomTraceFormatOutputMappingEnum,
+    CustomTraceFormatStrEnum,
+)
+from pydantic import BaseModel
+from trace_formats.enums import TraceFormatEnum
+from trace_formats.models.mapping_config import (
     BasicTransformationModel,
     CompleteConfigModel,
     CustomTransformationModel,
@@ -13,8 +18,12 @@ from models.mapping_config import (
     SwitchTransformationModel,
     ValueTransformationModel,
 )
-from pydantic import BaseModel
-from utils.utils_dict import get_value_from_flat_key, set_value_from_flat_key
+from utils.utils_dict import (
+    convert_yaml_file_to_json,
+    get_value_from_flat_key,
+    remove_empty_elements,
+    set_value_from_flat_key,
+)
 
 from app.xapi_converter.transformer import *
 
@@ -31,31 +40,62 @@ class FinalMappingModel(BaseModel):
 DEFAULT_CONDITION = "default"
 
 
-def get_mapping_by_trace_format(trace_format: str | TraceFormatEnum) -> CompleteConfigModel:
-    # Get correct Key
+def get_config_model_from_yaml_file(file_path: str) -> CompleteConfigModel:
+    """From a file path (for a YAML file) get the CompleteConfigModel used for the mapping process
+
+    Args:
+        file_path (str): YAML file path
+
+    Returns:
+        CompleteConfigModel: Model used to map input trace
+    """
+    json_config = convert_yaml_file_to_json(file_path)
+    # Load mapping in Model
+    return CompleteConfigModel(**json_config)
+
+
+def get_mapping_by_input_and_output_format(
+    input_format: str | TraceFormatEnum, output_format: str | TraceFormatEnum
+) -> CompleteConfigModel:
+    """From the input_format and the output_format, retrieve the correct mapping config (if exists)
+
+    Args:
+        input_format (str | TraceFormatEnum): Trace input format
+        output_format (str | TraceFormatEnum): Trace output format
+
+    Raises:
+        ValueError: No mapping for this output format found.
+        ValueError: No mapping from this input to this output format found.
+        ValueError: Mapping unloadable (empty file, wrong path...)
+
+    Returns:
+        CompleteConfigModel: Mapping config model
+    """
+    # Get correct mapping enum
+    mapping_config = None
     try:
-        if isinstance(trace_format, str):
-            trace_format = TraceFormatMappingEnum[trace_format]
-        elif isinstance(trace_format, TraceFormatEnum):
-            trace_format = TraceFormatMappingEnum[trace_format.name]
+        if isinstance(output_format, str):
+            enum_key = CustomTraceFormatStrEnum(output_format).name
+            mappings = CustomTraceFormatOutputMappingEnum[enum_key].value
+        elif isinstance(output_format, TraceFormatEnum):
+            mappings = CustomTraceFormatOutputMappingEnum[output_format.name].value
     except (ValueError, KeyError) as e:
-        raise ValueError(f"{trace_format} not found")
+        raise ValueError(f"Output mapping enum to {output_format} not found")
+
+    try:
+        if isinstance(input_format, str):
+            enum_key = CustomTraceFormatStrEnum(input_format).name
+            mapping_config = mappings[enum_key]
+        elif isinstance(input_format, TraceFormatEnum):
+            mapping_config = mappings[input_format.name]
+    except (ValueError, KeyError) as e:
+        raise ValueError(f"Mapping from {input_format} to {output_format} not found")
 
     # Read config file
-    if isinstance(trace_format, TraceFormatMappingEnum):
-        json_config = convert_yaml_file_to_json(trace_format.value)
-        # Load mapping in Model
-        return CompleteConfigModel(**json_config)
+    if isinstance(mapping_config, TraceFormatEnum):
+        return get_config_model_from_yaml_file(mapping_config.value)
     else:
         raise ValueError("Could not load mapping config into model")
-
-
-def convert_yaml_file_to_json(yaml_path: str) -> dict:
-    if yaml_path:
-        with open(yaml_path, "r") as file:
-            return yaml.safe_load(file)
-    else:
-        raise ValueError("'yaml_path' cannot be empty")
 
 
 class MappingInput:
@@ -66,9 +106,9 @@ class MappingInput:
 
     def __init__(
         self,
-        input_format: TraceFormatModelEnum,
+        input_format: CustomTraceFormatModelEnum,
         mapping_to_apply: CompleteConfigModel,
-        output_format: TraceFormatModelEnum,  # = TraceFormatModelEnum.XAPI,
+        output_format: CustomTraceFormatModelEnum,  # = TraceFormatModelEnum.XAPI,
     ) -> None:
         self.input_format = input_format
         self.output_format = output_format
@@ -80,14 +120,12 @@ class MappingInput:
         arguments: Iterable[Any] | None = None,
         deploy_arguments: bool = True,
     ) -> Any:
-        if not arguments:
-            arguments = list()
         if isinstance(custom_input, CustomTransformationModel):
             custom_input = custom_input.custom
 
         if custom_input:
             # Gérer erreur ici (lors de l'application de eval) + Gérer l'erreur en cas de fonction non callable
-            custom_code = eval(custom_input.pop(0))
+            custom_code = eval(custom_input[0])
             nb_arguments = len(signature(custom_code).parameters)
             response = (
                 custom_code(*arguments)
@@ -95,14 +133,9 @@ class MappingInput:
                 else custom_code(arguments)
             )
             return self.transformation_custom(
-                custom_input, arguments=response, deploy_arguments=False
+                custom_input[1:], arguments=response, deploy_arguments=False
             )
         return arguments
-
-    # CUSTOM TESTING
-    # test = CustomTransformationModel(custom=["lambda a, b: (a+b, a-b)", "lambda a: a+b"])
-    # # test = CustomTransformationModel(custom=["lambda a, b: a + b"])
-    # print(transformation_custom(test, 2, 3))
 
     def transformation_value(
         self, value: ValueTransformationModel, arguments: list[Any] | None = None
@@ -223,6 +256,7 @@ class MappingInput:
                 True,
                 list_input_value,
             )  # C'EST HYPER MAL GERE LES TRUCS DE ARGS ET KWARGS, PASSER PLUTÖT VIA DES VARIABLES FIXE, C'EST MIEUX NON? A CREUSER, MAIS LA C4EST TERRIBLE
+        output_trace = remove_empty_elements(output_trace)
         return output_trace
         # list_simplified_outputs = handle_output(mapping_content.output_fields, *list_inputs)
         # for simplified_outputs in list_simplified_outputs:
@@ -268,6 +302,21 @@ class MappingInput:
     # Ajouter les outputs partout où il faut
     # Transformation : "bob" par défaut c'est transformation: value: "bob", faire/mettre en place la prise en compte.
 
+    def mapping(self, input_trace):
+        # Mapping
+        # TODO: Sortir ce bloc de mapping
+        # TODO: Regarder pour donner la possibilité de faire de mapping sans forcément être dans l'Enum
+        # TODO: Isoler les parties mapping/enums...
+        output_trace = {}
+        output_trace = self.handle_mapping(
+            self.mapping_to_apply.mappings, input_trace, output_trace
+        )
+        # Default
+        output_trace = self.handle_default(self.mapping_to_apply.default_values, output_trace)
+
+        # Return response
+        return output_trace
+
     def run(self, input_trace: dict) -> dict:
         ##### MAIN FUNCTION #####
         if not self.input_format or not self.output_format or not self.mapping_to_apply:
@@ -279,13 +328,7 @@ class MappingInput:
         # An exception will be raised of not correct model
         self.input_format.value(**input_trace)  # TODO: To test
 
-        # Mapping
-        output_trace = {}
-        output_trace = self.handle_mapping(
-            self.mapping_to_apply.mappings, input_trace, output_trace
-        )
-        # Default
-        output_trace = self.handle_default(self.mapping_to_apply.default_values, output_trace)
+        output_trace = self.mapping(input_trace)
 
         # Output format (always xAPI non?)
         # An exception will be raised of not correct model
