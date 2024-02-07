@@ -55,7 +55,7 @@ mappings:
       # ... (see output_fields section)
 ```
 - `description`: Optional. Specify a description for the mapping element.
-- `input_fields`: A list of strings indicating the fields to use. The paths are specified usning the json dotted format. an integer in the path is considered as a list index.
+- `input_fields`: A list of strings indicating the fields to use. The paths are specified using the json dotted format. an integer in the path is considered as a list index.
 - `output_fields`: Action to apply for the output trace.
 
 #### Output Fields <a name="output-field"></a>
@@ -76,7 +76,7 @@ output_fields:
       value: "default_value_here"
 ```
 - `output_field`: Output corresponding field
-- `transformation`: Transformation to apply. If not transformation is specified, a direct mapping is done.
+- `transformation`: Transformation to apply. If no transformation is specified, a direct mapping is done.
 
 #### Transformation
 The `transformation` section defines the action to apply for the mapping concerned. Several transformations
@@ -133,16 +133,71 @@ metadata:
 ```
 
 ## Python mapping <a name="python-mapping"></a>
-The main mapping is done using the `app.xapi_converter.mapping_input.MappingInput` class. To initiate it, an input format, output format and the corresponding mappping configuration is needed. This class is complexe enough, it will not determine he correction mapping configuration to use depending on the input and output format, not will it guess the input format format the input trace. However, other methods will be created to help with these problems. Once all the information are gathered, the mapping class will handle the rest.
+The main mapping is done using the `app.xapi_converter.transformer.mapping_input.MappingInput` class. To initiate it, an input format and the corresponding mappping configuration is needed. By default, the output_format is xAPI. This class is complexe enough, it will not determine the correct mapping configuration to use depending on the input and output format, nor will it guess the input format from the input trace. However, other methods will be created to help with these problems. Once all the information are gathered, the mapping class will handle the rest.
 
-In terms of organization in the `MappingInput` class, each YAML bloc is handled by a python function. This allows the code to easily understand the config file however it is written.
+In terms of organization in the `MappingInput` class, each YAML bloc is handled by a python function (transformation with multiple lambda function, switch cases...). This allows the code to easily understand the config file however it is written.
 
-In addtion, a `config_runnable_function.py` file in present in the module. It utilies all methods the config file can call. Additional methods can be implemeted here.
+In addtion, a `config_runnable_function.py` file is present in the module. It utilies all methods the config file can call. Additional methods can be implemeted here.
+
+The `run` method is called to start the transformation. It will check if the input_trace is in the correct format, apply the mapping, and check the output_trace format before returning the converted trace.
+Here is a small diagram to summerise the process:
+
+IMAGE
+
+An endpoint exist to call this method. Its purpose is to test, validate or just try out the mapping process. Here a is diagram to explain the process
+
+IMAGE
+
+
 
 ## How to create my own YAML file? <a name="create-own-yaml"></a>
 
+Please refer to the [YAML File](#yaml-file) section to create your own config file. The example (in the `example` folder) can also help with understanding and creating a new YAML file. Once this file is created, here are the steps to follow:
+- Save your yaml file at `app/common/mappers`
+- Name it with something recognizable
+- If the input format model is not yet created, please create it at `app/common/models/custom_trace_formats` in a new file and import it into the `__init__.py` file.
+- In `app/common/enums/custom_trace_format.py` update :
+    - CAUTION: For all Enums, all keys of a same format has to be the same everywhere (if the chossen name is `NEW_FORMAT`, it has to be like so everywhere).
 
+    **Model**
+    - `CustomTraceFormatModelEnum` - Add new trace format pydantic model (example: `NEW_FORMAT = NewFormatModel`). This Enum regroups all the trace format models.
 
+    **Transform input traces (that are in other formats) into NewFormat**
+    - There is an Enum for each possible output format (xAPI, SCORM...). If you wish to have a mapping where the new trace format is the output format, you will have to create a new Enum like so
+    ```python
+    class TraceFormatToNewFormatMappingEnum(TraceFormatEnum):
+        SCORM_1_1 = "path/file1.yaml"
+        XAPI = "path/file2.yaml"
+    ```
+    - For each key, give the path to locate the yaml mapping file.
+        - For example, in this Enum, to transform `xAPI` to `NewFormat` we need to use `path/file2.yaml` config file.
+    - Then in `CustomTraceFormatOutputMappingEnum`, associate the newly created mapping enum with the corresponding key
+    ```python
+    @extend_enum(TraceFormatOutputMappingEnum)
+    class CustomTraceFormatOutputMappingEnum(TraceFormatEnum):
+        NEW_FORMAT = TraceFormatToNewFormatMappingEnum
+    ```
+    - For information: By using `@extend_enum(TraceFormatOutputMappingEnum)` the other mapping enum are preserved.
+    
+    **Transform input trace (that are in NewFormat format) into other formats** 
+    - If you wish to add a mapping for new_format into an existing output (NewFormat to xAPI for example), you have to inherit or directly modify the corresponding output mapping enum.
+    Here is an example in which we add a new mapping file for NewFormat to xAPI
+    ```python
+    @extend_enum(TraceFormatToXapiMappingEnum)
+    class CustomTraceFormatToXapiMappingEnum(TraceFormatEnum):
+        NEW_FORMAT = "path/file.yaml"
+
+    @extend_enum(TraceFormatOutputMappingEnum)
+    class CustomTraceFormatOutputMappingEnum(TraceFormatEnum):
+        XAPI = CustomTraceFormatToXapiMappingEnum
+    ```
+    - `TraceFormatToXapiMappingEnum` is the Enum that maps traces into xAPI. Since it is in not recommended to modify `TraceFormatToXapiMappingEnum` directly (because it is in `trace_formats` git submodule), we use `extend_enum` to inherit `TraceFormatToXapiMappingEnum` into `CustomTraceFormatToXapiMappingEnum`
+    - The xAPI mapping Enum has also changed so we associate the correct Enum in `CustomTraceFormatOutputMappingEnum` so that we do not directly change `TraceFormatOutputMappingEnum` (because it is in `trace_formats` git submodule).
+
+    - Once again, be careful, all the Enum keys must be the same in every Enum.
+    
+
+As reference, look at `app/common/trace_formats/enums/trace_format.py`
 
 
 

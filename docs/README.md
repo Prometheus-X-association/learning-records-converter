@@ -23,3 +23,4 @@ The project is seperated into different modules, each having its own objectives:
 # Authors
 
 # Other sources
+General projet architecture : Project's README.md
