@@ -1,9 +1,9 @@
+from api.handlers import get_format_from_trace
 from enums.custom_trace_format import CustomTraceFormatModelEnum
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from utils.utils_trace import get_format_from_trace
 
 from app.api.exceptions import (
     BadRequestError,
