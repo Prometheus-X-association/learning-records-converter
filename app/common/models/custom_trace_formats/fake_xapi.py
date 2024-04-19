@@ -52,7 +52,7 @@ class FakeXapiRootModel(BaseModel):
 
 
 class FakeXapiModel(BaseModel):
-    xapi: Optional[FakeXapiRootModel] = Field(default=None)
+    fake_xapi: FakeXapiRootModel = Field(...)
 
     class Config:
         # Do not allow extra fields
