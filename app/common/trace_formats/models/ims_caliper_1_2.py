@@ -3,11 +3,12 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import List, Literal, Union, get_args
 
-from base import ExtendedTypeBaseModel
 from pydantic import BaseModel, Field, field_validator
 from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
+
+from .base import ExtendedTypeBaseModel
 
 
 #############################################################
@@ -2024,8 +2025,8 @@ class IMSCapilerModel(BaseModel):
     @field_validator("data", mode="before")
     def validation(cls, value: List[EventModel], extra_info: ValidationInfo):
         """Pydantic does not allow a model to use a discriminator and a field_validator with mode=`before`.
-        
-        This validator will act as a custom discriminator to apply the correct model to all 
+
+        This validator will act as a custom discriminator to apply the correct model to all
         the data values by using the `type` field present in all EventModel instances.
 
         Args:

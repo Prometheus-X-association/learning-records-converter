@@ -3,11 +3,12 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import List, Literal, Union
 
-from base import ExtendedTypeBaseModel
 from pydantic import BaseModel, Field, field_validator
 from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
+
+from .base import ExtendedTypeBaseModel
 
 
 #############################################################
