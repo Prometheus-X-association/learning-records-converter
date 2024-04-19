@@ -30,7 +30,7 @@ class FakeScormRootModel(BaseModel):
 
 
 class FakeScormModel(BaseModel):
-    scorm: Optional[FakeScormRootModel] = Field(default=None)
+    fake_scorm: FakeScormRootModel = Field(...)
 
     class Config:
         # Do not allow extra fields
