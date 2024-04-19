@@ -8,7 +8,9 @@ The aim of this part is to convert a Learning Record to XAPI. In order to do thi
 
 # Table
 1. [Input Data Validation](#input-data-validation)
-2. [Data Transformation](#data-transformation)
+   - [Pydantic File](#pydantic-file)
+   
+3. [Data Transformation](#data-transformation)
     - [YAML File](#yaml-file)
         - [Mapping](#yaml-mapping)
         - [Default](#yaml-default)
@@ -18,6 +20,11 @@ The aim of this part is to convert a Learning Record to XAPI. In order to do thi
 
 
 # Input Data Validation <a name="input-data-validation"></a>
+## Pydantic File <a name="pydantic-file"></a>
+### Overview
+The Validation Config is a Pydantic (.py) file used to validate the format of an input file. An example can be found here [examples/version_1.py]
+
+WIP
 
 # Data Transformation <a name="data-transformation"></a>
 ## YAML File <a name="yaml-file"></a>
