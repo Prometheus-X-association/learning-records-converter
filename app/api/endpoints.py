@@ -1,4 +1,3 @@
-from api.handlers import get_format_from_trace
 from enums.custom_trace_format import CustomTraceFormatModelEnum
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -11,6 +10,7 @@ from app.api.exceptions import (
     InternalServerError,
     NotFoundElementError,
 )
+from app.api.handlers import get_format_from_trace
 from app.api.schemas import TransformInputTraceRequestModel, TransformInputTraceResponseModel
 from app.xapi_converter.transformer.mapping_input import (
     MappingInput,
@@ -94,7 +94,9 @@ async def validation_exception_handler(request, exc: Exception):
             message = str(exc)
     except Exception as e:
         message = str(exc).replace("\n", "; ")
-    if isinstance(exc, ValueError) or isinstance(exc, BadRequestError):
+    if isinstance(exc, BadRequestError):
+        status_code = 400
+    elif isinstance(exc, ValueError):
         status_code = 401
     elif isinstance(exc, ForbiddenError):
         status_code = 403
