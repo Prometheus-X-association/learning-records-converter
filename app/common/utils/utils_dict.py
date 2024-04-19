@@ -1,3 +1,4 @@
+import re
 from typing import Any, Dict, List, Tuple, Union, overload
 
 import yaml
@@ -29,12 +30,13 @@ def get_flat_from_nested(
 
     def recursive_flat_from_nested(content, field_name=""):
         # If dict type
-        if isinstance(content, dict):
+        if isinstance(content, dict) and content:
             for key in content:
-                recursive_flat_from_nested(content[key], field_name + key + ".")
+                key_encoded = key.replace(".", "\.")
+                recursive_flat_from_nested(content[key], field_name + key_encoded + ".")
 
         # If list type
-        elif isinstance(content, list):
+        elif isinstance(content, list) and content:
             list_element_nested = [isinstance(element, (list, dict)) for element in content]
 
             if (
@@ -172,11 +174,12 @@ def set_value_from_flat_key(
     Returns:
         Union[dict, list]: The original dict or list, modified if not overwrite.
     """
-    list_key = flat_key.split(".")
+    list_key = re.split(r"(?<!\\)\.", flat_key)
 
     # If there is at least one key to navigate
     if not is_empty(flat_key) and len(list_key) > 0:
         first_key = list_key.pop(0)
+        first_key = first_key.replace("\.", ".")
 
         # If not overwrite but found element is not list, dict or None, return
         if (
@@ -270,7 +273,9 @@ def get_nested_from_flat(
 
     # Format validation
     if nested_field is None:
-        all_field_start_with_numeric = [key.split(".")[0].isnumeric() for key in flat_field.keys()]
+        all_field_start_with_numeric = [
+            re.split(r"(?<!\\)\.", key)[0].isnumeric() for key in flat_field.keys()
+        ]
         if all(all_field_start_with_numeric):
             nested_field = []
         elif any(all_field_start_with_numeric):
