@@ -1,5 +1,5 @@
 {
-    "xapi": {
+    "fake_xapi": {
         "object": {
             "value": "Sample Value"
         },

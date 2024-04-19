@@ -1,5 +1,5 @@
 {
-    "xapi": {
+    "fake_xapi": {
         "actor": {
             "type": "MyName",
             "default": {

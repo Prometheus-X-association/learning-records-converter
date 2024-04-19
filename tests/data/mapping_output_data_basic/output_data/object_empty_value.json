@@ -1,5 +1,5 @@
 {
-    "xapi": {
+    "fake_xapi": {
         "context": {
             "full_content": "No full content in context provided"
         },

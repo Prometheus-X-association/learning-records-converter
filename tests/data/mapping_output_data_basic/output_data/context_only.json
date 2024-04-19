@@ -1,5 +1,5 @@
 {
-    "xapi": {
+    "fake_xapi": {
         "context": {
             "full_content": "Somewhere",
             "description": "somewhere for some reason SOMEWHERE FOR SOME REASON - length of 8"

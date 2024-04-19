@@ -1,5 +1,5 @@
 {
-    "xapi": {
+    "fake_xapi": {
         "actor": {
             "type": "No actor type provided",
             "empty_val": "anything"

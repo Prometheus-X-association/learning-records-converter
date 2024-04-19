@@ -1,5 +1,5 @@
 {
-    "scorm": {
+    "fake_scorm": {
         "context": {
             "where": "Additional Where",
             "why": "Additional Why",
