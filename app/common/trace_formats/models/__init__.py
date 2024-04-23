@@ -1,3 +1,5 @@
+from trace_formats.models.ims_caliper_1_1 import IMSCapilerModel as IMSCapilerSensorModel1_1
+from trace_formats.models.ims_caliper_1_2 import IMSCapilerModel as IMSCapilerSensorModel1_2
 from trace_formats.models.scorm_1_1 import SCORMDataModel
 from trace_formats.models.scorm_2004 import SCORM2004DataModel
 from trace_formats.models.xapi.base.statements import BaseXapiStatement
