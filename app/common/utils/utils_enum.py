@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any, Callable
 
 
 class CaseInsensitiveStrEnum(Enum):
@@ -12,7 +13,7 @@ class CaseInsensitiveStrEnum(Enum):
                 return member
 
 
-def extend_enum(*args, enum_class: type[Enum] = Enum):
+def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
     """Python does not allow Enum to inherit other Enum.
     This decorator "adds" the list of inherited enums into the decorated enum.
 
@@ -33,7 +34,7 @@ def extend_enum(*args, enum_class: type[Enum] = Enum):
     return wrapper
 
 
-def str_enum(*args, enum_class: type[Enum] = Enum):
+def str_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
     """Transform a Enum into a StrEnum
     This decorator transforms the list of enums to get all ENUM_KEY = 'enum_key' in one StrEnum.
 
