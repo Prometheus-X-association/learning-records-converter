@@ -1,0 +1,48 @@
+{
+    "sensor": "https://example.edu/sensors/1",
+    "sendTime": "2018-11-15T11:05:01.000Z",
+    "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "data": [{
+    "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "id": "urn:uuid:956b4a02-8de0-4991-b8c5-b6eebb6b4cab",
+    "type": "MediaEvent",
+    "actor": {
+        "id": "https://example.edu/users/554433",
+        "type": "Person"
+    },
+    "action": "Paused",
+    "object": {
+        "id": "https://example.edu/UQVK-dsU7-Y",
+        "type": "VideoObject",
+        "name": "Information and Welcome",
+        "mediaType": "video/ogg",
+        "duration": "PT20M20S"
+    },
+    "target": {
+        "id": "https://example.edu/UQVK-dsU7-Y?t=321",
+        "type": "MediaLocation",
+        "currentTime": "PT05M21S"
+    },
+    "eventTime": "2018-11-15T10:15:00.000Z",
+    "edApp": "https://example.edu/player",
+    "group": {
+        "id": "https://example.edu/terms/201801/courses/7/sections/1",
+        "type": "CourseSection",
+        "courseNumber": "CPS 435-01",
+        "academicSession": "Fall 2018"
+    },
+    "membership": {
+        "id": "https://example.edu/terms/201801/courses/7/sections/1/rosters/1",
+        "type": "Membership",
+        "member": "https://example.edu/users/554433",
+        "organization": "https://example.edu/terms/201801/courses/7/sections/1",
+        "roles": [ "Learner" ],
+        "status": "Active",
+        "dateCreated": "2018-08-01T06:00:00.000Z"
+    },
+    "session": {
+        "id": "https://example.edu/sessions/1f6442a482de72ea6ad134943812bff564a76259",
+        "type": "Session",
+        "startedAtTime": "2018-11-15T10:00:00.000Z"
+    }
+}]}

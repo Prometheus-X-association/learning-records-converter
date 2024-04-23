@@ -1,0 +1,55 @@
+{
+    "sensor": "https://example.edu/sensors/1",
+    "sendTime": "2018-11-15T11:05:01.000Z",
+    "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "data": [{
+    "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "id": "urn:uuid:d4618c23-d612-4709-8d9a-478d87808067",
+    "type": "AnnotationEvent",
+    "actor": {
+      "id": "https://example.edu/users/554433",
+      "type": "Person"
+    },
+    "action": "Bookmarked",
+    "object": {
+      "id": "https://example.com/#/texts/imscaliperimplguide/cfi/6/10!/4/2/2/2@0:0",
+      "type": "Page",
+      "name": "IMS Caliper Implementation Guide, pg 5",
+      "version": "1.1"
+    },
+    "generated": {
+      "id": "https://example.com/users/554433/texts/imscaliperimplguide/bookmarks/1",
+      "type": "BookmarkAnnotation",
+      "annotator": "https://example.edu/users/554433",
+      "annotated": "https://example.com/#/texts/imscaliperimplguide/cfi/6/10!/4/2/2/2@0:0",
+      "bookmarkNotes": "Caliper profiles model discrete learning activities or supporting activities that facilitate learning.",
+      "dateCreated": "2018-11-15T10:15:00.000Z"
+    },
+    "eventTime": "2018-11-15T10:15:00.000Z",
+    "edApp": {
+      "id": "https://example.com/reader",
+      "type": "SoftwareApplication",
+      "name": "ePub Reader",
+      "version": "1.2.3"
+    },
+    "group": {
+      "id": "https://example.edu/terms/201801/courses/7/sections/1",
+      "type": "CourseSection",
+      "courseNumber": "CPS 435-01",
+      "academicSession": "Fall 2018"
+    },
+    "membership": {
+      "id": "https://example.edu/terms/201801/courses/7/sections/1/rosters/1",
+      "type": "Membership",
+      "member": "https://example.edu/users/554433",
+      "organization": "https://example.edu/terms/201801/courses/7/sections/1",
+      "roles": [ "Learner" ],
+      "status": "Active",
+      "dateCreated": "2018-08-01T06:00:00.000Z"
+    },
+    "session": {
+      "id": "https://example.com/sessions/1f6442a482de72ea6ad134943812bff564a76259",
+      "type": "Session",
+      "startedAtTime": "2018-11-15T10:00:00.000Z"
+    }
+}]}
