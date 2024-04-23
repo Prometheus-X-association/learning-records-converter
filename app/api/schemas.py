@@ -12,3 +12,13 @@ class TransformInputTraceRequestModel(BaseModel):
 
 class TransformInputTraceResponseModel(BaseModel):
     output_trace: dict = Field(description="Transformed output trace in JSON format")
+
+
+class ValidateInputTraceRequestModel(BaseModel):
+    input_format: CustomTraceFormatStrEnum = Field(default=None, description="Input trace format")
+    # input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
+    input_trace: dict = Field(description="Input trace to convert in JSON format")
+
+
+class ValidateInputTraceResponseModel(BaseModel):
+    input_format: CustomTraceFormatStrEnum = Field(description="Input trace format.")
