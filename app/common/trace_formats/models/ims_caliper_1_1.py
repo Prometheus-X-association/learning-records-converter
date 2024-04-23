@@ -247,8 +247,8 @@ class TextPositionSelectorModel(ExtendedTypeBaseModel):
 ##################### ENTITIES #####################
 ####################################################
 class EntityModel(ExtendedTypeBaseModel):
-    context: str = Field(
-        default="http://purl.imsglobal.org/ctx/caliper/v1p1",
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p1"] = Field(
+        default=None,
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
     )
@@ -503,7 +503,7 @@ class ResponseModel(EntityModel):
 
 class SessionModel(EntityModel):
     type: Literal[TypeTermEnum.SESSION] = Field(alias="type", examples=["Session"])
-    user: PersonModel = Field(default=None, alias="user")
+    user: PersonModel | str = Field(default=None, alias="user")
     started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
     ended_at_time: str = Field(default=None, alias="endedAtTime")  # Datetime
     duration: str = Field(default=None, alias="duration")  # Duration ISO 8601
@@ -919,8 +919,8 @@ class WebPageModel(DigitalResourceModel):
 ##################### EVENTS #####################
 ##################################################
 class EventModel(ExtendedTypeBaseModel):
-    context: str = Field(
-        default="http://purl.imsglobal.org/ctx/caliper/v1p1",
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p1"] = Field(
+        default=None,
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
     )

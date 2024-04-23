@@ -205,6 +205,7 @@ class ProfileTermEnum(StrEnum):
     RESOURCEMANAGEMENTPROFILE = "ResourceManagementProfile"
     SEARCHPROFILE = "SearchProfile"
     SESSIONPROFILE = "SessionProfile"
+    SURVEYPROFILE = "SurveyProfile"
     TOOLLAUNCHPROFILE = "ToolLaunchProfile"
     TOOLUSEPROFILE = "ToolUseProfile"
 
@@ -336,8 +337,8 @@ class SystemIdentifierModel(ExtendedTypeBaseModel):
 ##################### ENTITIES #####################
 ####################################################
 class EntityModel(ExtendedTypeBaseModel):
-    context: str = Field(
-        default="http://purl.imsglobal.org/ctx/caliper/v1p2",
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p2"] = Field(
+        default=None,
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
     )
@@ -1285,8 +1286,8 @@ class WebPageModel(DigitalResourceModel):
 ##################### EVENTS #####################
 ##################################################
 class EventModel(ExtendedTypeBaseModel):
-    context: str = Field(
-        default="http://purl.imsglobal.org/ctx/caliper/v1p2",
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p2"] = Field(
+        default=None,
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
     )
@@ -1744,7 +1745,7 @@ class ResourceManagementEventModel(EventModel):
     @field_validator("generated")
     def generated_required_condition(cls, generated, values):
         """Required when the action value is Copied, otherwise optional"""
-        if values.get("action", "") == ActionTermEnum.COPIED and not generated:
+        if values.data.get("action", "") == ActionTermEnum.COPIED and not generated:
             raise ValueError(f"generated cannot be empty if action is {ActionTermEnum.COPIED}")
 
     @field_validator("action")
@@ -1942,7 +1943,7 @@ class ToolLaunchEventModel(EventModel):
     @field_validator("federated_session")
     def federated_session_required_condition(cls, federated_session, values):
         """Required when the action value is Launched, otherwise optional"""
-        if values.get("action", "") == ActionTermEnum.LAUNCHED and not federated_session:
+        if values.data.get("action", "") == ActionTermEnum.LAUNCHED and not federated_session:
             raise ValueError(
                 f"federated_session cannot be empty if action is {ActionTermEnum.LAUNCHED}"
             )
