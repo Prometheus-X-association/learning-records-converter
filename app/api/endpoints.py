@@ -1,8 +1,9 @@
-from enums.custom_trace_format import CustomTraceFormatModelEnum
+from enums.custom_trace_format import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic_core import ValidationError
 
 from app.api.exceptions import (
     BadRequestError,
@@ -11,7 +12,12 @@ from app.api.exceptions import (
     NotFoundElementError,
 )
 from app.api.handlers import get_format_from_trace
-from app.api.schemas import TransformInputTraceRequestModel, TransformInputTraceResponseModel
+from app.api.schemas import (
+    TransformInputTraceRequestModel,
+    TransformInputTraceResponseModel,
+    ValidateInputTraceRequestModel,
+    ValidateInputTraceResponseModel,
+)
 from app.xapi_converter.transformer.mapping_input import (
     MappingInput,
     get_mapping_by_input_and_output_format,
@@ -35,6 +41,33 @@ app.add_middleware(
 )
 
 
+def handle_trace_and_format(
+    trace: dict, format: CustomTraceFormatStrEnum | None = None
+) -> CustomTraceFormatModelEnum:
+    """Get the pydantic model of a speific trace
+
+    Args:
+        trace (dict): Trace
+        format (CustomTraceFormatStrEnum | None, optional): Trace format. Defaults to None.
+
+    Raises:
+        NotFoundElementError: No matched trace format for passed input
+
+    Returns:
+        CustomTraceFormatModelEnum: Enum element with the trace model
+    """
+    # Get input format if not provided
+    if format is None:
+        input_model = get_format_from_trace(trace)
+    else:
+        # Get input format model
+        input_model = CustomTraceFormatModelEnum[format.name]
+    # Handle empty input_model
+    if input_model is None:
+        raise NotFoundElementError("Input format not found from trace. Please specify one.")
+    return input_model
+
+
 @app.post(
     path="/convert",
     response_model=TransformInputTraceResponseModel,
@@ -43,28 +76,50 @@ app.add_middleware(
     status_code=200,
 )
 def transform_input_trace(query: TransformInputTraceRequestModel):
-    # Get input format if not provided
-    if query.input_format is None:
-        input_model = get_format_from_trace(query.input_trace)
-        if input_model is None:
-            raise NotFoundElementError("Input format not found from trace. Please specify one.")
-    else:
-        # Get input format model
-        input_model = CustomTraceFormatModelEnum[query.input_format.name]
+    """Transform a trace from an format into another format
 
+    Args:
+        query (TransformInputTraceRequestModel): Request query model
+
+    Returns:
+        TransformInputTraceResponseModel: Response model
+    """
+    input_model = handle_trace_and_format(trace=query.input_trace, format=query.input_format)
     # Get output format model
     output_model = CustomTraceFormatModelEnum[query.output_format.name]
     # Get Mapping
     mapping_config = get_mapping_by_input_and_output_format(input_model, output_model)
     # Apply Mapping
     mapper = MappingInput(
-        input_format=input_model,
-        mapping_to_apply=mapping_config,
-        output_format=output_model,
+        input_format=input_model, mapping_to_apply=mapping_config, output_format=output_model
     )
     response = mapper.run(query.input_trace)
     # Done
     return TransformInputTraceResponseModel(output_trace=response)
+
+
+@app.post(
+    path="/validate",
+    response_model=ValidateInputTraceResponseModel,
+    tags=["Trace validation"],
+    description="Validate an input trace. If a trace format is passed, it will only check the specific format. If no trace format is passed, it will try to detect one.",
+    status_code=200,
+)
+def validate_input_trace(query: ValidateInputTraceRequestModel):
+    """Validate or identify a trace
+
+    Args:
+        query (ValidateInputTraceRequestModel): Request Query Model
+
+    Returns:
+        ValidateInputTraceResponseModel: Response Model
+    """
+    input_model = handle_trace_and_format(trace=query.input_trace, format=query.input_format)
+    try:
+        input_model.value(**query.input_trace)
+    except ValidationError as ve:
+        raise BadRequestError("Input format does not match trace.")
+    return ValidateInputTraceResponseModel(input_format=input_model.name)
 
 
 ## Exception
