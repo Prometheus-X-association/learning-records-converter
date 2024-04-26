@@ -4,61 +4,61 @@ output_format: "xAPI"
 mappings:
   # Single input + Mulitple output
   - input_fields: 
-    - "scorm.actor.value"
+    - "fake_scorm.actor.value"
     output_fields:
       description: "Can map multiple fields"
       multiple:
         # Direct mapping
         - description: ""
-          output_field: "xapi.actor.type"
+          output_field: "fake_xapi.actor.type"
         # Switch tranformation
         - transformation:
             switch:
               - description: "No output needed because already passed before."
                 condition: "lambda val: is_empty(val)"
                 # Value tranformation
-                output_field: "xapi.actor.empty_val"
+                output_field: "fake_xapi.actor.empty_val"
                 transformation:
                   value: "anything"
               - condition: "lambda val: not is_empty(val) and val >= 0"
-                output_field: "xapi.actor.positive"
+                output_field: "fake_xapi.actor.positive"
               - condition: "lambda val: not is_empty(val) and val < 0"
-                output_field: "xapi.actor.negative"
+                output_field: "fake_xapi.actor.negative"
                 transformation:
                   custom:
                     - "lambda val: -1 * val"
                     - "lambda val: str(val) + ' is now an absolute number'"
               - condition: "default"
                 multiple:
-                  - output_field: "xapi.actor.default.str"
+                  - output_field: "fake_xapi.actor.default.str"
                     transformation:
                       value: "default"
-                  - output_field: "xapi.actor.value.int"
+                  - output_field: "fake_xapi.actor.value.int"
                     transformation:
                       value: 0
   # Single input + Single output
   - input_fields: 
-    - "scorm.object.value"
+    - "fake_scorm.object.value"
     output_fields:
-      output_field: "xapi.object.value"
+      output_field: "fake_xapi.object.value"
   # Multiple input + Single output
   - input_fields:
-    - "scorm.author.firstname"
-    - "scorm.author.lastname"
-    - "scorm.author.age"
+    - "fake_scorm.author.firstname"
+    - "fake_scorm.author.lastname"
+    - "fake_scorm.author.age"
     output_fields:
-      output_field: "xapi.author.description"
+      output_field: "fake_xapi.author.description"
       transformation:
         custom:
           - "lambda fn, ln, age: f'My name is {fn if fn else None} {ln.upper() if ln else None}, I am {age if age else None} years old.' if fn or ln or age else None"
   # Multiple input + Multiple output
   - input_fields:
-    - "scorm.context.where"
-    - "scorm.context.why"
+    - "fake_scorm.context.where"
+    - "fake_scorm.context.why"
     output_fields:
       multiple: 
-        - output_field: "xapi.context.full_content" 
-        - output_field: "xapi.context.description"
+        - output_field: "fake_xapi.context.full_content" 
+        - output_field: "fake_xapi.context.description"
           transformation:
             custom:
               - "lambda where, why: f'{where} {why}' if where and why else ''" 
@@ -69,47 +69,47 @@ mappings:
 
 default_values:
   - description: ""
-    output_field: "xapi.default.dict"
+    output_field: "fake_xapi.default.dict"
     # Value tranformation
     transformation:
       value: {"a": "b", "empty": null, "list": ["a", "b", "c"]}
   - description: ""
-    output_field: "xapi.default.list"
+    output_field: "fake_xapi.default.list"
     # Value tranformation
     transformation:
       value: ["a", "b", "c"]
   - description: ""
-    output_field: "xapi.default.int"
+    output_field: "fake_xapi.default.int"
     # Value tranformation
     transformation:
       value: 0
   - description: ""
-    output_field: "xapi.default.float"
+    output_field: "fake_xapi.default.float"
     # Value tranformation
     transformation:
       value: 1.5
   - description: ""
-    output_field: "xapi.default.str"
+    output_field: "fake_xapi.default.str"
     # Value tranformation
     transformation:
       value: "string here"
   - description: ""
-    output_field: "xapi.default.boolean"
+    output_field: "fake_xapi.default.boolean"
     # Value tranformation
     transformation:
       value: false
   - description: ""
-    output_field: "xapi.default.empty"
+    output_field: "fake_xapi.default.empty"
     # Value tranformation
     transformation:
       value: null
   - description: ""
-    output_field: "xapi.context.full_content" 
+    output_field: "fake_xapi.context.full_content" 
     # Value tranformation
     transformation:
       value: "No full content in context provided"
   - description: ""
-    output_field: "xapi.actor.type"
+    output_field: "fake_xapi.actor.type"
     # Value tranformation
     transformation:
       value: "No actor type provided"
