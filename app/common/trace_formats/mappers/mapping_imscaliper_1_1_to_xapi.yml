@@ -1,0 +1,227 @@
+version: 1.0
+input_format: "IMS Caliper"
+output_format: "xAPI"
+mappings:
+  # ID
+  - input_fields:
+    - "data.0.id"
+    output_fields:
+        output_field: "id"
+        transformation:
+          custom:
+            - "lambda id: str(id).split(':')[-1] if id else None"
+
+
+  # Mapping actor information
+  - input_fields:
+    - "data.0.actor.id"
+    output_fields:
+      multiple:
+        - output_field: "actor.account.homePage"
+          transformation:
+            custom:
+              - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
+        - output_field: "actor.account.name"
+
+  - input_fields:
+    - "data.0.actor.type"
+    output_fields:
+      output_field: "actor.objectType"
+      transformation:
+        value: "Agent"
+
+
+  # Mapping action
+  - input_fields:
+    - dataVersion
+    - "data.0.action"
+    output_fields:
+      multiple:
+        - output_field: "verb.id"
+          transformation:
+            custom: 
+              - "lambda dataVersion, action: path_join(dataVersion, 'action', action.lower() if action else 'undefined')"
+        - output_field: "verb.display.en-US"
+          transformation:
+            custom: 
+              - "lambda dataVersion, action: action"
+
+
+  # Mapping object information
+  - input_fields:
+    - "data.0.object.id"
+    output_fields:
+      output_field: "object.id" # ou "context.contextActivities.other.id"
+
+  - input_fields:
+    - "data.0.object.type"
+    output_fields:
+      output_field: "object.objectType" # ou "context.contextActivities.other.objectType"
+      transformation:
+        value: 'Activity'
+
+  - input_fields:
+    - "data.0.object.name"
+    output_fields:
+      output_field: "object.definition.name.en-US" # ou "context.contextActivities.other.definition.name.en-US"
+
+  - input_fields:
+    - "data.0.object.description"
+    output_fields:
+      output_field: "object.definition.description.en-US"
+      transformation:
+        custom: 
+          - "lambda description: description if description else 'No description provided'"
+
+  - input_fields:
+    - "sensor"
+    - "data.0.object"
+    output_fields:
+      output_field: "object.definition.extensions"
+      transformation:
+        custom:
+          - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
+          - "lambda iri, content: {path_join(iri, 'imscaliper/object'): {key: value for key, value in content.items() if key not in ['id', 'name', 'description']}}"
+
+
+  # Mapping group/course information
+  - input_fields:
+    - "data.0.group.id"
+    output_fields:
+      output_field: "context.contextActivities.grouping.id"
+
+  - input_fields:
+    - "data.0.group.id"
+    - "data.0.group.type"
+    output_fields:
+      output_field: "context.contextActivities.grouping.objectType"
+      transformation:
+        custom: 
+          - "lambda id, type: 'Activity' if id else None"
+
+
+  # Handling Event times
+  - input_fields:
+    - "data.0.eventTime"
+    output_fields:
+      output_field: "timestamp"
+
+
+  # Handling EdApp
+  - input_fields:
+    - "data.0.edApp.id"
+    output_fields:
+      output_field: "context.platform"
+
+  - input_fields:
+    - "data.0.edApp"
+    output_fields:
+      transformation:
+        switch:
+          - condition: "lambda iri, ed_app: isinstance(ed_app, str)"
+            output_field: "context.platform"
+            transformation:
+              custom:
+                - "lambda iri, ed_app: ed_app"
+
+
+  # Mapping generated and result
+  - input_fields:
+    - "data.0.generated"
+    output_fields:
+      transformation:
+        switch:
+          - condition: "lambda generated: generated.get('type', '') == 'Result' if isinstance(generated, dict) else False"
+            multiple:
+              - output_field: "result.score.raw"
+                transformation:
+                  custom:
+                    - "lambda generated: generated.get('resultScore', None)"
+              - output_field: "result.score.max"
+                transformation:
+                  custom:
+                    - "lambda generated: generated.get('maxResultScore', None)"
+          - condition: "lambda generated: generated.get('type', '') == 'Score' if isinstance(generated, dict) else False"
+            multiple:
+              - output_field: "result.score.raw"
+                transformation:
+                  custom:
+                    - "lambda generated: generated.get('scoreGiven', None)"
+              - output_field: "result.score.max"
+                transformation:
+                  custom:
+                    - "lambda generated: generated.get('maxScore', None)"
+
+  - input_fields:
+    - "data.0.generated.duration"
+    output_fields:
+      output_field: "result.duration"
+
+  - input_fields:
+    - "data.0.generated.values"
+    output_fields:
+      output_field: "result.response"
+      transformation:
+        custom: 
+          - "lambda values: ', '.join(values) if values else None"
+
+  - input_fields:
+    - "sensor"
+    - "data.0.generated"
+    output_fields:
+      output_field: "result.extensions"
+      transformation:
+        custom:
+          - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
+          - "lambda iri, content: {path_join(iri, 'imscaliper/generated'): {key: value for key, value in content.items() if key not in ['id', 'resultScore', 'maxResultScore', 'scoreGiven', 'maxScore', 'duration', 'values']}}"
+
+
+  # Content extensions
+  # Event type
+  - input_fields:
+    - "sensor"
+    - "data.0.type"
+    - "data.0.actor"
+    - "data.0.group"
+    - "data.0.session"
+    - "data.0.edApp"
+    - "data.0.membership"
+    output_fields:
+      output_field: "context.extensions"
+      transformation:
+        custom:
+          # Type
+          - "lambda sensor, type, actor, group, session, edApp, membership: ({path_join(sensor, 'imscaliper/type'): type}, sensor, actor, group, session, edApp, membership)"
+          # Action
+          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, actor if isinstance(actor, dict) else {'iri': actor}, group, session, edApp, membership)"
+          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in actor.items() if key not in ['id']}, group, session, edApp, membership)"
+          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/actor'): actor}) or extensions, sensor, group, session, edApp, membership)"
+          # Group
+          - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, group if isinstance(group, dict) else {'iri': group}, session, edApp, membership)"
+          - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in group.items() if key not in ['id']}, session, edApp, membership)"
+          - "lambda extensions, sensor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/group'): group}) or extensions, sensor, session, edApp, membership)"
+          # Session
+          - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, session if isinstance(session, dict) else {'iri': session}, edApp, membership)"
+          - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, {key: value for key, value in session.items()}, edApp, membership)"
+          - "lambda extensions, sensor, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/session'): session}) or extensions, sensor, edApp, membership)"
+          # EdApp
+          - "lambda extensions, sensor, edApp, membership: (extensions, sensor, edApp if isinstance(edApp, dict) else {'iri': edApp}, membership)"
+          - "lambda extensions, sensor, edApp, membership: (extensions, sensor, {key: value for key, value in edApp.items() if key not in ['id']}, membership)"
+          - "lambda extensions, sensor, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/edApp'): edApp}) or extensions, sensor, membership)"
+          # Membership
+          - "lambda extensions, sensor, membership: (extensions, sensor, membership if isinstance(membership, dict) else {'iri': membership})"
+          - "lambda extensions, sensor, membership: (extensions, sensor, {key: value for key, value in membership.items()})"
+          - "lambda extensions, sensor, membership: extensions.update({path_join(sensor, 'imscaliper/membership'): membership}) or extensions"
+
+
+default:
+  - description: "Default xAPI version"
+    output_field: "version"
+    transformation:
+      value: "1.0.0"
+
+metadata:
+  author: "Inokufu"
+  date:
+    publication: "2024-04-24"
+    update: "2024-04-26"

@@ -25,6 +25,8 @@ class TraceFormatToXapiMappingEnum(TraceFormatEnum):
     SCORM_1_1 = "app/common/trace_formats/mappers/mapping_scorm_1_1_to_xapi.yml"
     SCORM_2004 = "app/common/trace_formats/mappers/mapping_scorm2004_to_xapi.yml"
     XAPI = ""
+    IMSCALIPER1_2 = "app/common/trace_formats/mappers/mapping_imscaliper_1_1_to_xapi.yml"
+    IMSCALIPER1_1 = "app/common/trace_formats/mappers/mapping_imscaliper_1_1_to_xapi.yml"
 
 
 class TraceFormatToScorm11MappingEnum(TraceFormatEnum):
