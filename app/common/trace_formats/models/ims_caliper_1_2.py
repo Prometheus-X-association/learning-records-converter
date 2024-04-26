@@ -612,7 +612,7 @@ class ResponseModel(EntityModel):
 
 class SessionModel(EntityModel):
     type: Literal[TypeTermEnum.SESSION] = Field(alias="type", examples=["Session"])
-    user: PersonModel = Field(default=None, alias="user")
+    user: PersonModel | str = Field(default=None, alias="user")
     client: SoftwareApplicationModel = Field(default=None, alias="client")
     started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
     ended_at_time: str = Field(default=None, alias="endedAtTime")  # Datetime
@@ -1291,30 +1291,88 @@ class EventModel(ExtendedTypeBaseModel):
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
     )
-    id: str = Field(alias="id", examples=["urn:uuid:cf6e0f3b-3511-4254-86c5-6936ff33f267"])
-    type: Literal[TypeTermEnum.EVENT] = Field(alias="type", examples=["NavigationEvent"])
-    profile: ProfileTermEnum = Field(default=None, alias="profile", examples=["GeneralProfile"])
-    actor: Union[AgentModel, str] = Field(alias="actor")
-    action: ActionTermEnum = Field(alias="action", examples=["NavigatedTo"])
-    object: Union[EntityModel, str] = Field(alias="object")
-    event_time: str = Field(alias="eventTime", examples=["2019-11-01T00:09:06.878Z"])  # Datetime
-
-    ed_app: Union[SoftwareApplicationModel, str] = Field(default=None, alias="edApp")
-    generated: Union[EntityModel, str] = Field(default=None, alias="generated")
-    target: Union[EntityModel, str] = Field(default=None, alias="target")
+    id: str = Field(
+        alias="id",
+        description="The emitting application MUST provision the Event with a UUID. A version 4 UUID SHOULD be generated. The UUID MUST be expressed as a URN using the form 'urn:uuid:<UUID>' per [RFC4122].",
+        examples=["urn:uuid:cf6e0f3b-3511-4254-86c5-6936ff33f267"],
+    )
+    type: Literal[TypeTermEnum.EVENT] = Field(
+        alias="type",
+        description="A string value corresponding to the Term defined for the Event in the external 1EdTech Caliper JSON-LD context document. For a generic Event set the type to the string value Event. If a subtype of Entity is created, set the type to the Term corresponding to the subtype utilized, e.g., NavigationEvent.",
+        examples=["NavigationEvent"],
+    )
+    profile: ProfileTermEnum = Field(
+        default=None,
+        alias="profile",
+        description="A string value corresponding to the Profile Term value defined for the Profile that governs the rules of interpretation for this Event. The range of Profile values is limited to the set of profiles described in this specification and any profile extension specifications extending this specification. Only one Profile Term value may be specified per Event. For a generic Event set the profile property value to the string term GeneralProfile.",
+        examples=["GeneralProfile"],
+    )
+    actor: Union[AgentModel, str] = Field(
+        alias="actor",
+        description="The Agent who initiated the Event, typically though not always a Person. The action value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
+    )
+    action: ActionTermEnum = Field(
+        alias="action",
+        description="The action or predicate that binds the actor or subject to the object. The action range is limited to the set of actions described in this specification or associated profiles and may be further constrained by the chosen Event type. Only one action Term may be specified per Event.",
+        examples=["NavigatedTo"],
+    )
+    object: Union[EntityModel, str] = Field(
+        alias="object",
+        description="The Entity that comprises the object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
+    )
+    event_time: str = Field(
+        alias="eventTime",
+        description="An ISO 8601 date and time value expressed with millisecond precision that indicates when the Event occurred. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
+        examples=["2019-11-01T00:09:06.878Z"],
+    )  # Datetime
+    ed_app: Union[SoftwareApplicationModel, str] = Field(
+        default=None,
+        alias="edApp",
+        description="A SoftwareApplication that constitutes the application context. The edApp value MUST be expressed either as an object or as a string corresponding to the edApp's IRI.",
+    )
+    generated: Union[EntityModel, str] = Field(
+        default=None,
+        alias="generated",
+        description="An Entity created or generated as a result of the interaction. The  generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI.",
+    )
+    target: Union[EntityModel, str] = Field(
+        default=None,
+        alias="target",
+        description="An Entity that represents a particular segment or location within the  object. The target value MUST be expressed either as an object or as a string corresponding to the target entity's IRI.",
+    )
     referrer: Union[EntityModel, str] = Field(
         default=None,
         alias="referrer",
+        description="An Entity that represents the referring context. A SoftwareApplication or DigitalResource will typically constitute the referring context. The referrer value MUST be expressed either as an object or as a string corresponding to the referrer's IRI.",
         examples=[
             "https://oxana.instructure.com/courses/565/discussion_topics/1072925?module_item_id=4635201"
         ],
     )
-    group: Union[OrganizationModel, CourseSectionModel, str] = Field(default=None, alias="group")
-    membership: Union[MembershipModel, str] = Field(default=None, alias="membership")
-
-    session: Union[SessionModel, str] = Field(default=None, alias="session")
-    federated_session: Union[LtiSessionModel, str] = Field(default=None, alias="federatedSession")
-    extensions: dict = Field(default=None, alias="extensions")
+    group: Union[OrganizationModel, CourseSectionModel, str] = Field(
+        default=None,
+        alias="group",
+        description="An Organization that represents the group context. The group value MUST be expressed either as an object or as a string corresponding to the group's IRI.",
+    )
+    membership: Union[MembershipModel, str] = Field(
+        default=None,
+        alias="membership",
+        description="The relationship between the action and the group in terms of roles assigned and current status. The membership value MUST be expressed either as an object or as a string corresponding to the membership entity's IRI.",
+    )
+    session: Union[SessionModel, str] = Field(
+        default=None,
+        alias="session",
+        description="The current user Session. The session value MUST be expressed either as an object or as a string corresponding to the session's IRI.",
+    )
+    federated_session: Union[LtiSessionModel, str] = Field(
+        default=None,
+        alias="federatedSession",
+        description="If the Event occurs within the context of an LTI platform launch, the tool's LtiSession MAY be referenced. The federatedSession value MUST be expressed either as an object or as a string corresponding to the federated session's IRI.",
+    )
+    extensions: dict = Field(
+        default=None,
+        alias="extensions",
+        description="A map of additional attributes not defined by the model MAY be specified for a more concise representation of the Event.",
+    )
 
 
 class AnnotationEventModel(EventModel):
