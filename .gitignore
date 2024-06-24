@@ -147,3 +147,6 @@ node_modules
 *secret.yml
 *secret.yaml
 *secret.ymal
+
+# JetBrains
+.idea
