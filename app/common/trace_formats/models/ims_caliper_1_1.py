@@ -149,38 +149,25 @@ class ProfileTermEnum(StrEnum):
     ANNOTATIONPROFILE = "AnnotationProfile"
     ASSESSMENTPROFILE = "AssessmentProfile"
     ASSIGNABLEPROFILE = "AssignableProfile"
+    BASICPROFILE = "BasicProfile"
     FORUMPROFILE = "ForumProfile"
     GRADINGPROFILE = "GradingProfile"
     MEDIAPROFILE = "MediaProfile"
     READINGPROFILE = "ReadingProfile"
     SESSIONPROFILE = "SessionProfile"
     TOOLUSEPROFILE = "ToolUseProfile"
-    BASICPROFILE = "BasicProfile"
 
 
 class TypeTermEnum(StrEnum):
-    EVENT = "Event"
-    ANNOTATIONEVENT = "AnnotationEvent"
-    ASSESSMENTEVENT = "AssessmentEvent"
-    ASSESSMENTITEMEVENT = "AssessmentItemEvent"
-    ASSIGNABLEEVENT = "AssignableEvent"
-    FORUMEVENT = "ForumEvent"
-    GRADEEVENT = "GradeEvent"
-    MEDIAEVENT = "MediaEvent"
-    MESSAGEEVENT = "MessageEvent"
-    NAVIGATIONEVENT = "NavigationEvent"
-    OUTCOMEEVENT = "OutcomeEvent"
-    READINGEVENT = "ReadingEvent"
-    SESSIONEVENT = "SessionEvent"
-    THREADEVENT = "ThreadEvent"
-    TOOLUSEEVENT = "ToolUseEvent"
-    VIEWEVENT = "ViewEvent"
-    ENTITY = "Entity"
     AGENT = "Agent"
     ANNOTATION = "Annotation"
+    ANNOTATIONEVENT = "AnnotationEvent"
     ASSESSMENT = "Assessment"
+    ASSESSMENTEVENT = "AssessmentEvent"
     ASSESSMENTITEM = "AssessmentItem"
+    ASSESSMENTITEMEVENT = "AssessmentItemEvent"
     ASSIGNABLEDIGITALRESOURCE = "AssignableDigitalResource"
+    ASSIGNABLEEVENT = "AssignableEvent"
     ATTEMPT = "Attempt"
     AUDIOOBJECT = "AudioObject"
     BOOKMARKANNOTATION = "BookmarkAnnotation"
@@ -190,41 +177,54 @@ class TypeTermEnum(StrEnum):
     DIGITALRESOURCE = "DigitalResource"
     DIGITALRESOURCECOLLECTION = "DigitalResourceCollection"
     DOCUMENT = "Document"
+    ENTITY = "Entity"
     EPUBCHAPTER = "EpubChapter"
     EPUBPART = "EpubPart"
     EPUBSUBCHAPTER = "EpubSubChapter"
     EPUBVOLUME = "EpubVolume"
+    EVENT = "Event"
     FILLINBLANKRESPONSE = "FillinBlankResponse"
     FORUM = "Forum"
+    FORUMEVENT = "ForumEvent"
     FRAME = "Frame"
+    GRADEEVENT = "GradeEvent"
     GROUP = "Group"
     HIGHLIGHTANNOTATION = "HighlightAnnotation"
     IMAGEOBJECT = "ImageObject"
     LEARNINGOBJECTIVE = "LearningObjective"
     LTISESSION = "LtiSession"
+    MEDIAEVENT = "MediaEvent"
     MEDIALOCATION = "MediaLocation"
     MEDIAOBJECT = "MediaObject"
     MEMBERSHIP = "Membership"
     MESSAGE = "Message"
+    MESSAGEEVENT = "MessageEvent"
     MULTIPLECHOICERESPONSE = "MultipleChoiceResponse"
     MULTIPLERESPONSERESPONSE = "MultipleResponseResponse"
+    NAVIGATIONEVENT = "NavigationEvent"
     ORGANIZATION = "Organization"
+    OUTCOMEEVENT = "OutcomeEvent"
     PAGE = "Page"
     PERSON = "Person"
     READING = "Reading"
+    READINGEVENT = "ReadingEvent"
     RESPONSE = "Response"
     RESULT = "Result"
     SCORE = "Score"
     SELECTTEXTRESPONSE = "SelectTextResponse"
     SESSION = "Session"
+    SESSIONEVENT = "SessionEvent"
     SHAREDANNOTATION = "SharedAnnotation"
     SOFTWAREAPPLICATION = "SoftwareApplication"
     TAGANNOTATION = "TagAnnotation"
+    TEXTPOSITIONSELECTOR = "TextPositionSelector"
     THREAD = "Thread"
+    THREADEVENT = "ThreadEvent"
+    TOOLUSEEVENT = "ToolUseEvent"
     TRUEFALSERESPONSE = "TrueFalseResponse"
     VIDEOOBJECT = "VideoObject"
+    VIEWEVENT = "ViewEvent"
     WEBPAGE = "WebPage"
-    TEXTPOSITIONSELECTOR = "TextPositionSelector"
 
 
 ##############################################################
@@ -326,7 +326,7 @@ class DigitalResourceModel(EntityModel):
         alias="version",
         description="A string value that designates the current form or version of the resource.",
     )
-    # DEPRICATED
+    # DEPRECATED
     object_type: str = Field(
         default=None,
         alias="objectType",
@@ -367,7 +367,7 @@ class AttemptModel(EntityModel):
         alias="assignee",
         description="The Person who initiated the Attempt. The assignee value MUST be expressed either as an object or as a string corresponding to the assignee's IRI.",
     )
-    assignable: Union[DigitalResourceModel, str] = Field(
+    assignable: Union[AssessmentModel, DigitalResourceModel, str] = Field(
         default=None,
         alias="assignable",
         description="The DigitalResource that constitutes the object of the assignment. The assignable value MUST be expressed either as an object or as a string corresponding to the assigned resource's IRI.",
@@ -880,7 +880,7 @@ class SharedAnnotationModel(AnnotationModel):
     type: Literal[TypeTermEnum.SHAREDANNOTATION] = Field(
         alias="type", examples=["SharedAnnotation"]
     )
-    with_agents: List[Union[AgentModel, PersonModel, str]] = Field(
+    with_agents: List[Union[AgentModel, str]] = Field(
         default=None,
         alias="withAgents",
         description="An ordered collection of one or more Agent entities, typically of type Person, with whom the annotated DigitalResource has been shared. Each array item MUST be expressed either as an object or as a string corresponding to the item's IRI.",
@@ -997,7 +997,7 @@ class AssessmentEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Started, Paused, Resumed, Restarted, Reset, and Submitted actions only.",
     )
-    object: Union[AssessmentModel, str] = Field(
+    object: Union[AssessmentModel, AttemptModel, str] = Field(
         alias="object",
         description="The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
@@ -1011,11 +1011,11 @@ class AssessmentEventModel(EventModel):
     def action_limited_values(cls, action):
         """ """
         list_accepted_values = [
-            ActionTermEnum.STARTED,
             ActionTermEnum.PAUSED,
-            ActionTermEnum.RESUMED,
-            ActionTermEnum.RESTARTED,
             ActionTermEnum.RESET,
+            ActionTermEnum.RESTARTED,
+            ActionTermEnum.RESUMED,
+            ActionTermEnum.STARTED,
             ActionTermEnum.SUBMITTED,
         ]
         if action not in list_accepted_values:
@@ -1054,9 +1054,9 @@ class AssessmentItemEventModel(EventModel):
     def action_limited_values(cls, action):
         """ """
         list_accepted_values = [
-            ActionTermEnum.STARTED,
-            ActionTermEnum.SKIPPED,
             ActionTermEnum.COMPLETED,
+            ActionTermEnum.SKIPPED,
+            ActionTermEnum.STARTED,
         ]
         if action not in list_accepted_values:
             raise ValueError(f"action has to be in this list: {list_accepted_values}")
@@ -1073,7 +1073,7 @@ class AssignableEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Activated, Deactivated, Started, Completed, Submitted, and Reviewed actions only.",
     )
-    object: Union[AssignableDigitalResourceModel, str] = Field(
+    object: Union[AssignableDigitalResourceModel, AttemptModel, str] = Field(
         alias="object",
         description="The AssignableDigitalResource that constitutes the  object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
@@ -1093,11 +1093,11 @@ class AssignableEventModel(EventModel):
         """ """
         list_accepted_values = [
             ActionTermEnum.ACTIVATED,
-            ActionTermEnum.DEACTIVATED,
-            ActionTermEnum.STARTED,
             ActionTermEnum.COMPLETED,
-            ActionTermEnum.SUBMITTED,
+            ActionTermEnum.DEACTIVATED,
             ActionTermEnum.REVIEWED,
+            ActionTermEnum.STARTED,
+            ActionTermEnum.SUBMITTED,
         ]
         if action not in list_accepted_values:
             raise ValueError(f"action has to be in this list: {list_accepted_values}")
@@ -1181,25 +1181,25 @@ class MediaEventModel(EventModel):
     def action_limited_values(cls, action):
         """ """
         list_accepted_values = [
-            ActionTermEnum.STARTED,
-            ActionTermEnum.ENDED,
-            ActionTermEnum.PAUSED,
-            ActionTermEnum.RESUMED,
-            ActionTermEnum.RESTARTED,
-            ActionTermEnum.FORWARDEDTO,
-            ActionTermEnum.JUMPEDTO,
             ActionTermEnum.CHANGEDRESOLUTION,
             ActionTermEnum.CHANGEDSIZE,
             ActionTermEnum.CHANGEDSPEED,
             ActionTermEnum.CHANGEDVOLUME,
-            ActionTermEnum.ENABLEDCLOSEDCAPTIONING,
+            ActionTermEnum.CLOSEDPOPOUT,
             ActionTermEnum.DISABLEDCLOSEDCAPTIONING,
+            ActionTermEnum.ENABLEDCLOSEDCAPTIONING,
+            ActionTermEnum.ENDED,
             ActionTermEnum.ENTEREDFULLSCREEN,
             ActionTermEnum.EXITEDFULLSCREEN,
+            ActionTermEnum.FORWARDEDTO,
+            ActionTermEnum.JUMPEDTO,
             ActionTermEnum.MUTED,
-            ActionTermEnum.UNMUTED,
             ActionTermEnum.OPENEDPOPOUT,
-            ActionTermEnum.CLOSEDPOPOUT,
+            ActionTermEnum.PAUSED,
+            ActionTermEnum.RESTARTED,
+            ActionTermEnum.RESUMED,
+            ActionTermEnum.STARTED,
+            ActionTermEnum.UNMUTED,
         ]
         if action not in list_accepted_values:
             raise ValueError(f"action has to be in this list: {list_accepted_values}")
@@ -1236,7 +1236,7 @@ class MessageEventModel(EventModel):
 
 class NavigationEventModel(EventModel):
     type: Literal[TypeTermEnum.NAVIGATIONEVENT] = Field(alias="type", examples=["NavigationEvent"])
-    actor: Union[PersonModel, str] = Field(
+    actor: Union[PersonModel, SoftwareApplicationModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
@@ -1244,7 +1244,7 @@ class NavigationEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: NavigatedTo.",
     )
-    object: Union[DigitalResourceModel, SoftwareApplicationModel, str] = Field(
+    object: Union[DigitalResourceModel, EntityModel, SoftwareApplicationModel, str] = Field(
         alias="object",
         description="The DigitalResource or SoftwareApplication to which the actor navigated. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
     )
@@ -1395,7 +1395,7 @@ class ThreadEventModel(EventModel):
     @field_validator("action")
     def action_limited_values(cls, action):
         """ """
-        list_accepted_values = [ActionTermEnum.MARKEDASREAD, ActionTermEnum.MARKEDASUNREAD]
+        list_accepted_values = [ActionTermEnum.CREATED, ActionTermEnum.MARKEDASREAD, ActionTermEnum.MARKEDASUNREAD]
         if action not in list_accepted_values:
             raise ValueError(f"action has to be in this list: {list_accepted_values}")
         return action
@@ -1462,8 +1462,8 @@ class ViewEventModel(EventModel):
 ################################################
 ##################### MAIN #####################
 ################################################
-class IMSCapilerModel(BaseModel):
-    data: List[EventModel] = Field(alias="data")
+class IMSCaliperModel(BaseModel):
+    data: List[Union[AnnotationEventModel, AssessmentEventModel, EventModel]] = Field(alias="data")
     data_version: str = Field(
         alias="dataVersion", examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"]
     )
@@ -1506,7 +1506,7 @@ class IMSCapilerModel(BaseModel):
                 new_value = []
                 for each_value in value:
                     if isinstance(each_value, dict) and (
-                        event_model := dict_discriminator.get(each_value.get("type", ""), None)
+                            event_model := dict_discriminator.get(each_value.get("type", ""), None)
                     ):
                         each_value = event_model(**each_value)
                     new_value.append(each_value)

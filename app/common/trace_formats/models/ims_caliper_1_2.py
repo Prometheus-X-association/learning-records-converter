@@ -2073,7 +2073,7 @@ class ViewEventModel(EventModel):
 ################################################
 ##################### MAIN #####################
 ################################################
-class IMSCapilerModel(BaseModel):
+class IMSCaliperModel(BaseModel):
     data: List[EventModel] = Field(alias="data")
     data_version: str = Field(
         alias="dataVersion", examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"]

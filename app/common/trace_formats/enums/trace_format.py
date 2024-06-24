@@ -2,8 +2,8 @@ from enum import Enum
 
 from trace_formats.models import (
     BaseXapiStatement,
-    IMSCapilerSensorModel1_1,
-    IMSCapilerSensorModel1_2,
+    IMSCaliperSensorModel1_1,
+    IMSCaliperSensorModel1_2,
     SCORM2004DataModel,
     SCORMDataModel,
 )
@@ -17,8 +17,8 @@ class TraceFormatModelEnum(TraceFormatEnum):
     SCORM_1_1 = SCORMDataModel
     SCORM_2004 = SCORM2004DataModel
     XAPI = BaseXapiStatement
-    IMSCALIPER1_2 = IMSCapilerSensorModel1_2
-    IMSCALIPER1_1 = IMSCapilerSensorModel1_1
+    IMSCALIPER1_2 = IMSCaliperSensorModel1_2
+    IMSCALIPER1_1 = IMSCaliperSensorModel1_1
 
 
 class TraceFormatToXapiMappingEnum(TraceFormatEnum):
