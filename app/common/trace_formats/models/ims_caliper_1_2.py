@@ -1395,7 +1395,7 @@ class AssessmentItemEventModel(EventModel):
         alias="object",
         description="The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
-    generated: Union[ResponseModel, str] = Field(
+    generated: Union[AttemptModel, ResponseModel, str] = Field(
         default=None,
         alias="generated",
         description="For a completed action a generated Response or a subtype. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI.",
