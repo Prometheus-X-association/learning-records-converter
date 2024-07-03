@@ -2,7 +2,7 @@ from typing import Any
 
 
 def is_empty(x: Any) -> bool:
-    """Check a element is empty
+    """Check if an element is empty
 
     Args:
         x (_type_): element to check

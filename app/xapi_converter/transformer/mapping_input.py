@@ -1,13 +1,14 @@
 from collections.abc import Iterable
 from inspect import signature
-from typing import Any
 
+from pydantic import BaseModel
+
+from app.xapi_converter.transformer import *
 from enums import (
     CustomTraceFormatModelEnum,
     CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,
 )
-from pydantic import BaseModel
 from trace_formats.enums import TraceFormatEnum
 from trace_formats.models.mapping_config import (
     BasicTransformationModel,
@@ -21,11 +22,9 @@ from trace_formats.models.mapping_config import (
 from utils.utils_dict import (
     convert_yaml_file_to_json,
     get_value_from_flat_key,
-    remove_empty_elements,
     set_value_from_flat_key,
 )
 
-from app.xapi_converter.transformer import *
 
 # TODO: Revoir l'architecture de la classe
 # TODO: Documenter et test unitaire du code

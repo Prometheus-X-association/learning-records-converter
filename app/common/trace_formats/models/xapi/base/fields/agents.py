@@ -10,7 +10,7 @@ except ImportError:
 
 from pydantic.v1 import StrictStr
 
-from ..config import BaseModelWithConfig
+from trace_formats.models.xapi.config import BaseModelWithConfig
 from .common import IRI
 from .ifi import BaseXapiAccountIFI, BaseXapiMboxIFI, BaseXapiMboxSha1SumIFI, BaseXapiOpenIdIFI
 

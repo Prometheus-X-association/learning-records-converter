@@ -6,14 +6,14 @@ from uuid import UUID
 
 from pydantic.v1 import constr, root_validator
 
+from .fields.agents import BaseXapiAgent
+from .fields.attachments import BaseXapiAttachment
+from .fields.contexts import BaseXapiContext
+from .fields.groups import BaseXapiGroup
+from .fields.objects import BaseXapiObject
+from .fields.results import BaseXapiResult
+from .fields.verbs import BaseXapiVerb
 from ..config import BaseModelWithConfig
-from .agents import BaseXapiAgent
-from .attachments import BaseXapiAttachment
-from .contexts import BaseXapiContext
-from .groups import BaseXapiGroup
-from .objects import BaseXapiObject
-from .results import BaseXapiResult
-from .verbs import BaseXapiVerb
 
 
 class BaseXapiStatement(BaseModelWithConfig):

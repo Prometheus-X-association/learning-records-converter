@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic.v1 import StrictStr
 
-from ..config import BaseModelWithConfig
+from trace_formats.models.xapi.config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .common import IRI, LanguageTag
 from .groups import BaseXapiGroup

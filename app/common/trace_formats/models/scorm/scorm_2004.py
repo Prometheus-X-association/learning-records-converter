@@ -1,29 +1,29 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
 
 # Enums for SCORM 2004
-class Credit(Enum):
+class Credit(StrEnum):
     CREDIT = "credit"
     NO_CREDIT = "no-credit"
 
 
-class CompletionStatus(Enum):
+class CompletionStatus(StrEnum):
     COMPLETED = "completed"
     INCOMPLETE = "incomplete"
     NOT_ATTEMPTED = "not attempted"
     UNKNOWN = "unknown"
 
 
-class Entry(Enum):
+class Entry(StrEnum):
     AB_INITIO = "ab-initio"
     RESUME = "resume"
     EMPTY = ""
 
 
-class ExitMode(Enum):
+class ExitMode(StrEnum):
     TIME_OUT = "timeout"
     SUSPEND = "suspend"
     LOGOUT = "logout"
@@ -31,20 +31,20 @@ class ExitMode(Enum):
     EMPTY = ""
 
 
-class InteractionResult(Enum):
+class InteractionResult(StrEnum):
     CORRECT = "correct"
     INCORRECT = "incorrect"
     UNANTICIPATED = "unanticipated"
     NEUTRAL = "neutral"
 
 
-class Mode(Enum):
+class Mode(StrEnum):
     BROWSE = "browse"
     NORMAL = "normal"
     REVIEW = "review"
 
 
-class InteractionType(Enum):
+class InteractionType(StrEnum):
     TRUE_FALSE = "true-false"
     CHOICE = "choice"
     FILL_IN = "fill-in"
@@ -57,20 +57,20 @@ class InteractionType(Enum):
     OTHER = "other"
 
 
-class LearnerAudioCaptioning(Enum):
+class LearnerAudioCaptioning(StrEnum):
     MINUS_ONE = "-1"
     ZERO = "0"
     ONE = "1"
 
 
-class TimeLimitAction(Enum):
+class TimeLimitAction(StrEnum):
     EXIT_MESSAGE = "exit,message"
     CONTINUE_MESSAGE = "continue,message"
     EXIT_NOMESSAGE = "exit,no message"
     CONTINUE_NOMESSAGE = "continue,no message"
 
 
-class SuccessStatus(Enum):
+class SuccessStatus(StrEnum):
     FAILED = "failed"
     PASSED = "passed"
     UNKNOWN = "unknown"

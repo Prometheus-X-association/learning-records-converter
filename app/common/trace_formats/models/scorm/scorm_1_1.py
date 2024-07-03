@@ -1,16 +1,16 @@
-from enum import Enum
+from enum import StrEnum
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 
 # Enums for SCORM 1.1
-class Credit(Enum):
+class Credit(StrEnum):
     CREDIT = "credit"
     NO_CREDIT = "no-credit"
 
 
-class LessonStatus(Enum):
+class LessonStatus(StrEnum):
     PASSED = "passed"
     COMPLETED = "completed"
     FAILED = "failed"
@@ -19,25 +19,25 @@ class LessonStatus(Enum):
     NOT_ATTEMPTED = "not attempted"
 
 
-class Entry(Enum):
+class Entry(StrEnum):
     AB_INITIO = "ab-initio"
     RESUME = ""
 
 
-class LessonMode(Enum):
+class LessonMode(StrEnum):
     BROWSE = "browse"
     NORMAL = "normal"
     REVIEW = "review"
 
 
-class ExitMode(Enum):
+class ExitMode(StrEnum):
     TIME_OUT = "time-out"
     SUSPEND = "suspend"
     LOGOUT = "logout"
     EMPTY = ""
 
 
-class InteractionType(Enum):
+class InteractionType(StrEnum):
     TRUE_FALSE = "true-false"
     CHOICE = "choice"
     FILL_IN = "fill-in"

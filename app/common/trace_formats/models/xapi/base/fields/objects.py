@@ -11,7 +11,7 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from ..config import BaseModelWithConfig
+from trace_formats.models.xapi.config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .attachments import BaseXapiAttachment
 from .contexts import BaseXapiContext

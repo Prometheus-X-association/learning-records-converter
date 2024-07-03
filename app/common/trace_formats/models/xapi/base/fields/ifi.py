@@ -2,7 +2,7 @@
 
 from pydantic.v1 import AnyUrl, StrictStr, constr
 
-from ..config import BaseModelWithConfig
+from trace_formats.models.xapi.config import BaseModelWithConfig
 from .common import IRI, MailtoEmail
 
 

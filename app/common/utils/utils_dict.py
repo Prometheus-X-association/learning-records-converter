@@ -2,11 +2,14 @@ import re
 from typing import Any, Dict, List, Tuple, Union, overload
 
 import yaml
-from utils.utils_general import is_empty
+
+from .utils_general import is_empty
 
 
 def get_flat_from_nested(
-    nested_content: dict, flat_non_nested_list: bool = True, flat_nested_list: bool = True
+    nested_content: dict,
+    flat_non_nested_list: bool = True,
+    flat_nested_list: bool = True
 ) -> dict:
     """Generate flatten json from a nested json
 
@@ -32,7 +35,7 @@ def get_flat_from_nested(
         # If dict type
         if isinstance(content, dict) and content:
             for key in content:
-                key_encoded = key.replace(".", "\.")
+                key_encoded = key.replace(".", r"\.")
                 recursive_flat_from_nested(content[key], field_name + key_encoded + ".")
 
         # If list type
@@ -179,7 +182,7 @@ def set_value_from_flat_key(
     # If there is at least one key to navigate
     if not is_empty(flat_key) and len(list_key) > 0:
         first_key = list_key.pop(0)
-        first_key = first_key.replace("\.", ".")
+        first_key = first_key.replace(r"\.", ".")
 
         # If not overwrite but found element is not list, dict or None, return
         if (

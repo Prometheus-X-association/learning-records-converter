@@ -8,54 +8,80 @@ from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
 
-from .base import ExtendedTypeBaseModel
-
-from .ims_caliper_1_1 import (
-    StatusTermEnum,
-    RoleTermEnum,
-)
+from ..base import ExtendedTypeBaseModel
 
 
 #############################################################
 ##################### ENUMS/TERMS/TYPES #####################
 #############################################################
-class LtiMessageTypesEnum(StrEnum):
-    LTIDEEPLINKINGREQUEST = "LtiDeepLinkingRequest"
-    LTIRESOURCELINKREQUEST = "LtiResourceLinkRequest"
+class StatusTermEnum(StrEnum):
+    ACTIVE = "Active"
+    INACTIVE = "Inactive"
 
 
-class MetricEnum(StrEnum):
-    ASSESSMENTSPASSED = "AssessmentsPassed"
-    ASSESSMENTSSUBMITTED = "AssessmentsSubmitted"
-    MINUTESONTASK = "MinutesOnTask"
-    SKILLSMASTERED = "SkillsMastered"
-    STANDARDSMASTERED = "StandardsMastered"
-    UNITSCOMPLETED = "UnitsCompleted"
-    UNITSPASSED = "UnitsPassed"
-    WORDSREAD = "WordsRead"
-
-
-class SystemIdentifierTypeEnum(StrEnum):
-    ACCOUNTUSERNAME = "AccountUserName"
-    EMAILADDRESS = "EmailAddress"
-    LISSOURCEDID = "LisSourcedId"
-    LTICONTEXTID = "LtiContextId"
-    LTIDEPLOYMENTID = "LtiDeploymentId"
-    LTIPLATFORMID = "LtiPlatformId"
-    LTITOOLID = "LtiToolId"
-    LTIUSERID = "LtiUserId"
-    ONEROSTERSOURCEDID = "OneRosterSourcedId"
-    OTHER = "Other"
-    SISSOURCEDID = "SisSourcedId"
-    SYSTEMID = "SystemId"
+class RoleTermEnum(StrEnum):
+    ADMINISTRATOR = "Administrator"
+    ADMINISTRATOR_ADMINISTRATOR = "Administrator#Administrator"
+    ADMINISTRATOR_DEVELOPER = "Administrator#Developer"
+    ADMINISTRATOR_EXTERNALDEVELOPER = "Administrator#ExternalDeveloper"
+    ADMINISTRATOR_EXTERNALSUPPORT = "Administrator#ExternalSupport"
+    ADMINISTRATOR_EXTERNALSYSTEMADMINISTRATOR = "Administrator#ExternalSystemAdministrator"
+    ADMINISTRATOR_SUPPORT = "Administrator#Support"
+    ADMINISTRATOR_SYSTEMADMINISTRATOR = "Administrator#SystemAdministrator"
+    CONTENTDEVELOPER = "ContentDeveloper"
+    CONTENTDEVELOPER_CONTENTDEVELOPER = "ContentDeveloper#ContentDeveloper"
+    CONTENTDEVELOPER_CONTENTEXPERT = "ContentDeveloper#ContentExpert"
+    CONTENTDEVELOPER_EXTERNALCONTENTEXPERT = "ContentDeveloper#ExternalContentExpert"
+    CONTENTDEVELOPER_LIBRARIAN = "ContentDeveloper#Librarian"
+    INSTRUCTOR = "Instructor"
+    INSTRUCTOR_EXTERNALINSTRUCTOR = "Instructor#ExternalInstructor"
+    INSTRUCTOR_GRADER = "Instructor#Grader"
+    INSTRUCTOR_GUESTINSTRUCTOR = "Instructor#GuestInstructor"
+    INSTRUCTOR_INSTRUCTOR = "Instructor#Instructor"
+    INSTRUCTOR_LECTURER = "Instructor#Lecturer"
+    INSTRUCTOR_PRIMARYINSTRUCTOR = "Instructor#PrimaryInstructor"
+    INSTRUCTOR_SECONDARYINSTRUCTOR = "Instructor#SecondaryInstructor"
+    INSTRUCTOR_TEACHINGASSISTANT = "Instructor#TeachingAssistant"
+    INSTRUCTOR_TEACHINGASSISTANTGROUP = "Instructor#TeachingAssistantGroup"
+    INSTRUCTOR_TEACHINGASSISTANTOFFERING = "Instructor#TeachingAssistantOffering"
+    INSTRUCTOR_TEACHINGASSISTANTSECTION = "Instructor#TeachingAssistantSection"
+    INSTRUCTOR_TEACHINGASSISTANTTEMPLATE = "Instructor#TeachingAssistantTemplate"
+    LEARNER = "Learner"
+    LEARNER_EXTERNALLEARNER = "Learner#ExternalLearner"
+    LEARNER_GUESTLEARNER = "Learner#GuestLearner"
+    LEARNER_LEARNER = "Learner#Learner"
+    LEARNER_NONCREDITLEARNER = "Learner#NonCreditLearner"
+    MANAGER = "Manager"
+    MANAGER_AREAMANAGER = "Manager#AreaManager"
+    MANAGER_COURSECOORDINATOR = "Manager#CourseCoordinator"
+    MANAGER_EXTERNALOBSERVER = "Manager#ExternalObserver"
+    MANAGER_MANAGER = "Manager#Manager"
+    MANAGER_OBSERVER = "Manager#Observer"
+    MEMBER = "Member"
+    MEMBER_MEMBER = "Member#Member"
+    MENTOR = "Mentor"
+    MENTOR_ADVISOR = "Mentor#Advisor"
+    MENTOR_EXTERNALADVISOR = "Mentor#ExternalAdvisor"
+    MENTOR_EXTERNALAUDITOR = "Mentor#ExternalAuditor"
+    MENTOR_EXTERNALLEARNINGFACILITATOR = "Mentor#ExternalLearningFacilitator"
+    MENTOR_EXTERNALMENTOR = "Mentor#ExternalMentor"
+    MENTOR_EXTERNALREVIEWER = "Mentor#ExternalReviewer"
+    MENTOR_EXTERNALTUTOR = "Mentor#ExternalTutor"
+    MENTOR_LEARNINGFACILITATOR = "Mentor#LearningFacilitator"
+    MENTOR_MENTOR = "Mentor#Mentor"
+    MENTOR_REVIEWER = "Mentor#Reviewer"
+    MENTOR_TUTOR = "Mentor#Tutor"
+    OFFICER = "Officer"
+    OFFICER_CHAIR = "Officer#Chair"
+    OFFICER_SECRETARY = "Officer#Secretary"
+    OFFICER_TREASURER = "Officer#Treasurer"
+    OFFICER_VICECHAIR = "Officer#Vice-Chair"
 
 
 class ActionTermEnum(StrEnum):
     ABANDONED = "Abandoned"
-    ACCEPTED = "Accepted"
     ACTIVATED = "Activated"
     ADDED = "Added"
-    ARCHIVED = "Archived"
     ATTACHED = "Attached"
     BOOKMARKED = "Bookmarked"
     CHANGEDRESOLUTION = "ChangedResolution"
@@ -66,15 +92,12 @@ class ActionTermEnum(StrEnum):
     CLOSEDPOPOUT = "ClosedPopout"
     COMMENTED = "Commented"
     COMPLETED = "Completed"
-    COPIED = "Copied"
     CREATED = "Created"
     DEACTIVATED = "Deactivated"
-    DECLINED = "Declined"
     DELETED = "Deleted"
     DESCRIBED = "Described"
     DISABLEDCLOSEDCAPTIONING = "DisabledClosedCaptioning"
     DISLIKED = "Disliked"
-    DOWNLOADED = "Downloaded"
     ENABLEDCLOSEDCAPTIONING = "EnabledClosedCaptioning"
     ENDED = "Ended"
     ENTEREDFULLSCREEN = "EnteredFullScreen"
@@ -85,7 +108,6 @@ class ActionTermEnum(StrEnum):
     HIGHLIGHTED = "Highlighted"
     IDENTIFIED = "Identified"
     JUMPEDTO = "JumpedTo"
-    LAUNCHED = "Launched"
     LIKED = "Liked"
     LINKED = "Linked"
     LOGGEDIN = "LoggedIn"
@@ -96,27 +118,19 @@ class ActionTermEnum(StrEnum):
     MUTED = "Muted"
     NAVIGATEDTO = "NavigatedTo"
     OPENEDPOPOUT = "OpenedPopout"
-    OPTEDIN = "OptedIn"
-    OPTEDOUT = "OptedOut"
     PAUSED = "Paused"
     POSTED = "Posted"
-    PRINTED = "Printed"
-    PUBLISHED = "Published"
     QUESTIONED = "Questioned"
     RANKED = "Ranked"
     RECOMMENDED = "Recommended"
     REMOVED = "Removed"
     RESET = "Reset"
     RESTARTED = "Restarted"
-    RESTORED = "Restored"
     RESUMED = "Resumed"
     RETRIEVED = "Retrieved"
-    RETURNED = "Returned"
     REVIEWED = "Reviewed"
     REWOUND = "Rewound"
-    SAVED = "Saved"
     SEARCHED = "Searched"
-    SENT = "Sent"
     SHARED = "Shared"
     SHOWED = "Showed"
     SKIPPED = "Skipped"
@@ -126,9 +140,7 @@ class ActionTermEnum(StrEnum):
     TAGGED = "Tagged"
     TIMEDOUT = "TimedOut"
     UNMUTED = "Unmuted"
-    UNPUBLISHED = "Unpublished"
     UNSUBSCRIBED = "Unsubscribed"
-    UPLOADED = "Uploaded"
     USED = "Used"
     VIEWED = "Viewed"
 
@@ -137,24 +149,17 @@ class ProfileTermEnum(StrEnum):
     ANNOTATIONPROFILE = "AnnotationProfile"
     ASSESSMENTPROFILE = "AssessmentProfile"
     ASSIGNABLEPROFILE = "AssignableProfile"
-    FEEDBACKPROFILE = "FeedbackProfile"
+    BASICPROFILE = "BasicProfile"
     FORUMPROFILE = "ForumProfile"
-    GENERALPROFILE = "GeneralProfile"
     GRADINGPROFILE = "GradingProfile"
     MEDIAPROFILE = "MediaProfile"
     READINGPROFILE = "ReadingProfile"
-    RESOURCEMANAGEMENTPROFILE = "ResourceManagementProfile"
-    SEARCHPROFILE = "SearchProfile"
     SESSIONPROFILE = "SessionProfile"
-    SURVEYPROFILE = "SurveyProfile"
-    TOOLLAUNCHPROFILE = "ToolLaunchProfile"
     TOOLUSEPROFILE = "ToolUseProfile"
 
 
 class TypeTermEnum(StrEnum):
     AGENT = "Agent"
-    AGGREGATEMEASURE = "AggregateMeasure"
-    AGGREGATEMEASURECOLLECTION = "AggregateMeasureCollection"
     ANNOTATION = "Annotation"
     ANNOTATIONEVENT = "AnnotationEvent"
     ASSESSMENT = "Assessment"
@@ -167,18 +172,17 @@ class TypeTermEnum(StrEnum):
     AUDIOOBJECT = "AudioObject"
     BOOKMARKANNOTATION = "BookmarkAnnotation"
     CHAPTER = "Chapter"
-    COLLECTION = "Collection"
-    COMMENT = "Comment"
     COURSEOFFERING = "CourseOffering"
     COURSESECTION = "CourseSection"
-    DATETIMEQUESTION = "DateTimeQuestion"
-    DATETIMERESPONSE = "DateTimeResponse"
     DIGITALRESOURCE = "DigitalResource"
     DIGITALRESOURCECOLLECTION = "DigitalResourceCollection"
     DOCUMENT = "Document"
     ENTITY = "Entity"
+    EPUBCHAPTER = "EpubChapter"
+    EPUBPART = "EpubPart"
+    EPUBSUBCHAPTER = "EpubSubChapter"
+    EPUBVOLUME = "EpubVolume"
     EVENT = "Event"
-    FEEDBACKEVENT = "FeedbackEvent"
     FILLINBLANKRESPONSE = "FillinBlankResponse"
     FORUM = "Forum"
     FORUMEVENT = "ForumEvent"
@@ -188,9 +192,6 @@ class TypeTermEnum(StrEnum):
     HIGHLIGHTANNOTATION = "HighlightAnnotation"
     IMAGEOBJECT = "ImageObject"
     LEARNINGOBJECTIVE = "LearningObjective"
-    LIKERTSCALE = "LikertScale"
-    LINK = "Link"
-    LTILINK = "LtiLink"
     LTISESSION = "LtiSession"
     MEDIAEVENT = "MediaEvent"
     MEDIALOCATION = "MediaLocation"
@@ -200,47 +201,25 @@ class TypeTermEnum(StrEnum):
     MESSAGEEVENT = "MessageEvent"
     MULTIPLECHOICERESPONSE = "MultipleChoiceResponse"
     MULTIPLERESPONSERESPONSE = "MultipleResponseResponse"
-    MULTISELECTQUESTION = "MultiselectQuestion"
-    MULTISELECTRESPONSE = "MultiselectResponse"
-    MULTISELECTSCALE = "MultiselectScale"
     NAVIGATIONEVENT = "NavigationEvent"
-    NUMERICSCALE = "NumericScale"
-    OPENENDEDQUESTION = "OpenEndedQuestion"
-    OPENENDEDRESPONSE = "OpenEndedResponse"
     ORGANIZATION = "Organization"
+    OUTCOMEEVENT = "OutcomeEvent"
     PAGE = "Page"
     PERSON = "Person"
-    QUERY = "Query"
-    QUESTION = "Question"
-    QUESTIONNAIRE = "Questionnaire"
-    QUESTIONNAIREEVENT = "QuestionnaireEvent"
-    QUESTIONNAIREITEM = "QuestionnaireItem"
-    QUESTIONNAIREITEMEVENT = "QuestionnaireItemEvent"
-    RATING = "Rating"
-    RATINGSCALEQUESTION = "RatingScaleQuestion"
-    RATINGSCALERESPONSE = "RatingScaleResponse"
-    RESOURCEMANAGEMENTEVENT = "ResourceManagementEvent"
+    READING = "Reading"
+    READINGEVENT = "ReadingEvent"
     RESPONSE = "Response"
     RESULT = "Result"
-    SCALE = "Scale"
     SCORE = "Score"
-    SEARCHEVENT = "SearchEvent"
-    SEARCHRESPONSE = "SearchResponse"
     SELECTTEXTRESPONSE = "SelectTextResponse"
     SESSION = "Session"
     SESSIONEVENT = "SessionEvent"
     SHAREDANNOTATION = "SharedAnnotation"
     SOFTWAREAPPLICATION = "SoftwareApplication"
-    SURVEY = "Survey"
-    SURVEYEVENT = "SurveyEvent"
-    SURVEYINVITATION = "SurveyInvitation"
-    SURVEYINVITATIONEVENT = "SurveyInvitationEvent"
-    SYSTEMIDENTIFIER = "SystemIdentifier"
     TAGANNOTATION = "TagAnnotation"
     TEXTPOSITIONSELECTOR = "TextPositionSelector"
     THREAD = "Thread"
     THREADEVENT = "ThreadEvent"
-    TOOLLAUNCHEVENT = "ToolLaunchEvent"
     TOOLUSEEVENT = "ToolUseEvent"
     TRUEFALSERESPONSE = "TrueFalseResponse"
     VIDEOOBJECT = "VideoObject"
@@ -264,24 +243,14 @@ class TextPositionSelectorModel(ExtendedTypeBaseModel):
     )
 
 
-class SystemIdentifierModel(ExtendedTypeBaseModel):
-    type: Literal[TypeTermEnum.SYSTEMIDENTIFIER] = Field(
-        alias="type", examples=[TypeTermEnum.SYSTEMIDENTIFIER.value]
-    )
-    identifier_type: SystemIdentifierTypeEnum = Field(alias="identifierType")
-    identifier: str = Field(alias="identifier")
-    source: Union[SoftwareApplicationModel, str] = Field(default=None, alias="source")
-    extensions: dict = Field(default=None, alias="extensions")
-
-
 ####################################################
 ##################### ENTITIES #####################
 ####################################################
 class EntityModel(ExtendedTypeBaseModel):
-    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p2"] = Field(
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p1"] = Field(
         default=None,
         alias="@context",
-        examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
+        examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
     )
     id: str = Field(alias="id", examples=["urn:instructure:canvas:user:21070000000000001"])
     type: Literal[TypeTermEnum.ENTITY] = Field(alias="type", examples=[TypeTermEnum.PERSON.value])
@@ -289,9 +258,6 @@ class EntityModel(ExtendedTypeBaseModel):
     description: str = Field(default=None, alias="description")
     date_created: str = Field(default=None, alias="dateCreated")  # Datetime
     date_modified: str = Field(default=None, alias="dateModified")  # Datetime
-    other_identifiers: List[Union[SystemIdentifierModel, str]] = Field(
-        default=None, alias="otherIdentifiers"
-    )
     extensions: dict = Field(default=None, alias="extensions")
 
 
@@ -307,27 +273,12 @@ class SoftwareApplicationModel(AgentModel):
     type: Literal[TypeTermEnum.SOFTWAREAPPLICATION] = Field(
         alias="type", examples=[TypeTermEnum.SOFTWAREAPPLICATION.value]
     )
-    host: str = Field(default=None, alias="host")
-    ip_address: str = Field(default=None, alias="ipAddress")
-    user_agent: str = Field(default=None, alias="userAgent")
-    version: str = Field(default=None, alias="version")
 
 
 class LearningObjectiveModel(EntityModel):
     type: Literal[TypeTermEnum.LEARNINGOBJECTIVE] = Field(
         alias="type", examples=[TypeTermEnum.LEARNINGOBJECTIVE.value]
     )
-
-
-class AggregateMeasureModel(EntityModel):
-    type: Literal[TypeTermEnum.AGGREGATEMEASURE] = Field(
-        alias="type", examples=[TypeTermEnum.AGGREGATEMEASURE.value]
-    )
-    metric_value: float = Field(alias="metricValue")
-    max_metric_value: float = Field(default=None, alias="maxMetricValue")
-    metric: MetricEnum = Field(alias="metric")
-    started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
-    ended_at_time: str = Field(default=None, alias="endedAtTime")  # Datetime
 
 
 class OrganizationModel(AgentModel):
@@ -339,12 +290,8 @@ class OrganizationModel(AgentModel):
 
 
 class DigitalResourceModel(EntityModel):
-    type: Literal[TypeTermEnum.DIGITALRESOURCE] = Field(alias="type", examples=[TypeTermEnum.DIGITALRESOURCE.value])
-    storage_name: str = Field(
-        default=None,
-        alias="storageName",
-        description="The name of resource when stored in a file system.",
-    )
+    type: Literal[TypeTermEnum.DIGITALRESOURCE] = Field(alias="type",
+                                                        examples=[TypeTermEnum.DIGITALRESOURCE.DIGITALRESOURCE])
     creators: List[Union[AgentModel, str]] = Field(
         default=None,
         alias="creators",
@@ -380,15 +327,24 @@ class DigitalResourceModel(EntityModel):
         alias="version",
         description="A string value that designates the current form or version of the resource.",
     )
-
-
-class QuestionModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.QUESTION] = Field(alias="type", examples=[TypeTermEnum.QUESTION.value])
-    question_posed: str = Field(
+    # DEPRECATED
+    object_type: str = Field(
         default=None,
-        alias="questionPosed",
-        description="A string value comprising the question posed.",
+        alias="objectType",
+        description="A string value that designates the DigitalResource type.",
+        json_schema_extra={"deprecated": True},
     )
+    aligned_learning_objective: List[LearningObjectiveModel] = Field(
+        default=None,
+        alias="alignedLearningObjective",
+        description="An ordered collection of one or more LearningObjective entities that describe what a learner is expected to comprehend or accomplish after engaging with a DigitalResource. alignedLearningObjective has been DEPRECATED and replaced by learningObjectives.",
+        json_schema_extra={"deprecated": True},
+    )
+
+
+# DeprecationWarning
+class ReadingModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.READING] = Field(alias="type", examples=[TypeTermEnum.READING.value])
 
 
 class AnnotationModel(EntityModel):
@@ -412,10 +368,15 @@ class AttemptModel(EntityModel):
         alias="assignee",
         description="The Person who initiated the Attempt. The assignee value MUST be expressed either as an object or as a string corresponding to the assignee's IRI.",
     )
-    assignable: Union[DigitalResourceModel, str] = Field(
+    assignable: Union[AssessmentModel, DigitalResourceModel, str] = Field(
         default=None,
         alias="assignable",
         description="The DigitalResource that constitutes the object of the assignment. The assignable value MUST be expressed either as an object or as a string corresponding to the assigned resource's IRI.",
+    )
+    is_part_of: Union[AttemptModel, str] = Field(
+        default=None,
+        alias="isPartOf",
+        description="The parent Attempt, if one exists. The isPartOf value MUST be expressed either as an object or as a string corresponding to the associated attempt’s IRI.",
     )
     count: int = Field(
         default=None,
@@ -437,220 +398,21 @@ class AttemptModel(EntityModel):
         alias="duration",
         description="A time interval that represents the time taken to complete the Attempt. If a duration is specified the value MUST conform to the ISO 8601 duration format.",
     )  # Duration
-
-
-class CollectionModel(EntityModel):
-    type: Literal[TypeTermEnum.COLLECTION] = Field(alias="type", examples=[TypeTermEnum.COLLECTION.value])
-    items: List[Union[EntityModel, str]] = Field(
+    # DEPRECATED
+    actor: PersonModel = Field(
         default=None,
-        alias="items",
-        description="An ordered collection of entities. Each array item MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
+        alias="actor",
+        description="The Person who initiated the Attempt. actor has been DEPRECATED and replaced by assignee.",
+        json_schema_extra={"deprecated": True},
     )
-
-
-class CommentModel(EntityModel):
-    type: Literal[TypeTermEnum.COMMENT] = Field(alias="type", examples=[TypeTermEnum.COMMENT.value])
-    commenter: Union[PersonModel, str] = Field(
-        default=None,
-        alias="commenter",
-        description="The Person who provided the comment. The commenter value MUST be expressed either as an object or as a string corresponding to the commenter’s IRI.",
-    )
-    commented_on: Union[EntityModel, str] = Field(
-        default=None,
-        alias="commentedOn",
-        description="The Entity which received the comment. The commentedOn value MUST be expressed either as an object or as a string corresponding to the IRI of the resource that was commented on.",
-    )
-    value: str = Field(
-        default=None,
-        alias="value",
-        description="A string value representing the comment's textual value.",
-    )
-
-
-class LinkModel(EntityModel):
-    type: Literal[TypeTermEnum.LINK] = Field(alias="type", examples=[TypeTermEnum.LINK.value])
 
 
 class MembershipModel(EntityModel):
     type: Literal[TypeTermEnum.MEMBERSHIP] = Field(alias="type", examples=[TypeTermEnum.MEMBERSHIP.value])
     organization: Union[OrganizationModel, str] = Field(default=None, alias="organization")
     member: Union[PersonModel, str] = Field(default=None, alias="member")
-    roles: List[RoleTermEnum] = Field(default=None, alias="roles", examples=[["Learner"]])
+    roles: List[RoleTermEnum] = Field(default=None, alias="roles", examples=[[RoleTermEnum.LEARNER.value]])
     status: StatusTermEnum = Field(default=None, alias="status")
-
-
-class QueryModel(EntityModel):
-    type: Literal[TypeTermEnum.QUERY] = Field(alias="type", examples=[TypeTermEnum.QUERY.value])
-    creator: Union[PersonModel, str] = Field(
-        default=None,
-        alias="creator",
-        description="The Person who devised the search terms comprising this Query. The creator value MUST be expressed either as an object or as a string corresponding to the creator's IRI.",
-    )
-    search_target: Union[EntityModel, str] = Field(
-        default=None,
-        alias="searchTarget",
-        description="The Entity, typically a DigitalResource or SoftwareApplication, that is the target of the Query. The resourceSearched value MUST be expressed either as an object or as a string corresponding to the resources's IRI.",
-    )
-    search_terms: str = Field(
-        default=None,
-        alias="searchTerms",
-        description="The search terms employed by the creator of this Query.",
-    )
-
-
-class RatingModel(EntityModel):
-    type: Literal[TypeTermEnum.RATING] = Field(alias="type", examples=[TypeTermEnum.RATING.value])
-    rater: Union[PersonModel, str] = Field(
-        default=None,
-        alias="rater",
-        description="The Person who provided the Rating. The rater value MUST be expressed either as an object or as a string corresponding to the rater’s IRI.",
-    )
-    rated: Union[EntityModel, str] = Field(
-        default=None,
-        alias="rated",
-        description="The Entity which received the rating. The rated value MUST be expressed either as an object or as a string corresponding to the rated object's IRI.",
-    )
-    question: Union[QuestionModel, str] = Field(
-        default=None,
-        alias="question",
-        description="The Question used for the Rating. The question value MUST be expressed either as an object or as a string corresponding to the question's IRI.",
-    )
-    selections: List[str] = Field(
-        default=None,
-        alias="selections",
-        description="An array of the values representing the rater's selected response.",
-    )
-    rating_comment: Union[CommentModel, str] = Field(
-        default=None,
-        alias="ratingComment",
-        description="The Comment left with the Rating. The ratingComment value MUST be expressed either as an object or as a string corresponding to the comment’s IRI.",
-    )
-
-
-class ResponseModel(EntityModel):
-    type: Literal[TypeTermEnum.RESPONSE] = Field(alias="type", examples=[TypeTermEnum.RESPONSE.value])
-    attempt: Union[AttemptModel, str] = Field(
-        default=None,
-        alias="attempt",
-        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person who initiated the Response and the relevant DigitalResource such as an AssessmentItem or QuestionnaireItem.",
-    )
-    started_at_time: str = Field(
-        default=None,
-        alias="startedAtTime",
-        description="An ISO 8601 date and time value expressed with millisecond precision that describes when the  Response was commenced. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
-    )  # DateTime
-    ended_at_time: str = Field(
-        default=None,
-        alias="endedAtTime",
-        description="An ISO 8601 date and time value expressed with millisecond precision that describes when the  Response was completed or terminated. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
-    )  # DateTime
-    duration: str = Field(
-        default=None,
-        alias="duration",
-        description="A time interval that represents the time taken to complete the Response. If a duration is specified the value MUST conform to the ISO 8601 duration format.",
-    )  # Duration
-
-
-class SessionModel(EntityModel):
-    type: Literal[TypeTermEnum.SESSION] = Field(alias="type", examples=[TypeTermEnum.SESSION.value])
-    user: Union[PersonModel, str] = Field(default=None, alias="user")
-    client: SoftwareApplicationModel = Field(default=None, alias="client")
-    started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
-    ended_at_time: str = Field(default=None, alias="endedAtTime")  # Datetime
-    duration: str = Field(default=None, alias="duration")  # Duration ISO 8601
-
-
-class ResultModel(EntityModel):
-    type: Literal[TypeTermEnum.RESULT] = Field(alias="type", examples=[TypeTermEnum.RESULT.value])
-    attempt: Union[AttemptModel, str] = Field(
-        default=None,
-        alias="attempt",
-        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person making the Attempt and the assigned DigitalResource.",
-    )
-    max_result_score: float = Field(
-        default=None,
-        alias="maxResultScore",
-        description="A number with a fractional part denoted by a decimal separator that designates the maximum result score permitted.",
-    )
-    result_score: float = Field(
-        default=None,
-        alias="resultScore",
-        description="A number with a fractional part denoted by a decimal separator that designates the actual result score awarded.",
-    )
-    scored_by: Union[AgentModel, str] = Field(
-        default=None,
-        alias="scoredBy",
-        description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
-    )
-    comment: str = Field(
-        default=None, alias="comment", description="Plain text feedback provided by the scorer."
-    )
-
-
-class ScaleModel(EntityModel):
-    type: Literal[TypeTermEnum.SCALE] = Field(alias="type", examples=[TypeTermEnum.SCALE.value])
-
-
-class ScoreModel(EntityModel):
-    type: Literal[TypeTermEnum.SCORE] = Field(alias="type", examples=[TypeTermEnum.SCORE.value])
-    attempt: Union[AttemptModel, str] = Field(
-        default=None,
-        alias="attempt",
-        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person who generated the Attempt and the assigned DigitalResource.",
-    )
-    max_score: float = Field(
-        default=None,
-        alias="maxScore",
-        description="A number with a fractional part denoted by a decimal separator that designates the maximum score permitted.",
-    )
-    score_given: float = Field(
-        default=None,
-        alias="scoreGiven",
-        description="A number with a fractional part denoted by a decimal separator that designates the actual score awarded.",
-    )
-    scored_by: Union[AgentModel, str] = Field(
-        default=None,
-        alias="scoredBy",
-        description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
-    )
-    comment: str = Field(
-        default=None, alias="comment", description="Plain text feedback provided by the scorer."
-    )
-
-
-class SearchResponseModel(EntityModel):
-    type: Literal[TypeTermEnum.SEARCHRESPONSE] = Field(alias="type", examples=[TypeTermEnum.SEARCHRESPONSE.value])
-    search_provider: Union[SoftwareApplicationModel, str] = Field(
-        default=None,
-        alias="searchProvider",
-        description="The SoftwareApplication that is the provider of this  SearchResponse. The searchProvider value MUST be expressed either as an object or as a string corresponding to the resources's IRI.",
-    )
-    search_target: Union[EntityModel, str] = Field(
-        default=None,
-        alias="searchTarget",
-        description="The Entity, typically a DigitalResource or  SoftwareApplication, that is the target of the search. The resourceSearched value MUST be expressed either as an object or as a string corresponding to the resources's IRI.",
-    )
-    query: Union[QueryModel, str] = Field(
-        default=None, alias="query", description="The Query submitted by the actor."
-    )
-    search_results_item_count: int = Field(
-        default=None,
-        alias="searchResultsItemCount",
-        description="A total count of searchResults returned. If the Query submitted returned no results the count equal to zero (0).",
-    )
-
-
-class PageModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.PAGE] = Field(alias="type", examples=[TypeTermEnum.PAGE.value])
-
-
-class LtiSessionModel(SessionModel):
-    type: Literal[TypeTermEnum.LTISESSION] = Field(alias="type", examples=[TypeTermEnum.LTISESSION.value])
-    message_parameters: dict = Field(
-        default=None,
-        alias="messageParameters",
-        description="A map of LTI-specified message parameters that provide platform-related contextual information",
-    )
 
 
 class AssignableDigitalResourceModel(DigitalResourceModel):
@@ -703,7 +465,174 @@ class AssessmentItemModel(AssignableDigitalResourceModel):
     )
 
 
-class DigitalResourceCollectionModel(CollectionModel, DigitalResourceModel):
+class ResponseModel(EntityModel):
+    type: Literal[TypeTermEnum.RESPONSE] = Field(alias="type", examples=[TypeTermEnum.RESPONSE.value])
+    attempt: Union[AttemptModel, str] = Field(
+        default=None,
+        alias="attempt",
+        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person who initiated the Response and the relevant DigitalResource such as an AssessmentItem or QuestionnaireItem.",
+    )
+    started_at_time: str = Field(
+        default=None,
+        alias="startedAtTime",
+        description="An ISO 8601 date and time value expressed with millisecond precision that describes when the  Response was commenced. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
+    )  # DateTime
+    ended_at_time: str = Field(
+        default=None,
+        alias="endedAtTime",
+        description="An ISO 8601 date and time value expressed with millisecond precision that describes when the  Response was completed or terminated. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
+    )  # DateTime
+    duration: str = Field(
+        default=None,
+        alias="duration",
+        description="A time interval that represents the time taken to complete the Response. If a duration is specified the value MUST conform to the ISO 8601 duration format.",
+    )  # Duration
+    # DEPRECATED
+    actor: PersonModel = Field(
+        default=None,
+        alias="actor",
+        description="The Person who generated the Response. actor has been DEPRECATED and replaced by attempt.",
+        json_schema_extra={"deprecated": True},
+    )
+    assignable: AssessmentItemModel = Field(
+        default=None,
+        alias="assignable",
+        description="The AssessmentItem associated with the Response. assignable has been DEPRECATED and replaced by attempt.",
+        json_schema_extra={"deprecated": True},
+    )
+
+
+class SessionModel(EntityModel):
+    type: Literal[TypeTermEnum.SESSION] = Field(alias="type", examples=[TypeTermEnum.SESSION.value])
+    user: Union[PersonModel, str] = Field(default=None, alias="user")
+    started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
+    ended_at_time: str = Field(default=None, alias="endedAtTime")  # Datetime
+    duration: str = Field(default=None, alias="duration")  # Duration ISO 8601
+    # DEPRECATED
+    actor: PersonModel = Field(
+        default=None,
+        alias="actor",
+        description="The Person who initiated the Session. actor property has been DEPRECATED and replaced by user.",
+    )
+
+
+class ResultModel(EntityModel):
+    type: Literal[TypeTermEnum.RESULT] = Field(alias="type", examples=[TypeTermEnum.RESULT.value])
+    attempt: Union[AttemptModel, str] = Field(
+        default=None,
+        alias="attempt",
+        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person making the Attempt and the assigned DigitalResource.",
+    )
+    max_result_score: float = Field(
+        default=None,
+        alias="maxResultScore",
+        description="A number with a fractional part denoted by a decimal separator that designates the maximum result score permitted.",
+    )
+    result_score: float = Field(
+        default=None,
+        alias="resultScore",
+        description="A number with a fractional part denoted by a decimal separator that designates the actual result score awarded.",
+    )
+    scored_by: Union[AgentModel, str] = Field(
+        default=None,
+        alias="scoredBy",
+        description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
+    )
+    comment: str = Field(
+        default=None, alias="comment", description="Plain text feedback provided by the scorer."
+    )
+    # DEPRECATED
+    actor: PersonModel = Field(
+        default=None,
+        alias="actor",
+        description="The Person who generated the Attempt. actor has been DEPRECATED and replaced by attempt.",
+        json_schema_extra={"deprecated": True},
+    )
+    assignable: DigitalResourceModel = Field(
+        default=None,
+        alias="assignable",
+        description="The assigned DigitalResource associated with the Result. assignable has been DEPRECATED and replaced by attempt.",
+        json_schema_extra={"deprecated": True},
+    )
+    normal_score: float = Field(
+        default=None,
+        alias="normalScore",
+        description="The score earned by the learner before adding the extraCreditScore, subtracting the penaltyScore or applying the curveFactor, if any.",
+        json_schema_extra={"deprecated": True},
+    )
+    penalty_score: float = Field(
+        default=None,
+        alias="penaltyScore",
+        description="The number of points deducted from the normalScore due to an infraction such as submitting an Attempt after the due date.",
+        json_schema_extra={"deprecated": True},
+    )
+    extra_credit_score: float = Field(
+        default=None,
+        alias="extraCreditScore",
+        description="The number of extra credit points earned by the learner.",
+        json_schema_extra={"deprecated": True},
+    )
+    total_score: float = Field(
+        default=None,
+        alias="totalScore",
+        description="A score earned by the learner equal to the sum of normalScore + extraCreditScore - penaltyScore. This value does not take into account the effects of curving.",
+        json_schema_extra={"deprecated": True},
+    )
+    curved_total_score: float = Field(
+        default=None,
+        alias="curvedTotalScore",
+        description="The total score earned by the learner after applying a curveFactor to a method for computing a scaled score; e.g., adjusting the score equal to the sum of 100 - curvedFactor(100 - totalScore).",
+        json_schema_extra={"deprecated": True},
+    )
+    curve_factor: float = Field(
+        default=None,
+        alias="curveFactor",
+        description="A scale factor to be used in adjusting the totalScore.",
+        json_schema_extra={"deprecated": True},
+    )
+
+
+class ScoreModel(EntityModel):
+    type: Literal[TypeTermEnum.SCORE] = Field(alias="type", examples=[TypeTermEnum.SCORE.value])
+    attempt: Union[AttemptModel, str] = Field(
+        default=None,
+        alias="attempt",
+        description="The associated Attempt. The attempt value MUST be expressed either as an object or as a string corresponding to the attempt's IRI. If an object representation is provided, the Attempt SHOULD reference both the Person who generated the Attempt and the assigned DigitalResource.",
+    )
+    max_score: float = Field(
+        default=None,
+        alias="maxScore",
+        description="A number with a fractional part denoted by a decimal separator that designates the maximum score permitted.",
+    )
+    score_given: float = Field(
+        default=None,
+        alias="scoreGiven",
+        description="A number with a fractional part denoted by a decimal separator that designates the actual score awarded.",
+    )
+    scored_by: Union[AgentModel, str] = Field(
+        default=None,
+        alias="scoredBy",
+        description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
+    )
+    comment: str = Field(
+        default=None, alias="comment", description="Plain text feedback provided by the scorer."
+    )
+
+
+class PageModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.PAGE] = Field(alias="type", examples=[TypeTermEnum.PAGE.value])
+
+
+class LtiSessionModel(SessionModel):
+    type: Literal[TypeTermEnum.LTISESSION] = Field(alias="type", examples=[TypeTermEnum.LTISESSION.value])
+    message_parameters: dict = Field(
+        default=None,
+        alias="messageParameters",
+        description="A map of LTI-specified message parameters that provide platform-related contextual information",
+    )
+
+
+class DigitalResourceCollectionModel(DigitalResourceModel):
     type: Literal[TypeTermEnum.DIGITALRESOURCECOLLECTION] = Field(
         alias="type", examples=[TypeTermEnum.DIGITALRESOURCECOLLECTION.value]
     )
@@ -711,17 +640,6 @@ class DigitalResourceCollectionModel(CollectionModel, DigitalResourceModel):
         default=None,
         alias="items",
         description="An ordered collection of DigitalResource entities. Each array item MUST be expressed either as an object or as a string corresponding to the item's IRI.",
-    )
-
-
-class AggregateMeasureCollectionModel(CollectionModel):
-    type: Literal[TypeTermEnum.AGGREGATEMEASURECOLLECTION] = Field(
-        alias="type", examples=[TypeTermEnum.AGGREGATEMEASURECOLLECTION.value]
-    )
-    items: List[Union[AggregateMeasureModel, str]] = Field(
-        default=None,
-        alias="items",
-        description="An ordered collection of AggregateMeasure entities. Each array item MUST be expressed either as an object or as a string corresponding to the item’s IRI.",
     )
 
 
@@ -805,41 +723,28 @@ class CourseSectionModel(CourseOfferingModel):
     )
 
 
-class DateTimeQuestionModel(QuestionModel):
-    type: Literal[TypeTermEnum.DATETIMEQUESTION] = Field(
-        alias="type", examples=[TypeTermEnum.DATETIMEQUESTION.value]
-    )
-    min_date_time: str = Field(
-        default=None,
-        alias="minDateTime",
-        description="A DateTime value used to determine the minimum value allowed.",
-    )  # DateTime
-    min_label: str = Field(
-        default=None, alias="minLabel", description="The label for the minimum DateTime."
-    )
-    max_date_time: str = Field(
-        default=None,
-        alias="maxDateTime",
-        description="A DateTime value used to determine the maximum value allowed.",
-    )  # DateTime
-    max_label: str = Field(
-        default=None, alias="maxLabel", description="The label for the maximum value."
-    )
-
-
-class DateTimeResponseModel(ResponseModel):
-    type: Literal[TypeTermEnum.DATETIMERESPONSE] = Field(
-        alias="type", examples=[TypeTermEnum.DATETIMERESPONSE.value]
-    )
-    date_time_selected: str = Field(
-        default=None,
-        alias="dateTimeSelected",
-        description="The DateTime selected in response to the question.",
-    )  # DateTime
-
-
 class DocumentModel(DigitalResourceModel):
     type: Literal[TypeTermEnum.DOCUMENT] = Field(alias="type", examples=[TypeTermEnum.DOCUMENT.value])
+
+
+# DeprecationWarning
+class EpubChapterModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.EPUBCHAPTER] = Field(alias="type", examples=[TypeTermEnum.EPUBCHAPTER.value])
+
+
+# DeprecationWarning
+class EpubPartModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.EPUBPART] = Field(alias="type", examples=[TypeTermEnum.EPUBPART.value])
+
+
+# DeprecationWarning
+class EpubSubChapterModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.EPUBSUBCHAPTER] = Field(alias="type", examples=[TypeTermEnum.EPUBSUBCHAPTER.value])
+
+
+# DeprecationWarning
+class EpubVolumeModel(DigitalResourceModel):
+    type: Literal[TypeTermEnum.EPUBVOLUME] = Field(alias="type", examples=[TypeTermEnum.EPUBVOLUME.value])
 
 
 class FillinBlankResponseModel(ResponseModel):
@@ -874,6 +779,11 @@ class MessageModel(DigitalResourceModel):
 
 class ThreadModel(DigitalResourceCollectionModel):
     type: Literal[TypeTermEnum.THREAD] = Field(alias="type", examples=[TypeTermEnum.THREAD.value])
+    is_part_of: Union[ForumModel, str] = Field(
+        default=None,
+        alias="isPartOf",
+        description="A related Entity that includes or incorporates the resource as a part of its whole. The isPartOf value MUST be expressed either as an object or as a string corresponding to the associated entity's IRI.",
+    )
     items: List[Union[MessageModel, str]] = Field(
         default=None,
         alias="items",
@@ -907,6 +817,11 @@ class HighlightAnnotationModel(AnnotationModel):
     type: Literal[TypeTermEnum.HIGHLIGHTANNOTATION] = Field(
         alias="type", examples=[TypeTermEnum.HIGHLIGHTANNOTATION.value]
     )
+    selection: TextPositionSelectorModel = Field(
+        default=None,
+        alias="selection",
+        description="The start and end positions of the highlighted text segment. The first character in the full text is character position 0. If a TextPositionSelector is defined both its start and end positions MUST be specified.",
+    )
     selection_text: str = Field(
         default=None,
         alias="selectionText",
@@ -916,34 +831,6 @@ class HighlightAnnotationModel(AnnotationModel):
 
 class ImageObjectModel(MediaObjectModel):
     type: Literal[TypeTermEnum.IMAGEOBJECT] = Field(alias="type", examples=[TypeTermEnum.IMAGEOBJECT.value])
-
-
-class LikertScaleModel(ScaleModel):
-    type: Literal[TypeTermEnum.LIKERTSCALE] = Field(alias="type", examples=[TypeTermEnum.LIKERTSCALE.value])
-    scale_points: int = Field(
-        default=None,
-        alias="scalePoints",
-        description="A integer value used to determine the amount of points on the LikertScale.",
-    )
-    item_labels: List[str] = Field(
-        default=None,
-        alias="itemLabels",
-        description="The ordered list of labels for each point on the scale. The values MUST be cast as strings.",
-    )
-    item_values: List[str] = Field(
-        default=None,
-        alias="itemValues",
-        description="The ordered list of values for each point on the scale. The values MUST be cast as strings.",
-    )
-
-
-class LtiLinkModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.LTILINK] = Field(alias="type", examples=[TypeTermEnum.LTILINK.value])
-    message_type: LtiMessageTypesEnum = Field(
-        default=None,
-        alias="messageType",
-        description="If present, the string value MUST be set to the term name of the LTI message type used to gain access to this LTI resource link (including but not limited to, LtiResourceLinkRequest or LtiDeepLinkingRequest, LtiDeepLinkingResponse).",
-    )
 
 
 class MediaLocationModel(DigitalResourceModel):
@@ -979,165 +866,6 @@ class MultipleResponseResponseModel(ResponseModel):
     )
 
 
-class MultiselectQuestionModel(QuestionModel):
-    type: Literal[TypeTermEnum.MULTISELECTQUESTION] = Field(
-        alias="type", examples=[TypeTermEnum.MULTISELECTQUESTION.value]
-    )
-    points: int = Field(
-        default=None,
-        alias="points",
-        description="A integer value used to determine the amount of points on the MultiselectQuestion.",
-    )
-    item_labels: List[str] = Field(
-        default=None,
-        alias="itemLabels",
-        description="The list of labels that describe the set of selectable question options. Each label MUST be cast as a string.",
-    )
-    item_values: List[str] = Field(
-        default=None,
-        alias="itemValues",
-        description="The list of values associated with the set of selectable question options. Each value MUST be cast as a string.",
-    )
-
-
-class MultiselectResponseModel(ResponseModel):
-    type: Literal[TypeTermEnum.MULTISELECTRESPONSE] = Field(
-        alias="type", examples=[TypeTermEnum.MULTISELECTRESPONSE.value]
-    )
-    selections: List[str] = Field(
-        default=None,
-        alias="selections",
-        description="An array of the values representing the rater's selected responses.",
-    )
-
-
-class MultiselectScaleModel(ScaleModel):
-    type: Literal[TypeTermEnum.MULTISELECTSCALE] = Field(
-        alias="type", examples=[TypeTermEnum.MULTISELECTSCALE.value]
-    )
-    scale_points: int = Field(
-        default=None,
-        alias="scalePoints",
-        description="A integer value used to determine the amount of points on the MultiselectScale.",
-    )
-    item_labels: List[str] = Field(
-        default=None,
-        alias="itemLabels",
-        description="The ordered list of labels for each point on the scale. The values MUST be cast as strings.",
-    )
-    item_values: List[str] = Field(
-        default=None,
-        alias="itemValues",
-        description="The ordered list of values for each point on the scale. The values MUST be cast as strings.",
-    )
-    is_ordered_selection: bool = Field(
-        default=None,
-        alias="isOrderedSelection",
-        description="Indicates whether the order of the selected items is important.",
-    )
-    min_selections: int = Field(
-        default=None,
-        alias="minSelections",
-        description="Indicates the minimum number of selections that can be chosen.",
-    )
-    max_selections: int = Field(
-        default=None,
-        alias="maxSelections",
-        description="Indicates the maximum number of selections that can be chosen.",
-    )
-
-
-class NumericScaleModel(ScaleModel):
-    type: Literal[TypeTermEnum.NUMERICSCALE] = Field(alias="type", examples=[TypeTermEnum.NUMERICSCALE.value])
-    min_value: float = Field(
-        default=None,
-        alias="minValue",
-        description="A decimal value used to determine the minimum value of the NumericScale.",
-    )
-    min_label: str = Field(
-        default=None, alias="minLabel", description="The label for the minimum value."
-    )
-    max_value: float = Field(
-        default=None,
-        alias="maxValue",
-        description="A decimal value used to determine the maximum value of the NumericScale.",
-    )
-    max_label: str = Field(
-        default=None, alias="maxLabel", description="The label for the maximum value."
-    )
-    step: float = Field(
-        default=None,
-        alias="step",
-        description="Indicates the decimal step used for determining the options between the minimum and maximum values.",
-    )
-
-
-class OpenEndedQuestionModel(QuestionModel):
-    type: Literal[TypeTermEnum.OPENENDEDQUESTION] = Field(
-        alias="type", examples=[TypeTermEnum.OPENENDEDQUESTION.value]
-    )
-
-
-class OpenEndedResponseModel(ResponseModel):
-    type: Literal[TypeTermEnum.OPENENDEDRESPONSE] = Field(
-        alias="type", examples=[TypeTermEnum.OPENENDEDRESPONSE.value]
-    )
-    value: str = Field(
-        default=None, alias="value", description="the textual value of the response."
-    )
-
-
-class QuestionnaireItemModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.QUESTIONNAIREITEM] = Field(
-        alias="type", examples=[TypeTermEnum.QUESTIONNAIREITEM.value]
-    )
-    question: Union[QuestionModel, str] = Field(
-        default=None,
-        alias="question",
-        description="The Question entity posed by the QuestionnaireItem. The Question value MUST be expressed either as an object or as a string corresponding to the question's IRI.",
-    )
-    categories: List[str] = Field(
-        default=None,
-        alias="categories",
-        description="An array of category items comprising the categories the QuestionnaireItem encompasses. Each category item MUST be cast as a string.",
-    )
-    weight: float = Field(
-        default=None,
-        alias="weight",
-        description="A decimal value used to determine the weight of the QuestionnaireItem.",
-    )
-
-
-class QuestionnaireModel(DigitalResourceCollectionModel):
-    type: Literal[TypeTermEnum.QUESTIONNAIRE] = Field(alias="type", examples=[TypeTermEnum.QUESTIONNAIRE.value])
-    items: List[Union[QuestionnaireItemModel, str]] = Field(
-        alias="items",
-        description="An array of one or more QuestionnaireItem entities that together comprise the Questionnaire. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
-    )
-
-
-class RatingScaleQuestionModel(QuestionModel):
-    type: Literal[TypeTermEnum.RATINGSCALEQUESTION] = Field(
-        alias="type", examples=[TypeTermEnum.RATINGSCALEQUESTION.value]
-    )
-    scale: Union[ScaleModel, str] = Field(
-        default=None,
-        alias="scale",
-        description="The Scale used in the question. The scale value MUST be expressed either as an object or as a string corresponding to the scale's IRI.",
-    )
-
-
-class RatingScaleResponseModel(ResponseModel):
-    type: Literal[TypeTermEnum.RATINGSCALERESPONSE] = Field(
-        alias="type", examples=[TypeTermEnum.RATINGSCALERESPONSE.value]
-    )
-    selections: List[str] = Field(
-        default=None,
-        alias="selections",
-        description="An array of the values representing the rater's selected responses.",
-    )
-
-
 class SelectTextResponseModel(ResponseModel):
     type: Literal[TypeTermEnum.SELECTTEXTRESPONSE] = Field(
         alias="type", examples=[TypeTermEnum.SELECTTEXTRESPONSE.value]
@@ -1153,46 +881,11 @@ class SharedAnnotationModel(AnnotationModel):
     type: Literal[TypeTermEnum.SHAREDANNOTATION] = Field(
         alias="type", examples=[TypeTermEnum.SHAREDANNOTATION.value]
     )
-    with_agents: List[Union[AgentModel, PersonModel, str]] = Field(
+    with_agents: List[Union[AgentModel, str]] = Field(
         default=None,
         alias="withAgents",
         description="An ordered collection of one or more Agent entities, typically of type Person, with whom the annotated DigitalResource has been shared. Each array item MUST be expressed either as an object or as a string corresponding to the item's IRI.",
     )
-
-
-class SurveyModel(CollectionModel):
-    type: Literal[TypeTermEnum.SURVEY] = Field(alias="type", examples=[TypeTermEnum.SURVEY.value])
-    items: List[Union[QuestionnaireModel, str]] = Field(
-        default=None,
-        alias="items",
-        description="An array of one or more Questionnaire entities that together comprise the Survey. Each array item MUST be expressed either as an object or as a string corresponding to the Questionnaire resource's IRI.",
-    )
-
-
-class SurveyInvitationModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.SURVEYINVITATION] = Field(
-        alias="type", examples=[TypeTermEnum.SURVEYINVITATION.value]
-    )
-    rater: Union[PersonModel, str] = Field(
-        default=None,
-        alias="rater",
-        description="The Person which will rate the Survey. The rater value MUST be expressed either as an object or as a string corresponding to the rater resource’s IRI.",
-    )
-    survey: Union[SurveyModel, str] = Field(
-        default=None,
-        alias="survey",
-        description="The Survey that the invitation is for. The survey value MUST be expressed either as an object or as a string corresponding to the rater resource’s IRI.",
-    )
-    sent_count: int = Field(
-        default=None,
-        alias="sentCount",
-        description="An integer value used to determine the amount of times the invitation was sent to the rater.",
-    )
-    date_sent: str = Field(
-        default=None,
-        alias="dateSent",
-        description="An ISO 8601 date and time value expressed with millisecond precision that describes when the  SurveyInvitation was sent. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
-    )  # DateTime
 
 
 class TagAnnotationModel(AnnotationModel):
@@ -1227,93 +920,33 @@ class WebPageModel(DigitalResourceModel):
 ##################### EVENTS #####################
 ##################################################
 class EventModel(ExtendedTypeBaseModel):
-    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p2"] = Field(
+    context: Literal["http://purl.imsglobal.org/ctx/caliper/v1p1"] = Field(
         default=None,
         alias="@context",
-        examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
+        examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
     )
-    id: str = Field(
-        alias="id",
-        description="The emitting application MUST provision the Event with a UUID. A version 4 UUID SHOULD be generated. The UUID MUST be expressed as a URN using the form 'urn:uuid:<UUID>' per [RFC4122].",
-        examples=["urn:uuid:cf6e0f3b-3511-4254-86c5-6936ff33f267"],
-    )
-    type: Literal[TypeTermEnum.EVENT] = Field(
-        alias="type",
-        description="A string value corresponding to the Term defined for the Event in the external 1EdTech Caliper JSON-LD context document. For a generic Event set the type to the string value Event. If a subtype of Entity is created, set the type to the Term corresponding to the subtype utilized, e.g., NavigationEvent.",
-        examples=[TypeTermEnum.NAVIGATIONEVENT.value],
-    )
-    profile: ProfileTermEnum = Field(
-        default=None,
-        alias="profile",
-        description="A string value corresponding to the Profile Term value defined for the Profile that governs the rules of interpretation for this Event. The range of Profile values is limited to the set of profiles described in this specification and any profile extension specifications extending this specification. Only one Profile Term value may be specified per Event. For a generic Event set the profile property value to the string term GeneralProfile.",
-        examples=[ProfileTermEnum.GENERALPROFILE.value],
-    )
-    actor: Union[AgentModel, str] = Field(
-        alias="actor",
-        description="The Agent who initiated the Event, typically though not always a Person. The action value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: ActionTermEnum = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The action range is limited to the set of actions described in this specification or associated profiles and may be further constrained by the chosen Event type. Only one action Term may be specified per Event.",
-        examples=[ActionTermEnum.NAVIGATEDTO.value],
-    )
-    object: Union[EntityModel, str] = Field(
-        alias="object",
-        description="The Entity that comprises the object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
-    )
-    event_time: str = Field(
-        alias="eventTime",
-        description="An ISO 8601 date and time value expressed with millisecond precision that indicates when the Event occurred. The value MUST be expressed using the format YYYY-MM-DDTHH:mm:ss.SSSZ set to UTC with no offset specified.",
-        examples=["2019-11-01T00:09:06.878Z"],
-    )  # Datetime
-    ed_app: Union[SoftwareApplicationModel, str] = Field(
-        default=None,
-        alias="edApp",
-        description="A SoftwareApplication that constitutes the application context. The edApp value MUST be expressed either as an object or as a string corresponding to the edApp's IRI.",
-    )
-    generated: Union[EntityModel, str] = Field(
-        default=None,
-        alias="generated",
-        description="An Entity created or generated as a result of the interaction. The  generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI.",
-    )
-    target: Union[EntityModel, str] = Field(
-        default=None,
-        alias="target",
-        description="An Entity that represents a particular segment or location within the  object. The target value MUST be expressed either as an object or as a string corresponding to the target entity's IRI.",
-    )
+    id: str = Field(alias="id", examples=["urn:uuid:cf6e0f3b-3511-4254-86c5-6936ff33f267"])
+    type: Literal[TypeTermEnum.EVENT] = Field(alias="type", examples=[TypeTermEnum.NAVIGATIONEVENT.value])
+    actor: Union[AgentModel, str] = Field(alias="actor")
+    action: ActionTermEnum = Field(alias="action", examples=[ActionTermEnum.NAVIGATEDTO.value])
+    object: Union[EntityModel, str] = Field(alias="object")
+    event_time: str = Field(alias="eventTime", examples=["2019-11-01T00:09:06.878Z"])  # Datetime
+    target: Union[EntityModel, str] = Field(default=None, alias="target")
+    generated: Union[EntityModel, str] = Field(default=None, alias="generated")
+    ed_app: Union[SoftwareApplicationModel, str] = Field(default=None, alias="edApp")
     referrer: Union[EntityModel, str] = Field(
         default=None,
         alias="referrer",
-        description="An Entity that represents the referring context. A SoftwareApplication or DigitalResource will typically constitute the referring context. The referrer value MUST be expressed either as an object or as a string corresponding to the referrer's IRI.",
         examples=[
             "https://oxana.instructure.com/courses/565/discussion_topics/1072925?module_item_id=4635201"
         ],
     )
-    group: Union[CourseSectionModel, OrganizationModel, str] = Field(
-        default=None,
-        alias="group",
-        description="An Organization that represents the group context. The group value MUST be expressed either as an object or as a string corresponding to the group's IRI.",
-    )
-    membership: Union[MembershipModel, str] = Field(
-        default=None,
-        alias="membership",
-        description="The relationship between the action and the group in terms of roles assigned and current status. The membership value MUST be expressed either as an object or as a string corresponding to the membership entity's IRI.",
-    )
-    session: Union[SessionModel, str] = Field(
-        default=None,
-        alias="session",
-        description="The current user Session. The session value MUST be expressed either as an object or as a string corresponding to the session's IRI.",
-    )
-    federated_session: Union[LtiSessionModel, str] = Field(
-        default=None,
-        alias="federatedSession",
-        description="If the Event occurs within the context of an LTI platform launch, the tool's LtiSession MAY be referenced. The federatedSession value MUST be expressed either as an object or as a string corresponding to the federated session's IRI.",
-    )
-    extensions: dict = Field(
-        default=None,
-        alias="extensions",
-        description="A map of additional attributes not defined by the model MAY be specified for a more concise representation of the Event.",
-    )
+    group: Union[OrganizationModel, str] = Field(default=None, alias="group")
+    membership: Union[MembershipModel, str] = Field(default=None, alias="membership")
+
+    session: Union[SessionModel, str] = Field(default=None, alias="session")
+    federated_session: Union[LtiSessionModel, str] = Field(default=None, alias="federatedSession")
+    extensions: dict = Field(default=None, alias="extensions")
 
 
 class AnnotationEventModel(EventModel):
@@ -1364,7 +997,7 @@ class AssessmentEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Started, Paused, Resumed, Restarted, Reset, and Submitted actions only.",
     )
-    object: Union[AssessmentModel, str] = Field(
+    object: Union[AssessmentModel, AttemptModel, str] = Field(
         alias="object",
         description="The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
@@ -1395,7 +1028,7 @@ class AssessmentItemEventModel(EventModel):
         alias="object",
         description="The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
-    generated: Union[AttemptModel, ResponseModel, str] = Field(
+    generated: Union[ResponseModel, str] = Field(
         default=None,
         alias="generated",
         description="For a completed action a generated Response or a subtype. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI.",
@@ -1424,7 +1057,7 @@ class AssignableEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Activated, Deactivated, Started, Completed, Submitted, and Reviewed actions only.",
     )
-    object: Union[AssignableDigitalResourceModel, str] = Field(
+    object: Union[AssignableDigitalResourceModel, AttemptModel, str] = Field(
         alias="object",
         description="The AssignableDigitalResource that constitutes the  object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
@@ -1437,35 +1070,6 @@ class AssignableEventModel(EventModel):
         default=None,
         alias="generated",
         description="For Started, Completed and Reviewed actions, the actor's Attempt SHOULD be specified. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI.",
-    )
-
-
-class FeedbackEventModel(EventModel):
-    type: Literal[TypeTermEnum.FEEDBACKEVENT] = Field(alias="type", examples=[TypeTermEnum.FEEDBACKEVENT.value])
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.COMMENTED,
-        ActionTermEnum.RANKED,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Commented and Ranked actions only.",
-    )
-    object: Union[EntityModel, str] = Field(
-        alias="object",
-        description="The Entity that is the target of the feedback. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
-    )
-    target: Union[FrameModel, str] = Field(
-        default=None,
-        alias="target",
-        description="If the object of the feedback is a particular segment of a DigitalResource use a Frame to mark its location. The target value MUST be expressed either as an object or as a string corresponding to the target entity’s IRI.",
-    )
-    generated: Union[CommentModel, RatingModel, str] = Field(
-        default=None,
-        alias="generated",
-        description="The Rating or Comment entity that describes the feedback provided. If the action is Ranked then the  generated value MUST be expressed as a Rating. If the action is Commented then the generated value MUST be expressed as a Comment. The generated value MUST be expressed either as an object or as a string corresponding to the entity's IRI.",
     )
 
 
@@ -1574,7 +1178,7 @@ class MessageEventModel(EventModel):
 
 class NavigationEventModel(EventModel):
     type: Literal[TypeTermEnum.NAVIGATIONEVENT] = Field(alias="type", examples=[TypeTermEnum.NAVIGATIONEVENT.value])
-    actor: Union[PersonModel, str] = Field(
+    actor: Union[PersonModel, SoftwareApplicationModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
@@ -1584,11 +1188,11 @@ class NavigationEventModel(EventModel):
         alias="action",
         description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: NavigatedTo.",
     )
-    object: Union[DigitalResourceModel, SoftwareApplicationModel, str] = Field(
+    object: Union[DigitalResourceModel, EntityModel, SoftwareApplicationModel, str] = Field(
         alias="object",
         description="The DigitalResource or SoftwareApplication to which the actor navigated. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
     )
-    target: Union[DigitalResourceModel, str] = Field(
+    target: Union[FrameModel, str] = Field(
         default=None,
         alias="target",
         description="The DigitalResource that represents the particular part or location of the object being navigated to. The target value MUST be expressed either as an object or as a string corresponding to the referrer's IRI.",
@@ -1598,120 +1202,62 @@ class NavigationEventModel(EventModel):
         alias="referrer",
         description="The DigitalResource or SoftwareApplication that constitutes the referring context. The referrer value MUST be expressed either as an object or as a string corresponding to the referrer's IRI.",
     )
-
-
-class QuestionnaireEventModel(EventModel):
-    type: Literal[TypeTermEnum.QUESTIONNAIREEVENT] = Field(
-        alias="type", examples=[TypeTermEnum.QUESTIONNAIREEVENT.value]
+    # DEPRECATED
+    navigated_from: Union[DigitalResourceModel, SoftwareApplicationModel] = Field(
+        default=None,
+        alias="navigatedFrom",
+        description="The DigitalResource or SoftwareApplication that constitutes the referring context. navigatedFrom has been DEPRECATED and replaced by referrer.",
+        json_schema_extra={"deprecated": True},
     )
-    actor: Union[PersonModel, str] = Field(
+
+
+# DeprecationWarning
+class OutcomeEventModel(EventModel):
+    type: Literal[TypeTermEnum.OUTCOMEEVENT] = Field(alias="type", examples=[TypeTermEnum.OUTCOMEEVENT.value])
+    actor: Union[AgentModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
     action: Literal[
-        ActionTermEnum.STARTED,
-        ActionTermEnum.SUBMITTED,
+        ActionTermEnum.GRADED,
     ] = Field(
         alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The value range is limited to the actions: Started, or Submitted.",
+        description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: NavigatedTo.",
     )
-    object: Union[QuestionnaireModel, str] = Field(
+    object: Union[AttemptModel, str] = Field(
         alias="object",
-        description="The Questionnaire that the actor is taking. The  object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
+        description="The DigitalResource or SoftwareApplication to which the actor navigated. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
     )
-
-
-class QuestionnaireItemEventModel(EventModel):
-    type: Literal[TypeTermEnum.QUESTIONNAIREITEMEVENT] = Field(
-        alias="type", examples=[TypeTermEnum.QUESTIONNAIREITEMEVENT.value]
-    )
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.COMPLETED,
-        ActionTermEnum.SKIPPED,
-        ActionTermEnum.STARTED,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The value range is limited to the actions: Started, Skipped, or Completed.",
-    )
-    object: Union[QuestionnaireItemModel, str] = Field(
-        alias="object",
-        description="The QuestionnaireItem started, attempted, or skipped by the  actor. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
-    )
-    generated: Union[ResponseModel, str] = Field(
+    generated: Union[ResultModel, str] = Field(
         default=None,
         alias="generated",
         description="For a Completed action a generated Response MAY be referenced. The generated value MUST be expressed either as an object or as a string corresponding to the Response resource's IRI.",
     )
 
 
-class ResourceManagementEventModel(EventModel):
-    type: Literal[TypeTermEnum.RESOURCEMANAGEMENTEVENT] = Field(
-        alias="type", examples=[TypeTermEnum.RESOURCEMANAGEMENTEVENT.value]
-    )
+# DeprecationWarning
+class ReadingEventModel(EventModel):
+    type: Literal[TypeTermEnum.READINGEVENT] = Field(alias="type", examples=[TypeTermEnum.READINGEVENT.value])
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
     action: Literal[
-        ActionTermEnum.ARCHIVED,
-        ActionTermEnum.COPIED,
-        ActionTermEnum.CREATED,
-        ActionTermEnum.DELETED,
-        ActionTermEnum.DESCRIBED,
-        ActionTermEnum.DOWNLOADED,
-        ActionTermEnum.MODIFIED,
-        ActionTermEnum.PRINTED,
-        ActionTermEnum.PUBLISHED,
-        ActionTermEnum.RESTORED,
-        ActionTermEnum.RETRIEVED,
-        ActionTermEnum.SAVED,
-        ActionTermEnum.UNPUBLISHED,
-        ActionTermEnum.UPLOADED,
+        ActionTermEnum.NAVIGATEDTO,
+        ActionTermEnum.SEARCHED,
+        ActionTermEnum.VIEWED,
     ] = Field(
         alias="action",
-        description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the Archived, Copied, Created, Deleted, Described, Downloaded, Modified, Printed, Published, Restored, Retrieved, Saved, Unpublished, and Uploaded actions only.",
+        description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: NavigatedTo.",
     )
     object: Union[DigitalResourceModel, str] = Field(
         alias="object",
-        description="The DigitalResource that is being managed. The  object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
+        description="The DigitalResource or SoftwareApplication to which the actor navigated. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
     )
-    generated: Union[DigitalResourceModel, str] = Field(
+    target: Union[FrameModel, str] = Field(
         default=None,
-        alias="generated",
-        description="The DigitalResource that was generated by the Copied action. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI. (Copied action only)",
-    )
-
-    @field_validator("generated")
-    def generated_required_condition(cls, generated, values):
-        """Required when the action value is Copied, otherwise optional"""
-        if values.data.get("action", "") == ActionTermEnum.COPIED and not generated:
-            raise ValueError(f"generated cannot be empty if action is {ActionTermEnum.COPIED}")
-
-
-class SearchEventModel(EventModel):
-    type: Literal[TypeTermEnum.SEARCHEVENT] = Field(alias="type", examples=[TypeTermEnum.SEARCHEVENT.value])
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.SEARCHED,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the Searched action only.",
-    )
-    object: Union[EntityModel, str] = Field(
-        alias="object",
-        description="The Entity, typically a DigitalResource or SoftwareApplication, that is the target of the search. The object value MUST be expressed either as an object or as a string corresponding to the resources's IRI.",
-    )
-    generated: Union[SearchResponseModel, str] = Field(
-        default=None,
-        alias="generated",
-        description="The SearchResponse generated by the search provider that describes the search criteria, count of search results returned (if any), and references to the search result items (if any) returned by the search. The SearchResponse value MUST be expressed either as an object or as a string corresponding to the query’s IRI.",
+        alias="target",
+        description="The DigitalResource that represents the particular part or location of the object being navigated to. The target value MUST be expressed either as an object or as a string corresponding to the referrer's IRI.",
     )
 
 
@@ -1745,47 +1291,6 @@ class SessionEventModel(EventModel):
     )
 
 
-class SurveyEventModel(EventModel):
-    type: Literal[TypeTermEnum.SURVEYEVENT] = Field(alias="type", examples=[TypeTermEnum.SURVEYEVENT.value])
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.OPTEDIN,
-        ActionTermEnum.OPTEDOUT,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: OptedIn or OptedOut.",
-    )
-    object: Union[SurveyModel, str] = Field(
-        alias="object",
-        description="The Survey to which the actor is opting into or out of. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
-    )
-
-
-class SurveyInvitationEventModel(EventModel):
-    type: Literal[TypeTermEnum.SURVEYINVITATIONEVENT] = Field(
-        alias="type", examples=[TypeTermEnum.SURVEYINVITATIONEVENT.value]
-    )
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.ACCEPTED,
-        ActionTermEnum.DECLINED,
-        ActionTermEnum.SENT,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The value range is limited to the actions: Accepted, Declined, or Sent.",
-    )
-    object: Union[SurveyInvitationModel, str] = Field(
-        alias="object",
-        description="The SurveyInvitation to which the actor is sending out or responding to. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
-    )
-
-
 class ThreadEventModel(EventModel):
     type: Literal[TypeTermEnum.THREADEVENT] = Field(alias="type", examples=[TypeTermEnum.THREADEVENT.value])
     actor: Union[PersonModel, str] = Field(
@@ -1793,6 +1298,7 @@ class ThreadEventModel(EventModel):
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
     action: Literal[
+        ActionTermEnum.CREATED,
         ActionTermEnum.MARKEDASREAD,
         ActionTermEnum.MARKEDASUNREAD,
     ] = Field(
@@ -1803,48 +1309,6 @@ class ThreadEventModel(EventModel):
         alias="object",
         description="The Thread that constitutes the object of the interaction. The  object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
-
-
-class ToolLaunchEventModel(EventModel):
-    type: Literal[TypeTermEnum.TOOLLAUNCHEVENT] = Field(alias="type", examples=[TypeTermEnum.TOOLLAUNCHEVENT.value])
-    actor: Union[PersonModel, str] = Field(
-        alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
-    )
-    action: Literal[
-        ActionTermEnum.LAUNCHED,
-        ActionTermEnum.RETURNED,
-    ] = Field(
-        alias="action",
-        description="The action or predicate that binds the actor or subject to the object. The value range is limited to either the Launched or Returned actions.",
-    )
-    object: Union[SoftwareApplicationModel, str] = Field(
-        alias="object",
-        description="The SoftwareApplication that is the target of the actor's launch activity. The object value MUST be expressed either as an object or as a string corresponding to the software application's IRI.",
-    )
-    generated: DigitalResourceModel = Field(
-        default=None,
-        alias="generated",
-        description="In the case that the workflow comes with a resource intended for the receiver of the workflow message associated with this event (for example, a file, or image, or LTI resource link for the receiver to embed within its system), this property can carry its representation as a Caliper DigitalResource or, more likely, one of its specific subtypes.",
-    )
-    target: Union[LinkModel, LtiLinkModel] = Field(
-        default=None,
-        alias="target",
-        description="The fully qualified URL to which the workflow was redirected. In the case of the Launched action, this would be the fully qualified entry-point on the external tool to which the platform launches. In the case of the Returned action, this would be the fully qualified entry-point on the platform to which the tool is redirecting the workflow after user activity from the original launch finishes (this could be the launch_presentation_return_url in the case of a simple LTI Resource Link request; it could also be the deep_link_return_url in the case of a Deep Linking Response message).",
-    )
-    federated_session: Union[LtiSessionModel, str] = Field(
-        alias="federatedSession",
-        description='The Platform\'s session, constituting part of the tool launch context. The federatedSession value MUST be expressed either as an object or as a string corresponding to the federatedSession’s IRI. Required when the action value is Launched, otherwise optional. Workflows that include a specific "return message" component (e.g. LTI Deep Linking response messages) SHOULD provide the federatedSession property and SHOULD populate its messageParameters property with the message parameters in the response message.',
-    )
-
-    @field_validator("federated_session")
-    def federated_session_required_condition(cls, federated_session, values):
-        """Required when the action value is Launched, otherwise optional"""
-        if values.data.get("action", "") == ActionTermEnum.LAUNCHED and not federated_session:
-            raise ValueError(
-                f"federated_session cannot be empty if action is {ActionTermEnum.LAUNCHED}"
-            )
-        return federated_session
 
 
 class ToolUseEventModel(EventModel):
@@ -1868,11 +1332,6 @@ class ToolUseEventModel(EventModel):
         alias="target",
         description="A SoftwareApplication that represents a particular capability or feature provided by the object. The target value MUST be expressed either as an object or as a string corresponding to the target entity’s IRI.",
     )
-    generated: Union[AggregateMeasureCollectionModel, str] = Field(
-        default=None,
-        alias="generated",
-        description="An AggregateMeasureCollection created or generated as a result of the interaction. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity’s IRI. Note that if the sender of the event wants to send aggregate measure information as part of this ToolUseEvent it should, by best practice, send a single AggregateMeasureCollection as the generated value.",
-    )
 
 
 class ViewEventModel(EventModel):
@@ -1891,6 +1350,11 @@ class ViewEventModel(EventModel):
         alias="object",
         description="The DigitalResource that the actor viewed. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
     )
+    target: Union[FrameModel, str] = Field(
+        default=None,
+        alias="target",
+        description="A SoftwareApplication that represents a particular capability or feature provided by the object. The target value MUST be expressed either as an object or as a string corresponding to the target entity’s IRI.",
+    )
 
 
 ################################################
@@ -1899,7 +1363,7 @@ class ViewEventModel(EventModel):
 class IMSCaliperModel(BaseModel):
     data: List[Union[EntityModel, EventModel]] = Field(alias="data")
     data_version: str = Field(
-        alias="dataVersion", examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"]
+        alias="dataVersion", examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"]
     )
     send_time: str = Field(alias="sendTime", examples=["2019-11-16T02:08:59.163Z"])
     sensor: str = Field(alias="sensor", examples=["http://oxana.instructure.com/"])
@@ -1940,7 +1404,7 @@ class IMSCaliperModel(BaseModel):
                 new_value = []
                 for each_value in value:
                     if isinstance(each_value, dict) and (
-                        event_model := dict_discriminator.get(each_value.get("type", ""), None)
+                            event_model := dict_discriminator.get(each_value.get("type", ""), None)
                     ):
                         each_value = event_model(**each_value)
                     new_value.append(each_value)
