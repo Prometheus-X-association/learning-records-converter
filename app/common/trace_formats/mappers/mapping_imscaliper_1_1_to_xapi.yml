@@ -4,17 +4,17 @@ output_format: "xAPI"
 mappings:
   # ID
   - input_fields:
-    - "data.0.id"
+      - "data.0.id"
     output_fields:
-        output_field: "id"
-        transformation:
-          custom:
-            - "lambda id: str(id).split(':')[-1] if id else None"
+      output_field: "id"
+      transformation:
+        custom:
+          - "lambda id: str(id).split(':')[-1] if id else None"
 
 
   # Mapping actor information
   - input_fields:
-    - "data.0.actor.id"
+      - "data.0.actor.id"
     output_fields:
       multiple:
         - output_field: "actor.account.homePage"
@@ -22,9 +22,12 @@ mappings:
             custom:
               - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
         - output_field: "actor.account.name"
+          transformation:
+            custom:
+              - "lambda url: (match.group(1) if (match := search(r'/users/(\\d+)', url)) else url)"
 
   - input_fields:
-    - "data.0.actor.type"
+      - "data.0.actor.type"
     output_fields:
       output_field: "actor.objectType"
       transformation:
@@ -33,49 +36,49 @@ mappings:
 
   # Mapping action
   - input_fields:
-    - dataVersion
-    - "data.0.action"
+      - dataVersion
+      - "data.0.action"
     output_fields:
       multiple:
         - output_field: "verb.id"
           transformation:
-            custom: 
+            custom:
               - "lambda dataVersion, action: path_join(dataVersion, 'action', action.lower() if action else 'undefined')"
         - output_field: "verb.display.en-US"
           transformation:
-            custom: 
+            custom:
               - "lambda dataVersion, action: action"
 
 
   # Mapping object information
   - input_fields:
-    - "data.0.object.id"
+      - "data.0.object.id"
     output_fields:
       output_field: "object.id" # ou "context.contextActivities.other.id"
 
   - input_fields:
-    - "data.0.object.type"
+      - "data.0.object.type"
     output_fields:
       output_field: "object.objectType" # ou "context.contextActivities.other.objectType"
       transformation:
         value: 'Activity'
 
   - input_fields:
-    - "data.0.object.name"
+      - "data.0.object.name"
     output_fields:
       output_field: "object.definition.name.en-US" # ou "context.contextActivities.other.definition.name.en-US"
 
   - input_fields:
-    - "data.0.object.description"
+      - "data.0.object.description"
     output_fields:
       output_field: "object.definition.description.en-US"
       transformation:
-        custom: 
+        custom:
           - "lambda description: description if description else 'No description provided'"
 
   - input_fields:
-    - "sensor"
-    - "data.0.object"
+      - "sensor"
+      - "data.0.object"
     output_fields:
       output_field: "object.definition.extensions"
       transformation:
@@ -86,35 +89,35 @@ mappings:
 
   # Mapping group/course information
   - input_fields:
-    - "data.0.group.id"
+      - "data.0.group.id"
     output_fields:
       output_field: "context.contextActivities.grouping.id"
 
   - input_fields:
-    - "data.0.group.id"
-    - "data.0.group.type"
+      - "data.0.group.id"
+      - "data.0.group.type"
     output_fields:
       output_field: "context.contextActivities.grouping.objectType"
       transformation:
-        custom: 
+        custom:
           - "lambda id, type: 'Activity' if id else None"
 
 
   # Handling Event times
   - input_fields:
-    - "data.0.eventTime"
+      - "data.0.eventTime"
     output_fields:
       output_field: "timestamp"
 
 
   # Handling EdApp
   - input_fields:
-    - "data.0.edApp.id"
+      - "data.0.edApp.id"
     output_fields:
       output_field: "context.platform"
 
   - input_fields:
-    - "data.0.edApp"
+      - "data.0.edApp"
     output_fields:
       transformation:
         switch:
@@ -127,7 +130,7 @@ mappings:
 
   # Mapping generated and result
   - input_fields:
-    - "data.0.generated"
+      - "data.0.generated"
     output_fields:
       transformation:
         switch:
@@ -153,21 +156,21 @@ mappings:
                     - "lambda generated: generated.get('maxScore', None)"
 
   - input_fields:
-    - "data.0.generated.duration"
+      - "data.0.generated.duration"
     output_fields:
       output_field: "result.duration"
 
   - input_fields:
-    - "data.0.generated.values"
+      - "data.0.generated.values"
     output_fields:
       output_field: "result.response"
       transformation:
-        custom: 
+        custom:
           - "lambda values: ', '.join(values) if values else None"
 
   - input_fields:
-    - "sensor"
-    - "data.0.generated"
+      - "sensor"
+      - "data.0.generated"
     output_fields:
       output_field: "result.extensions"
       transformation:
@@ -179,13 +182,13 @@ mappings:
   # Content extensions
   # Event type
   - input_fields:
-    - "sensor"
-    - "data.0.type"
-    - "data.0.actor"
-    - "data.0.group"
-    - "data.0.session"
-    - "data.0.edApp"
-    - "data.0.membership"
+      - "sensor"
+      - "data.0.type"
+      - "data.0.actor"
+      - "data.0.group"
+      - "data.0.session"
+      - "data.0.edApp"
+      - "data.0.membership"
     output_fields:
       output_field: "context.extensions"
       transformation:
@@ -213,6 +216,98 @@ mappings:
           - "lambda extensions, sensor, membership: (extensions, sensor, {key: value for key, value in membership.items()})"
           - "lambda extensions, sensor, membership: extensions.update({path_join(sensor, 'imscaliper/membership'): membership}) or extensions"
 
+  # DASES Profiles
+  - input_fields:
+      - "data.0.type"
+      - "data.0.action"
+      - "data.0.object.type"
+    output_fields:
+      transformation:
+        switch:
+          # accesses_page
+          - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/accessed"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/acrossx/activities/webpage"
+          # downloaded_audio
+          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "http://id.tincanapi.com/verb/downloaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Downloaded"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/audio"
+          # downloaded_video
+          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "http://id.tincanapi.com/verb/downloaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Downloaded"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/video"
+          # downloaded_document
+          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "http://id.tincanapi.com/verb/downloaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Downloaded"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/document"
+          # downloaded_file
+          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/downloaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Downloaded"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "http://activitystrea.ms/file"
+          # accessed_file
+          - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/accessed"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "http://activitystrea.ms/file"
+
+
+  - input_fields:
+      - "data.0.group.type"
+    output_fields:
+      transformation:
+        switch:
+          - condition: "lambda groupType: groupType == 'CourseSection'"
+            output_field: "object.definition.extensions"
+            transformation:
+              custom:
+                - "lambda group: {'https://w3id.org/xapi/acrossx/extensions/type': 'course'}"
 
 default:
   - description: "Default xAPI version"
