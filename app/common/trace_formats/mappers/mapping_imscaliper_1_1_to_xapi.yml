@@ -224,7 +224,7 @@ mappings:
     output_fields:
       transformation:
         switch:
-          # accesses_page
+          # accessed_page
           - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
             multiple:
               - output_field: "verb.id"
@@ -273,7 +273,7 @@ mappings:
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/document"
           # downloaded_file
-          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource']"
+          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
             multiple:
               - output_field: "verb.id"
                 transformation:
@@ -296,6 +296,55 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "http://activitystrea.ms/file"
+          # uploaded_audio
+          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/audio"
+          # uploaded_video
+          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/video"
+          # uploaded_document
+          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/document"
+          # uploaded_file
+          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Accessed"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/video/activity-type/video"
+
 
 
   - input_fields:
