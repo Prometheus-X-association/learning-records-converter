@@ -224,7 +224,7 @@ mappings:
     output_fields:
       transformation:
         switch:
-          # accessed_page
+          # lms_accessed_page
           - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
             multiple:
               - output_field: "verb.id"
@@ -236,7 +236,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/acrossx/activities/webpage"
-          # downloaded_audio
+          # lms_downloaded_audio
           - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
             multiple:
               - output_field: "verb.id"
@@ -248,7 +248,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/audio"
-          # downloaded_video
+          # lms_downloaded_video
           - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
             multiple:
               - output_field: "verb.id"
@@ -260,7 +260,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/video"
-          # downloaded_document
+          # lms_downloaded_document
           - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
             multiple:
               - output_field: "verb.id"
@@ -272,7 +272,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/document"
-          # downloaded_file
+          # lms_downloaded_file
           - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
             multiple:
               - output_field: "verb.id"
@@ -284,7 +284,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "http://activitystrea.ms/file"
-          # accessed_file
+          # lms_accessed_file
           - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
             multiple:
               - output_field: "verb.id"
@@ -296,7 +296,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "http://activitystrea.ms/file"
-          # uploaded_audio
+          # lms_uploaded_audio
           - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
             multiple:
               - output_field: "verb.id"
@@ -308,7 +308,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/audio"
-          # uploaded_video
+          # lms_uploaded_video
           - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
             multiple:
               - output_field: "verb.id"
@@ -320,7 +320,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/video"
-          # uploaded_document
+          # lms_uploaded_document
           - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
             multiple:
               - output_field: "verb.id"
@@ -332,7 +332,7 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/document"
-          # uploaded_file
+          # lms_uploaded_file
           - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
             multiple:
               - output_field: "verb.id"
@@ -344,7 +344,42 @@ mappings:
               - output_field: "object.definition.type"
                 transformation:
                   value: "https://w3id.org/xapi/video/activity-type/video"
-
+          # virtual_classroom_joined
+          - condition: "lambda type, action, objectType: type in ['SessionEvent'] action in ['LoggedIn']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "http://activitystrea.ms/join"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Joined session"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+          # virtual_classroom_left
+          - condition: "lambda type, action, objectType: type in ['SessionEvent'] action in ['LoggedOut']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "http://activitystrea.ms/leave"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Left session"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+          # virtual_classroom_posted_public_message
+          - condition: "lambda type, action, objectType: type in ['MessageEvent'] action in ['Posted']"
+            multiple:
+              - output_field: "verb.id"
+                transformation:
+                  value: "https://w3id.org/xapi/acrossx/verbs/posted"
+              - output_field: "verb.display.en-US"
+                transformation:
+                  value: "Left session"
+              - output_field: "object.definition.type"
+                transformation:
+                  value: "https://w3id.org/xapi/acrossx/activities/message"
 
 
   - input_fields:
