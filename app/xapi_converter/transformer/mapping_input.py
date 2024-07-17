@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from inspect import signature
+from typing import List
 
 from pydantic import BaseModel
 
@@ -11,13 +12,9 @@ from enums import (
 )
 from trace_formats.enums import TraceFormatEnum
 from trace_formats.models.mapping_config import (
-    BasicTransformationModel,
     CompleteConfigModel,
-    CustomTransformationModel,
     MainMappingModel,
-    OutputMappingModel,
-    SwitchTransformationModel,
-    ValueTransformationModel,
+    OutputMappingModel, ConditionOutputMappingModel,
 )
 from utils.utils_dict import (
     convert_yaml_file_to_json,
@@ -115,13 +112,10 @@ class MappingInput:
 
     def transformation_custom(
         self,
-        custom_input: CustomTransformationModel | list[str],
+        custom_input: List[str],
         arguments: Iterable[Any] | None = None,
         deploy_arguments: bool = True,
     ) -> Any:
-        if isinstance(custom_input, CustomTransformationModel):
-            custom_input = custom_input.custom
-
         if custom_input:
             # Gérer erreur ici (lors de l'application de eval) + Gérer l'erreur en cas de fonction non callable
             custom_code = eval(custom_input[0])
@@ -137,15 +131,15 @@ class MappingInput:
         return arguments
 
     def transformation_value(
-        self, value: ValueTransformationModel, arguments: list[Any] | None = None
+        self, value: Any, arguments: list[Any] | None = None
     ) -> Any:
         if not arguments:
             arguments = list()
-        return value.value
+        return value
 
     # TODO: > OK for 1 output, but not multiple, return list?
     def transformation_switch(
-        self, switch_value: SwitchTransformationModel, arguments: list[Any] | None = None
+        self, switch_value: List[ConditionOutputMappingModel], arguments: list[Any] | None = None
     ) -> list[FinalMappingModel]:
         # def action(condition: ConditionOutputMappingModel):
         #     list_response = []
@@ -162,10 +156,9 @@ class MappingInput:
         # TODO: recheck this part
         if not arguments:
             arguments = list()
-        list_condition = switch_value.switch
         list_response = []
         # Check each condition
-        for condition in list_condition:
+        for condition in switch_value:
             if str(condition.condition).lower().strip() != DEFAULT_CONDITION:
                 lambda_condition = eval(condition.condition)
                 try:
@@ -182,18 +175,18 @@ class MappingInput:
 
     def launch_transformation(
         self,
-        transformation_model: BasicTransformationModel,
+        transformation_model: OutputMappingModel,
         output_field: str | None,
         arguments: list[Any] | None = None,
     ) -> list[FinalMappingModel]:
         if not arguments:
             arguments = list()
-        if isinstance(transformation_model, CustomTransformationModel):
-            value = self.transformation_custom(transformation_model, arguments)
-        elif isinstance(transformation_model, ValueTransformationModel):
-            value = self.transformation_value(transformation_model, arguments)
-        elif isinstance(transformation_model, SwitchTransformationModel):
-            return self.transformation_switch(transformation_model, arguments)
+        if transformation_model.custom:
+            value = self.transformation_custom(transformation_model.custom, arguments)
+        elif transformation_model.value:
+            value = self.transformation_value(transformation_model.value, arguments)
+        elif transformation_model.switch:
+            return self.transformation_switch(transformation_model.switch, arguments)
         else:
             raise TypeError(f"Unknow transformation model: {type(transformation_model)}")
         return [FinalMappingModel(output_field=output_field, value=value)]
@@ -207,14 +200,14 @@ class MappingInput:
         list_response = []
 
         # Single output
-        if basic_output.transformation:
+        if basic_output.custom or basic_output.value or basic_output.switch:
             # value = launch_transformation(basic_output.transformation, basic_output.output_field, arguments)
             # list_response.append(
             #     FinalMappingModel(output_field=basic_output.output_field, value=value)
             # )
             list_response.extend(
                 self.launch_transformation(
-                    basic_output.transformation, basic_output.output_field, arguments
+                    basic_output, basic_output.output_field, arguments
                 )
             )
         # Multiple output

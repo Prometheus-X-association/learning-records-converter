@@ -79,37 +79,24 @@ output_fields:
 ```yaml
 output_fields:
   output_field: "actor.mbox"
-    transformation: # Optional, see tranformation section)
-      value: "default_value_here"
+  value: "default_value_here"
 ```
 - `output_field`: Output corresponding field
-- `transformation`: Transformation to apply. If no transformation is specified, a direct mapping is done.
 
 #### Transformation
-The `transformation` section defines the action to apply for the mapping concerned. Several transformations
-are possible and others will be added as the projet goes.
-##### Apply custom python code
-```yaml
-transformation: 
-    custom:
-      - "lambda a, b: a + b"
-      - "lambda val: str(val) + '.com'"
-```
 - `custom`: List of string representing a python lambda to execute some code by using the inputs values. Some utils exists in order to use it directly in the lambda
 
 ##### Static value
 ```yaml
-transformation: 
-    value: "searched"
+value: "searched"
 ```
 - `value`: Static value to map the output with. Essentially used for the default section.
 
 ##### Switch cases
 ```yaml
-transformation: 
-  switch:
-    - condition: "lambda a: is_empty(a)"
-      # ... (other fields from the output_field section)
+switch:
+  - condition: "lambda a: is_empty(a)"
+    # ... (other fields from the output_field section)
 ```
 - `switch`: Like in some programming languages, this is a list of cases with each a condition. The first case with a correct condition wil be used for the output.
 - `condition`: Python lambda with a boolean response to verify condition. There can be (only one) "default" condition where if none of the conditions before have passed, it will still apply the default one. This condition needs to be placed at the end of the list and is not mandatory.
@@ -122,8 +109,7 @@ The `default_values` section specifies default values for certain output fields.
 default_values:
   - description: ""
     output_field: "actor.mbox"
-    transformation:
-      value: "default_value_here"
+    value: "default_value_here"
     # ... (same as the output_field section)
 ```
 - All the output fields can be found [here](#output-field)

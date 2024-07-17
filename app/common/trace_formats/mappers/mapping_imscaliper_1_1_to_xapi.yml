@@ -7,9 +7,8 @@ mappings:
       - "data.0.id"
     output_fields:
       output_field: "id"
-      transformation:
-        custom:
-          - "lambda id: str(id).split(':')[-1] if id else None"
+      custom:
+        - "lambda id: str(id).split(':')[-1] if id else None"
 
 
   # Mapping actor information
@@ -18,20 +17,17 @@ mappings:
     output_fields:
       multiple:
         - output_field: "actor.account.homePage"
-          transformation:
-            custom:
-              - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
+          custom:
+            - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
         - output_field: "actor.account.name"
-          transformation:
-            custom:
-              - "lambda url: (match.group(1) if (match := search(r'/users/(\\d+)', url)) else url)"
+          custom:
+            - "lambda url: (match.group(1) if (match := search(r'/users/(\\d+)', url)) else url)"
 
   - input_fields:
       - "data.0.actor.type"
     output_fields:
       output_field: "actor.objectType"
-      transformation:
-        value: "Agent"
+      value: "Agent"
 
 
   # Mapping action
@@ -41,13 +37,11 @@ mappings:
     output_fields:
       multiple:
         - output_field: "verb.id"
-          transformation:
-            custom:
-              - "lambda dataVersion, action: path_join(dataVersion, 'action', action.lower() if action else 'undefined')"
+          custom:
+            - "lambda dataVersion, action: path_join(dataVersion, 'action', action.lower() if action else 'undefined')"
         - output_field: "verb.display.en-US"
-          transformation:
-            custom:
-              - "lambda dataVersion, action: action"
+          custom:
+            - "lambda dataVersion, action: action"
 
 
   # Mapping object information
@@ -60,8 +54,7 @@ mappings:
       - "data.0.object.type"
     output_fields:
       output_field: "object.objectType" # ou "context.contextActivities.other.objectType"
-      transformation:
-        value: 'Activity'
+      value: 'Activity'
 
   - input_fields:
       - "data.0.object.name"
@@ -72,19 +65,17 @@ mappings:
       - "data.0.object.description"
     output_fields:
       output_field: "object.definition.description.en-US"
-      transformation:
-        custom:
-          - "lambda description: description if description else 'No description provided'"
+      custom:
+        - "lambda description: description if description else 'No description provided'"
 
   - input_fields:
       - "sensor"
       - "data.0.object"
     output_fields:
       output_field: "object.definition.extensions"
-      transformation:
-        custom:
-          - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
-          - "lambda iri, content: {path_join(iri, 'imscaliper/object'): {key: value for key, value in content.items() if key not in ['id', 'name', 'description']}}"
+      custom:
+        - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
+        - "lambda iri, content: {path_join(iri, 'imscaliper/object'): {key: value for key, value in content.items() if key not in ['id', 'name', 'description']}}"
 
 
   # Mapping group/course information
@@ -98,9 +89,8 @@ mappings:
       - "data.0.group.type"
     output_fields:
       output_field: "context.contextActivities.grouping.objectType"
-      transformation:
-        custom:
-          - "lambda id, type: 'Activity' if id else None"
+      custom:
+        - "lambda id, type: 'Activity' if id else None"
 
 
   # Handling Event times
@@ -119,41 +109,34 @@ mappings:
   - input_fields:
       - "data.0.edApp"
     output_fields:
-      transformation:
-        switch:
-          - condition: "lambda iri, ed_app: isinstance(ed_app, str)"
-            output_field: "context.platform"
-            transformation:
-              custom:
-                - "lambda iri, ed_app: ed_app"
+      switch:
+        - condition: "lambda iri, ed_app: isinstance(ed_app, str)"
+          output_field: "context.platform"
+          custom:
+            - "lambda iri, ed_app: ed_app"
 
 
   # Mapping generated and result
   - input_fields:
       - "data.0.generated"
     output_fields:
-      transformation:
-        switch:
-          - condition: "lambda generated: generated.get('type', '') == 'Result' if isinstance(generated, dict) else False"
-            multiple:
-              - output_field: "result.score.raw"
-                transformation:
-                  custom:
-                    - "lambda generated: generated.get('resultScore', None)"
-              - output_field: "result.score.max"
-                transformation:
-                  custom:
-                    - "lambda generated: generated.get('maxResultScore', None)"
-          - condition: "lambda generated: generated.get('type', '') == 'Score' if isinstance(generated, dict) else False"
-            multiple:
-              - output_field: "result.score.raw"
-                transformation:
-                  custom:
-                    - "lambda generated: generated.get('scoreGiven', None)"
-              - output_field: "result.score.max"
-                transformation:
-                  custom:
-                    - "lambda generated: generated.get('maxScore', None)"
+      switch:
+        - condition: "lambda generated: generated.get('type', '') == 'Result' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('resultScore', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxResultScore', None)"
+        - condition: "lambda generated: generated.get('type', '') == 'Score' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('scoreGiven', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxScore', None)"
 
   - input_fields:
       - "data.0.generated.duration"
@@ -164,19 +147,17 @@ mappings:
       - "data.0.generated.values"
     output_fields:
       output_field: "result.response"
-      transformation:
-        custom:
-          - "lambda values: ', '.join(values) if values else None"
+      custom:
+        - "lambda values: ', '.join(values) if values else None"
 
   - input_fields:
       - "sensor"
       - "data.0.generated"
     output_fields:
       output_field: "result.extensions"
-      transformation:
-        custom:
-          - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
-          - "lambda iri, content: {path_join(iri, 'imscaliper/generated'): {key: value for key, value in content.items() if key not in ['id', 'resultScore', 'maxResultScore', 'scoreGiven', 'maxScore', 'duration', 'values']}}"
+      custom:
+        - "lambda iri, content: (iri, content if isinstance(content, dict) else {'iri': content})"
+        - "lambda iri, content: {path_join(iri, 'imscaliper/generated'): {key: value for key, value in content.items() if key not in ['id', 'resultScore', 'maxResultScore', 'scoreGiven', 'maxScore', 'duration', 'values']}}"
 
 
   # Content extensions
@@ -191,30 +172,29 @@ mappings:
       - "data.0.membership"
     output_fields:
       output_field: "context.extensions"
-      transformation:
-        custom:
-          # Type
-          - "lambda sensor, type, actor, group, session, edApp, membership: ({path_join(sensor, 'imscaliper/type'): type}, sensor, actor, group, session, edApp, membership)"
-          # Action
-          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, actor if isinstance(actor, dict) else {'iri': actor}, group, session, edApp, membership)"
-          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in actor.items() if key not in ['id']}, group, session, edApp, membership)"
-          - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/actor'): actor}) or extensions, sensor, group, session, edApp, membership)"
-          # Group
-          - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, group if isinstance(group, dict) else {'iri': group}, session, edApp, membership)"
-          - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in group.items() if key not in ['id']}, session, edApp, membership)"
-          - "lambda extensions, sensor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/group'): group}) or extensions, sensor, session, edApp, membership)"
-          # Session
-          - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, session if isinstance(session, dict) else {'iri': session}, edApp, membership)"
-          - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, {key: value for key, value in session.items()}, edApp, membership)"
-          - "lambda extensions, sensor, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/session'): session}) or extensions, sensor, edApp, membership)"
-          # EdApp
-          - "lambda extensions, sensor, edApp, membership: (extensions, sensor, edApp if isinstance(edApp, dict) else {'iri': edApp}, membership)"
-          - "lambda extensions, sensor, edApp, membership: (extensions, sensor, {key: value for key, value in edApp.items() if key not in ['id']}, membership)"
-          - "lambda extensions, sensor, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/edApp'): edApp}) or extensions, sensor, membership)"
-          # Membership
-          - "lambda extensions, sensor, membership: (extensions, sensor, membership if isinstance(membership, dict) else {'iri': membership})"
-          - "lambda extensions, sensor, membership: (extensions, sensor, {key: value for key, value in membership.items()})"
-          - "lambda extensions, sensor, membership: extensions.update({path_join(sensor, 'imscaliper/membership'): membership}) or extensions"
+      custom:
+        # Type
+        - "lambda sensor, type, actor, group, session, edApp, membership: ({path_join(sensor, 'imscaliper/type'): type}, sensor, actor, group, session, edApp, membership)"
+        # Action
+        - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, actor if isinstance(actor, dict) else {'iri': actor}, group, session, edApp, membership)"
+        - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in actor.items() if key not in ['id']}, group, session, edApp, membership)"
+        - "lambda extensions, sensor, actor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/actor'): actor}) or extensions, sensor, group, session, edApp, membership)"
+        # Group
+        - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, group if isinstance(group, dict) else {'iri': group}, session, edApp, membership)"
+        - "lambda extensions, sensor, group, session, edApp, membership: (extensions, sensor, {key: value for key, value in group.items() if key not in ['id']}, session, edApp, membership)"
+        - "lambda extensions, sensor, group, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/group'): group}) or extensions, sensor, session, edApp, membership)"
+        # Session
+        - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, session if isinstance(session, dict) else {'iri': session}, edApp, membership)"
+        - "lambda extensions, sensor, session, edApp, membership: (extensions, sensor, {key: value for key, value in session.items()}, edApp, membership)"
+        - "lambda extensions, sensor, session, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/session'): session}) or extensions, sensor, edApp, membership)"
+        # EdApp
+        - "lambda extensions, sensor, edApp, membership: (extensions, sensor, edApp if isinstance(edApp, dict) else {'iri': edApp}, membership)"
+        - "lambda extensions, sensor, edApp, membership: (extensions, sensor, {key: value for key, value in edApp.items() if key not in ['id']}, membership)"
+        - "lambda extensions, sensor, edApp, membership: (extensions.update({path_join(sensor, 'imscaliper/edApp'): edApp}) or extensions, sensor, membership)"
+        # Membership
+        - "lambda extensions, sensor, membership: (extensions, sensor, membership if isinstance(membership, dict) else {'iri': membership})"
+        - "lambda extensions, sensor, membership: (extensions, sensor, {key: value for key, value in membership.items()})"
+        - "lambda extensions, sensor, membership: extensions.update({path_join(sensor, 'imscaliper/membership'): membership}) or extensions"
 
   # DASES Profiles
   - input_fields:
@@ -222,182 +202,189 @@ mappings:
       - "data.0.action"
       - "data.0.object.type"
     output_fields:
-      transformation:
-        switch:
-          # lms_accessed_page
-          - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/accessed"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/acrossx/activities/webpage"
-          # lms_downloaded_audio
-          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "http://id.tincanapi.com/verb/downloaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Downloaded"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/audio"
-          # lms_downloaded_video
-          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "http://id.tincanapi.com/verb/downloaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Downloaded"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/video"
-          # lms_downloaded_document
-          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "http://id.tincanapi.com/verb/downloaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Downloaded"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/document"
-          # lms_downloaded_file
-          - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/downloaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Downloaded"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "http://activitystrea.ms/file"
-          # lms_accessed_file
-          - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/accessed"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "http://activitystrea.ms/file"
-          # lms_uploaded_audio
-          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/audio"
-          # lms_uploaded_video
-          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/video"
-          # lms_uploaded_document
-          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/document"
-          # lms_uploaded_file
-          - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/netc/verbs/uploaded"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Accessed"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/video/activity-type/video"
-          # virtual_classroom_joined
-          - condition: "lambda type, action, objectType: type in ['SessionEvent'] action in ['LoggedIn']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "http://activitystrea.ms/join"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Joined session"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-          # virtual_classroom_left
-          - condition: "lambda type, action, objectType: type in ['SessionEvent'] action in ['LoggedOut']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "http://activitystrea.ms/leave"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Left session"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-          # virtual_classroom_posted_public_message
-          - condition: "lambda type, action, objectType: type in ['MessageEvent'] action in ['Posted']"
-            multiple:
-              - output_field: "verb.id"
-                transformation:
-                  value: "https://w3id.org/xapi/acrossx/verbs/posted"
-              - output_field: "verb.display.en-US"
-                transformation:
-                  value: "Left session"
-              - output_field: "object.definition.type"
-                transformation:
-                  value: "https://w3id.org/xapi/acrossx/activities/message"
+      switch:
+        # lms_accessed_page
+        - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/accessed"
+            - output_field: "verb.display.en-US"
+              value: "Accessed"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/acrossx/activities/webpage"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_downloaded_audio
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
+          multiple:
+            - output_field: "verb.id"
+              value: "http://id.tincanapi.com/verb/downloaded"
+            - output_field: "verb.display.en-US"
+              value: "Downloaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/audio"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_downloaded_video
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
+          multiple:
+            - output_field: "verb.id"
+              value: "http://id.tincanapi.com/verb/downloaded"
+            - output_field: "verb.display.en-US"
+              value: "Downloaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/video"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_downloaded_document
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
+          multiple:
+            - output_field: "verb.id"
+              value: "http://id.tincanapi.com/verb/downloaded"
+            - output_field: "verb.display.en-US"
+              value: "Downloaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/document"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_downloaded_file
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/downloaded"
+            - output_field: "verb.display.en-US"
+              value: "Downloaded"
+            - output_field: "object.definition.type"
+              value: "http://activitystrea.ms/file"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_accessed_file
+        - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/accessed"
+            - output_field: "verb.display.en-US"
+              value: "Accessed"
+            - output_field: "object.definition.type"
+              value: "http://activitystrea.ms/file"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_uploaded_audio
+        - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/uploaded"
+            - output_field: "verb.display.en-US"
+              value: "Uploaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/audio"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_uploaded_video
+        - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/uploaded"
+            - output_field: "verb.display.en-US"
+              value: "Uploaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/video"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_uploaded_document
+        - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/uploaded"
+            - output_field: "verb.display.en-US"
+              value: "Uploaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/document"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # lms_uploaded_file
+        - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/netc/verbs/uploaded"
+            - output_field: "verb.display.en-US"
+              value: "Uploaded"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/video/activity-type/video"
+            - output_field: "context.contextActivities.category.0.id"
+              value: "https://w3id.org/xapi/lms"
+            - output_field: "context.contextActivities.category.0.definition.type"
+              value: "http://adlnet.gov/expapi/activities/profile"
+
+        # virtual_classroom_joined
+        - condition: "lambda type, action, objectType: type in ['SessionEvent'] and action in ['LoggedIn']"
+          multiple:
+            - output_field: "verb.id"
+              value: "http://activitystrea.ms/join"
+            - output_field: "verb.display.en-US"
+              value: "Joined session"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+        # virtual_classroom_left
+        - condition: "lambda type, action, objectType: type in ['SessionEvent'] and action in ['LoggedOut']"
+          multiple:
+            - output_field: "verb.id"
+              value: "http://activitystrea.ms/leave"
+            - output_field: "verb.display.en-US"
+              value: "Left session"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+        # virtual_classroom_posted_public_message
+        - condition: "lambda type, action, objectType: type in ['MessageEvent'] and action in ['Posted']"
+          multiple:
+            - output_field: "verb.id"
+              value: "https://w3id.org/xapi/acrossx/verbs/posted"
+            - output_field: "verb.display.en-US"
+              value: "Left session"
+            - output_field: "object.definition.type"
+              value: "https://w3id.org/xapi/acrossx/activities/message"
 
 
   - input_fields:
       - "data.0.group.type"
     output_fields:
-      transformation:
-        switch:
-          - condition: "lambda groupType: groupType == 'CourseSection'"
-            output_field: "object.definition.extensions"
-            transformation:
-              custom:
-                - "lambda group: {'https://w3id.org/xapi/acrossx/extensions/type': 'course'}"
+      switch:
+        - condition: "lambda groupType: groupType == 'CourseSection'"
+          output_field: "object.definition.extensions"
+          custom:
+            - "lambda group: {'https://w3id.org/xapi/acrossx/extensions/type': 'course'}"
 
-default:
+default_values:
   - description: "Default xAPI version"
     output_field: "version"
-    transformation:
-      value: "1.0.0"
+    value: "1.0.0"
 
 metadata:
   author: "Inokufu"

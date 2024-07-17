@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -18,46 +18,52 @@ class BasicTransformationModel(BaseModel):
     pass
 
 
-class CustomTransformationModel(BasicTransformationModel):
-    custom: List[str] = Field(
-        ...,
+class OutputMappingModel(BasicModel):
+    output_field: Optional[str] = Field(
+        default=None,
+        description="Output field for the mapping.",
+        examples=["actor.mbox"],
+    )
+
+    value: Optional[Any] = Field(
+        default=None,
+        description="Static value",
+        examples=["http://example.com/xapi/verbs/completed"],
+    )
+
+    custom: Optional[List[str]] = Field(
+        default=None,
         description="List of custom lambda (python) code?",
         examples=[
             "lambda val: 'http://example.com/xapi/verbs/completed' if val == 'completed' else None"
         ],
     )
 
-
-class ValueTransformationModel(BasicTransformationModel):
-    value: Any = Field(
-        ..., description="Static value", examples=["http://example.com/xapi/verbs/completed"]
+    switch: Optional[List["ConditionOutputMappingModel"]] = Field(
+        default=None,
+        description="Static value",
+        examples=["http://example.com/xapi/verbs/completed"],
     )
-
-
-class OutputMappingModel(BasicModel):
-    output_field: Optional[str] = Field(
-        default=None, description="Output field for the mapping.", examples=["actor.mbox"]
-    )
-    transformation: Optional[
-        Union["CustomTransformationModel", "ValueTransformationModel", "SwitchTransformationModel"]
-    ] = Field(default=None, description="Transformation logic.")
 
     multiple: Optional[List["OutputMappingModel"]] = Field(
-        default=[], description="List of multiple output mapping."
+        default=[],
+        description="List of multiple output mapping.",
     )
 
     @model_validator(mode="before")
     def validate_output_field_transformation_xor_multiple(cls, values):
-        output_field, transformation, multiple = (
+        output_field, value, custom, switch, multiple = (
             values.get("output_field"),
-            values.get("transformation"),
+            values.get("value"),
+            values.get("custom"),
+            values.get("switch"),
             values.get("multiple"),
         )
-        if (output_field or transformation) and multiple:
+        if (output_field or value or custom or switch) and multiple:
             raise ValueError(
                 "Either 'output_field' and 'transformation' or 'multiple' should be provided, not both."
             )
-        if not (output_field or transformation) and not multiple:
+        if not (output_field or value or custom or switch) and not multiple:
             raise ValueError(
                 "Either 'output_field' and 'transformation' or 'multiple' should be provided."
             )
@@ -67,17 +73,21 @@ class OutputMappingModel(BasicModel):
 
 class ConditionOutputMappingModel(OutputMappingModel):
     condition: str = Field(
-        ..., description="Condition for the switch.", examples=["lambda val: val == 'book'"]
+        ...,
+        description="Condition for the switch.",
+        examples=["lambda val: val == 'book'"],
     )
 
     @model_validator(mode="before")
     def validate_output_field_transformation(cls, values):
-        output_field, transformation, multiple = (
+        output_field, value, custom, switch, multiple = (
             values.get("output_field"),
-            values.get("transformation"),
+            values.get("value"),
+            values.get("custom"),
+            values.get("switch"),
             values.get("multiple"),
         )
-        if transformation and not output_field:
+        if (value or custom or switch) and not output_field:
             raise ValueError(
                 "If 'transformation' is defined, 'output_field' also needs to be define."
             )
@@ -85,46 +95,71 @@ class ConditionOutputMappingModel(OutputMappingModel):
         return values
 
 
-class SwitchTransformationModel(BasicTransformationModel):
-    switch: List[ConditionOutputMappingModel] = Field(
-        ..., description="Static value", examples=["http://example.com/xapi/verbs/completed"]
-    )
-
-
 class MainMappingModel(BasicModel):
     input_fields: List[str] = Field(
-        ..., description="Input field for the switch.", examples=["cmi.object.type"]
+        ...,
+        description="Input field for the switch.",
+        examples=["cmi.object.type"],
     )
-    output_fields: OutputMappingModel = Field(..., description="Output field for the mapping.")
+    output_fields: OutputMappingModel = Field(
+        ...,
+        description="Output field for the mapping.",
+    )
 
 
 class MetadataDateModel(BaseModel):
-    publication: str = Field(..., description="Publication date.", examples=["2023-01-01"])
-    update: str = Field(..., description="Update date.", examples=["2023-02-01"])
+    publication: str = Field(
+        ...,
+        description="Publication date.",
+        examples=["2023-01-01"],
+    )
+    update: str = Field(
+        ...,
+        description="Update date.",
+        examples=["2023-02-01"],
+    )
 
 
 class MetadataModel(BasicModel):
     author: str = Field(
-        ..., description="Author of the transformation config.", examples=["Your Name"]
+        ...,
+        description="Author of the transformation config.",
+        examples=["Your Name"],
     )
     # version: float = Field(
     #     ..., description="Version of the transformation config.", examples=[1.0]
     # )
-    date: MetadataDateModel = Field(..., description="Dates related to the transformation config.")
+    date: MetadataDateModel = Field(
+        ...,
+        description="Dates related to the transformation config.",
+    )
 
 
 class CompleteConfigModel(BaseModel):
     version: float = Field(
-        ..., description="Version of the transformation config.", examples=[1.0]
+        ...,
+        description="Version of the transformation config.",
+        examples=[1.0],
     )
     input_format: str = Field(
-        ..., description="Input format for the transformation.", examples=["SCORM"]
+        ...,
+        description="Input format for the transformation.",
+        examples=["SCORM"],
     )
     output_format: str = Field(
-        ..., description="Output format for the transformation.", examples=["xAPI"]
+        ...,
+        description="Output format for the transformation.",
+        examples=["xAPI"],
     )
-    mappings: List[MainMappingModel] = Field(..., description="List of mappings.")
+    mappings: List[MainMappingModel] = Field(
+        ...,
+        description="List of mappings.",
+    )
     default_values: List[OutputMappingModel] = Field(
-        default=[], description="List of default values."
+        default=[],
+        description="List of default values.",
     )
-    metadata: MetadataModel = Field(..., description="Metadata for the transformation config.")
+    metadata: MetadataModel = Field(
+        ...,
+        description="Metadata for the transformation config.",
+    )
