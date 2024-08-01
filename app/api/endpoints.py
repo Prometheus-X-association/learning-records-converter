@@ -1,4 +1,5 @@
-from enums.custom_trace_format import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
+import os
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,10 +19,13 @@ from app.api.schemas import (
     ValidateInputTraceRequestModel,
     ValidateInputTraceResponseModel,
 )
+from app.profile_enricher.profiler import Profiler
+from app.profile_enricher.repositories.jsonld import JsonLdProfileRepository
 from app.xapi_converter.transformer.mapping_input import (
     MappingInput,
     get_mapping_by_input_and_output_format,
 )
+from enums.custom_trace_format import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 
 ROOT_PATH = ""
 
@@ -90,8 +94,10 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     # Get Mapping
     mapping_config = get_mapping_by_input_and_output_format(input_model, output_model)
     # Apply Mapping
+    jsonld_repository = JsonLdProfileRepository(base_path=os.path.join('data', 'dases_profiles'))
+    profiler = Profiler(repository=jsonld_repository)
     mapper = MappingInput(
-        input_format=input_model, mapping_to_apply=mapping_config, output_format=output_model
+        input_format=input_model, mapping_to_apply=mapping_config, output_format=output_model, profile_enricher=profiler
     )
     response = mapper.run(query.input_trace)
     # Done

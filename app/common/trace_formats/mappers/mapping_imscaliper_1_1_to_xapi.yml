@@ -206,16 +206,12 @@ mappings:
         # lms_accessed_page
         - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/accessed"
-            - output_field: "verb.display.en-US"
-              value: "Accessed"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/acrossx/activities/webpage"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.accessed-page"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_downloaded_audio
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"

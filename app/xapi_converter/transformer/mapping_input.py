@@ -4,6 +4,7 @@ from typing import List
 
 from pydantic import BaseModel
 
+from app.profile_enricher.profiler import Profiler
 from app.xapi_converter.transformer import *
 from enums import (
     CustomTraceFormatModelEnum,
@@ -105,10 +106,12 @@ class MappingInput:
         input_format: CustomTraceFormatModelEnum,
         mapping_to_apply: CompleteConfigModel,
         output_format: CustomTraceFormatModelEnum,  # = TraceFormatModelEnum.XAPI,
+        profile_enricher: Profiler
     ) -> None:
         self.input_format = input_format
         self.output_format = output_format
         self.mapping_to_apply = mapping_to_apply
+        self.profile_enricher = profile_enricher
 
     def transformation_custom(
         self,
@@ -136,6 +139,18 @@ class MappingInput:
         if not arguments:
             arguments = list()
         return value
+
+    def transformation_profile(
+        self, profile: str, arguments: list[Any] | None = None
+    ) -> list[FinalMappingModel]:
+        list_response = []
+        enriched_data = self.profile_enricher.enrich(profile)
+        for field, value in enriched_data.items():
+            list_response.append(
+                FinalMappingModel(output_field=field, value=value)
+            )
+        return list_response
+
 
     # TODO: > OK for 1 output, but not multiple, return list?
     def transformation_switch(
@@ -198,6 +213,12 @@ class MappingInput:
             arguments = list()
         # TODO: Check code here... append models?
         list_response = []
+
+        # Profile handling
+        if basic_output.profile:
+            list_response.extend(
+                self.transformation_profile(basic_output.profile, arguments)
+            )
 
         # Single output
         if basic_output.custom or basic_output.value or basic_output.switch:

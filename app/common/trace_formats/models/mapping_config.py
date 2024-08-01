@@ -50,22 +50,28 @@ class OutputMappingModel(BasicModel):
         description="List of multiple output mapping.",
     )
 
+    profile: str = Field(
+        default=None,
+        description="Dases profile to apply.",
+    )
+
     @model_validator(mode="before")
     def validate_output_field_transformation_xor_multiple(cls, values):
-        output_field, value, custom, switch, multiple = (
+        output_field, value, custom, switch, multiple, profile = (
             values.get("output_field"),
             values.get("value"),
             values.get("custom"),
             values.get("switch"),
             values.get("multiple"),
+            values.get("profile")
         )
         if (output_field or value or custom or switch) and multiple:
             raise ValueError(
-                "Either 'output_field' and 'transformation' or 'multiple' should be provided, not both."
+                "Only one mapping should be provided."
             )
-        if not (output_field or value or custom or switch) and not multiple:
+        if not (output_field or value or custom or switch or profile or multiple):
             raise ValueError(
-                "Either 'output_field' and 'transformation' or 'multiple' should be provided."
+                "A mapping should be provided."
             )
 
         return values
