@@ -20,7 +20,7 @@ from app.api.schemas import (
     ValidateInputTraceResponseModel,
 )
 from app.profile_enricher.profiler import Profiler
-from app.profile_enricher.repositories.jsonld import JsonLdProfileRepository
+from app.profile_enricher.repositories.jsonld.jsonld_repository import JsonLdProfileRepository
 from app.xapi_converter.transformer.mapping_input import (
     MappingInput,
     get_mapping_by_input_and_output_format,

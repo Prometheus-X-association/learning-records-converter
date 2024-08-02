@@ -174,7 +174,7 @@ class Extension(ProfileElement):
         """
         Validator to ensure 'recommendedActivityTypes' is only allowed on ActivityExtension types.
         """
-        if value is not None and info.data.get('type') != ExtensionTypeEnum.ACTIVITY.value:
+        if value is not None and info.data.get('type') != ExtensionTypeEnum.ACTIVITY:
             raise ValueError("recommendedActivityTypes is only allowed on an ActivityExtension")
         return value
 
@@ -184,7 +184,7 @@ class Extension(ProfileElement):
         """
         Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types.
         """
-        if value is not None and info.data.get('type') not in [ExtensionTypeEnum.CONTEXT.value, ExtensionTypeEnum.RESULT.value]:
+        if value is not None and info.data.get('type') not in [ExtensionTypeEnum.CONTEXT, ExtensionTypeEnum.RESULT]:
             raise ValueError("recommendedVerbs is only allowed on a ContextExtension or a ResultExtension")
         return value
 

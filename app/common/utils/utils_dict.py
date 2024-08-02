@@ -1,4 +1,5 @@
 import re
+from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union, overload
 
 import yaml
@@ -433,3 +434,19 @@ def convert_yaml_file_to_json(yaml_path: str) -> dict:
             return yaml.safe_load(file)
     else:
         raise ValueError("'yaml_path' cannot be empty")
+
+
+def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
+    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
+    updating only top-level keys, dict_merge recurses down into dicts nested
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
+    ``dct``.
+    :param target_dict: dict onto which the merge is executed
+    :param merge_dct: dct merged into dct
+    :return: None
+    """
+    for k, v in merge_dct.items():
+        if k in target_dict and isinstance(target_dict[k], dict) and isinstance(merge_dct[k], dict):  #noqa
+            deep_merge(target_dict[k], merge_dct[k])
+        else:
+            target_dict[k] = merge_dct[k]

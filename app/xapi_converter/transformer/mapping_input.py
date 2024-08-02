@@ -112,6 +112,7 @@ class MappingInput:
         self.output_format = output_format
         self.mapping_to_apply = mapping_to_apply
         self.profile_enricher = profile_enricher
+        self.profile = None
 
     def transformation_custom(
         self,
@@ -139,18 +140,6 @@ class MappingInput:
         if not arguments:
             arguments = list()
         return value
-
-    def transformation_profile(
-        self, profile: str, arguments: list[Any] | None = None
-    ) -> list[FinalMappingModel]:
-        list_response = []
-        enriched_data = self.profile_enricher.enrich(profile)
-        for field, value in enriched_data.items():
-            list_response.append(
-                FinalMappingModel(output_field=field, value=value)
-            )
-        return list_response
-
 
     # TODO: > OK for 1 output, but not multiple, return list?
     def transformation_switch(
@@ -214,11 +203,8 @@ class MappingInput:
         # TODO: Check code here... append models?
         list_response = []
 
-        # Profile handling
         if basic_output.profile:
-            list_response.extend(
-                self.transformation_profile(basic_output.profile, arguments)
-            )
+            self.profile = basic_output.profile
 
         # Single output
         if basic_output.custom or basic_output.value or basic_output.switch:
@@ -330,6 +316,18 @@ class MappingInput:
         # Return response
         return output_trace
 
+    def enrich_and_validate_with_profile(self, output_trace: dict):
+        # Enrich trace with profile
+        self.profile_enricher.enrich_trace(profile=self.profile, trace=output_trace)
+
+        # Valid trace with profile
+        if not self.profile_enricher.validate_trace(
+            profile=self.profile,
+            trace=output_trace
+        ):
+            raise ValueError("The trace does not match the profile")
+
+
     def run(self, input_trace: dict) -> dict:
         ##### MAIN FUNCTION #####
         if not self.input_format or not self.output_format or not self.mapping_to_apply:
@@ -346,5 +344,9 @@ class MappingInput:
         # Output format (always xAPI non?)
         # An exception will be raised of not correct model
         self.output_format.value(**output_trace)  # TODO: To test
+
+        if self.profile is not None:
+            self.enrich_and_validate_with_profile(output_trace=output_trace)
+
         # Check if output_trace match output_format (model validation)
         return output_trace
