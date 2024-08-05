@@ -1,29 +1,26 @@
 import json
 import logging
-import os
+from pathlib import Path
 from typing import Optional
 
 from pydantic import ValidationError
 
-from app.profile_enricher.exceptions import (
-    InvalidJsonException,
-    ProfileNotFoundException,
-    ProfileValidationError,
-    TemplateNotFoundException,
-)
-from app.profile_enricher.profiles.jsonld import (
-    Profile,
-    StatementTemplate,
-)
+from app.profile_enricher.exceptions import (InvalidJsonException,
+                                             ProfileNotFoundException,
+                                             ProfileValidationError,
+                                             TemplateNotFoundException)
+from app.profile_enricher.profiles.jsonld import Profile, StatementTemplate
 from app.profile_enricher.types import JsonType
 
 logger = logging.getLogger(__name__)
 
 
 class ProfileLoader:
+    """Class responsible for loading profile's file."""
+
     def __init__(self, base_path: str):
-        self.base_path = base_path
-        self.profiles_cache = {}
+        self.base_path: Path = Path(base_path)
+        self.profiles_cache: dict[str, Profile] = {}
 
     def load_template(self, group_name: str, template_name: str) -> StatementTemplate:
         """
@@ -43,7 +40,9 @@ class ProfileLoader:
             logger.debug(f"Load profile: {group_name}")
 
             # First, read the profile file
-            profile_json = self._load_profile_file(group=group_name)
+            file_path = self.base_path.joinpath(f"{group_name}.jsonld")
+            profile_json = self._read_profile_file(file_path=file_path)
+
             # Next, validate the profile with the Pydantic model
             profile = self._validate_profile(profile_json=profile_json)
 
@@ -60,30 +59,38 @@ class ProfileLoader:
         )
 
         if template is None:
-            logger.error(f"Template '{template_name}' not found in profile '{group_name}'")
-            raise TemplateNotFoundException(f"Template '{template_name}' not found in profile '{group_name}'")
+            logger.error(
+                f"Template '{template_name}' not found in profile '{group_name}'"
+            )
+            raise TemplateNotFoundException(
+                f"Template '{template_name}' not found in profile '{group_name}'"
+            )
 
         return template
 
-    def _load_profile_file(self, group: str) -> JsonType:
+    @staticmethod
+    def _read_profile_file(file_path: Path) -> JsonType:
         """
         Load a profile file from the file system.
 
-        :param group: The group name of the profile
+        :param file_path: The file path of the profile
         :return: The loaded profile data
         :raises ProfileNotFoundException: If the profile file is not found
         :raises InvalidJsonException: If the profile JSON is invalid
         """
-        file = os.path.join(self.base_path, f'{group}.jsonld')
         try:
-            with open(file=file, mode='r', encoding="utf8") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            logger.error(f"Profile file not found: {file}")
-            raise ProfileNotFoundException(f"Profile file not found: {file}")
-        except json.JSONDecodeError:
-            logger.error(f"Invalid JSON in profile file: {file}")
-            raise InvalidJsonException(f"Invalid JSON in profile file: {file}")
+            file_content = file_path.read_text(encoding="utf8")
+            return json.loads(file_content)
+        except FileNotFoundError as e:
+            logger.error(f"Profile file not found: {file_path}")
+            raise ProfileNotFoundException(
+                f"Profile file not found: {file_path} {e}"
+            ) from e
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in profile file: {file_path}")
+            raise InvalidJsonException(
+                f"Invalid JSON in profile file: {file_path} {e}"
+            ) from e
 
     @staticmethod
     def _validate_profile(profile_json: JsonType) -> Profile:
@@ -98,16 +105,20 @@ class ProfileLoader:
             return Profile(**profile_json)
         except ValidationError as e:
             logger.error(f"Profile validation failed: {e}")
-            raise ProfileValidationError(f"Profile validation failed: {e}")
+            raise ProfileValidationError(f"Profile validation failed: {e}") from e
         except TypeError as e:
             logger.error(f"Invalid data type in profile: {e}")
-            raise ProfileValidationError(f"Invalid data type in profile: {e}")
+            raise ProfileValidationError(f"Invalid data type in profile: {e}") from e
         except Exception as e:
             logger.error(f"Unexpected error during profile validation: {e}")
-            raise ProfileValidationError(f"Unexpected error during profile validation: {e}")
+            raise ProfileValidationError(
+                f"Unexpected error during profile validation: {e}"
+            ) from e
 
     @staticmethod
-    def _get_template_in_profile(profile: Profile, template_name: str) -> Optional[StatementTemplate]:
+    def _get_template_in_profile(
+        profile: Profile, template_name: str
+    ) -> Optional[StatementTemplate]:
         """
         Get a specific template from a profile.
 

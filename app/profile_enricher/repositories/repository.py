@@ -21,7 +21,9 @@ class ProfileRepository(ABC):
         ...
 
     @abstractmethod
-    def validate_trace(self, group_name: str, template_name: str, trace: JsonType) -> bool:
+    def validate_trace(
+        self, group_name: str, template_name: str, trace: JsonType
+    ) -> bool:
         """
         Validate a trace against its profile rules.
 

@@ -1,12 +1,13 @@
 import logging
 
+from utils.utils_dict import deep_merge
+
 from app.profile_enricher.repositories.repository import ProfileRepository
 from app.profile_enricher.types import JsonType
+
 from .profile_loader import ProfileLoader
 from .trace_enricher import TraceEnricher
 from .trace_validator import TraceValidator
-
-from utils.utils_dict import deep_merge, get_nested_from_flat
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class JsonLdProfileRepository(ProfileRepository):
 
         :param base_path: Base path for profile files
         """
-        self.profile_loader = ProfileLoader(base_path)
+        self.profile_loader = ProfileLoader(base_path=base_path)
         self.trace_enricher = TraceEnricher()
         self.trace_validator = TraceValidator()
 
@@ -48,10 +49,12 @@ class JsonLdProfileRepository(ProfileRepository):
         enriched_data = self.trace_enricher.get_enriched_data(template=template)
 
         # Merge recursively the original trace with enriched data
-        deep_merge(target_dict=trace, merge_dct=get_nested_from_flat(enriched_data))
+        deep_merge(target_dict=trace, merge_dct=enriched_data)
         logger.debug(f"Trace enriched successfully for template: {template_name}")
 
-    def validate_trace(self, group_name: str, template_name: str, trace: JsonType) -> bool:
+    def validate_trace(
+        self, group_name: str, template_name: str, trace: JsonType
+    ) -> bool:
         """
         Validate a trace against its profile rules.
 

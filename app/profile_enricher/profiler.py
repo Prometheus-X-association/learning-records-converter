@@ -63,7 +63,9 @@ class Profiler:
         :return: The group_name and the template_name
         """
         try:
-            group_name, template_name = profile.split('.', 1)
+            group_name, template_name = profile.split(".", 1)
         except ValueError as e:
-            raise ProfilerException(f"Invalid profile format : {str(e)}. Expected 'group_name.template_name', got: {profile}") from e
+            raise ProfilerException(
+                f"Invalid profile format : {str(e)}. Expected 'group_name.template_name', got: {profile}"
+            ) from e
         return group_name, template_name

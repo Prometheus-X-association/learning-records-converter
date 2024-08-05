@@ -3,17 +3,14 @@ from typing import Any
 
 import jsonpath_ng
 
-from app.profile_enricher.profiles.jsonld import (
-    PresenceTypeEnum,
-    StatementTemplate,
-    StatementTemplateRule,
-)
+from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
+                                                  StatementTemplateRule)
 from app.profile_enricher.types import JsonType
 
 logger = logging.getLogger(__name__)
 
 
-class TraceValidator():
+class TraceValidator:
     """Class responsible for validating traces against templates."""
 
     def validate_trace(self, template: StatementTemplate, trace: JsonType) -> bool:
@@ -24,10 +21,11 @@ class TraceValidator():
         :param trace: The trace to validate.
         :return: True if the trace is valid, False otherwise.
         """
-        for rule in template.rules:
-            if not self._follows_rule(trace=trace, rule=rule):
-                logger.debug(f"Trace validation failed for rule: {rule}")
-                return False
+        if template.rules:
+            for rule in template.rules:
+                if not self._follows_rule(trace=trace, rule=rule):
+                    logger.debug(f"Trace validation failed for rule: {rule}")
+                    return False
 
         logger.debug(f"Trace validated successfully against template '{template.id}'")
 
@@ -45,19 +43,21 @@ class TraceValidator():
         # Apply the JSONPath to retrieve the field to check
         values = self._apply_jsonpath(data=trace, path=rule.location)
         if rule.selector:
-            values = self._apply_selector(values, rule.selector)
+            values = self._apply_selector(values=values, selector=rule.selector)
 
         # Check the "included" and "excluded" rules
-        if rule.presence and not self._check_presence(rule.presence, values):
+        if rule.presence and not self._check_presence(
+            presence=rule.presence, values=values
+        ):
             return False
 
         # Check the "any" / "all" / "none" rules
         if rule.presence != PresenceTypeEnum.RECOMMENDED or values:
-            if rule.any and not self._check_any(rule.any, values):
+            if rule.any and not self._check_any(any_values=rule.any, values=values):
                 return False
-            if rule.all and not self._check_all(rule.all, values):
+            if rule.all and not self._check_all(all_values=rule.all, values=values):
                 return False
-            if rule.none and not self._check_none(rule.none, values):
+            if rule.none and not self._check_none(none_values=rule.none, values=values):
                 return False
 
         return True
@@ -123,7 +123,13 @@ class TraceValidator():
         try:
             results = jsonpath_ng.parse(path).find(data)
             # Flatten the list if the result is a list of lists
-            return [item for result in results for item in (result.value if isinstance(result.value, list) else [result.value])]
+            return [
+                item
+                for result in results
+                for item in (
+                    result.value if isinstance(result.value, list) else [result.value]
+                )
+            ]
         except Exception as e:
             logger.error(f"Invalid JSONPath: {path}")
             raise ValueError(f"Invalid JSONPath: {path}") from e
@@ -139,5 +145,5 @@ class TraceValidator():
         result = []
         for value in values:
             if isinstance(value, dict):
-                result.extend(self._apply_jsonpath(value, selector))
+                result.extend(self._apply_jsonpath(data=value, path=selector))
         return result
