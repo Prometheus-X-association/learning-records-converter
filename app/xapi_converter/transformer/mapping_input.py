@@ -321,11 +321,12 @@ class MappingInput:
         self.profile_enricher.enrich_trace(profile=self.profile, trace=output_trace)
 
         # Valid trace with profile
-        if not self.profile_enricher.validate_trace(
+        errors = self.profile_enricher.validate_trace(
             profile=self.profile,
-            trace=output_trace
-        ):
-            raise ValueError("The trace does not match the profile")
+            trace=output_trace,
+        )
+        if errors:
+            raise ValueError(f"The trace does not match the profile: {errors}")
 
 
     def run(self, input_trace: dict) -> dict:

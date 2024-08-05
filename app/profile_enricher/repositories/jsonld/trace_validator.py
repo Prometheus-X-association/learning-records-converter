@@ -5,7 +5,7 @@ import jsonpath_ng
 
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
                                                   StatementTemplateRule)
-from app.profile_enricher.types import JsonType
+from app.profile_enricher.types import JsonType, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -13,69 +13,95 @@ logger = logging.getLogger(__name__)
 class TraceValidator:
     """Class responsible for validating traces against templates."""
 
-    def validate_trace(self, template: StatementTemplate, trace: JsonType) -> bool:
+    def validate_trace(
+        self, template: StatementTemplate, trace: JsonType
+    ) -> list[ValidationError]:
         """
         Validate a trace against a given template.
 
         :param template: The template to validate against.
         :param trace: The trace to validate.
-        :return: True if the trace is valid, False otherwise.
+        :return: A list of ValidationError objects. An empty list indicates a valid trace.
         """
+        errors: list[ValidationError] = []
         if template.rules:
             for rule in template.rules:
-                if not self._follows_rule(trace=trace, rule=rule):
+                rule_errors = self._follows_rule(trace=trace, rule=rule)
+                if rule_errors:
                     logger.debug(f"Trace validation failed for rule: {rule}")
-                    return False
+                    errors.extend(rule_errors)
 
-        logger.debug(f"Trace validated successfully against template '{template.id}'")
+        if not errors:
+            logger.debug(
+                f"Trace validated successfully against template '{template.id}'"
+            )
 
-        return True
+        return errors
 
-    def _follows_rule(self, trace: JsonType, rule: StatementTemplateRule) -> bool:
+    def _follows_rule(
+        self, trace: JsonType, rule: StatementTemplateRule
+    ) -> list[ValidationError]:
         """
         Check if a trace follows a specific rule.
         See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid
 
         :param trace: The trace to check
         :param rule: The rule to check against
-        :return: True if the trace follows the rule, False otherwise
+        :return: List of errors
         """
+        errors = []
+
         # Apply the JSONPath to retrieve the field to check
         values = self._apply_jsonpath(data=trace, path=rule.location)
         if rule.selector:
             values = self._apply_selector(values=values, selector=rule.selector)
 
         # Check the "included" and "excluded" rules
-        if rule.presence and not self._check_presence(
-            presence=rule.presence, values=values
-        ):
-            return False
+        if rule.presence:
+            if rule.presence == PresenceTypeEnum.INCLUDED and not values:
+                errors.append(
+                    ValidationError(
+                        rule="presence",
+                        expected="included",
+                        actual="missing",
+                        path=rule.location,
+                    )
+                )
+            elif rule.presence == PresenceTypeEnum.EXCLUDED and values:
+                errors.append(
+                    ValidationError(
+                        rule="presence",
+                        expected="excluded",
+                        actual="present",
+                        path=rule.location,
+                    )
+                )
 
         # Check the "any" / "all" / "none" rules
         if rule.presence != PresenceTypeEnum.RECOMMENDED or values:
             if rule.any and not self._check_any(any_values=rule.any, values=values):
-                return False
+                errors.append(
+                    ValidationError(
+                        rule="any", expected=rule.any, actual=values, path=rule.location
+                    )
+                )
             if rule.all and not self._check_all(all_values=rule.all, values=values):
-                return False
+                errors.append(
+                    ValidationError(
+                        rule="all", expected=rule.all, actual=values, path=rule.location
+                    )
+                )
             if rule.none and not self._check_none(none_values=rule.none, values=values):
-                return False
+                errors.append(
+                    ValidationError(
+                        rule="none",
+                        expected=f"no values from {rule.none}",
+                        actual=values,
+                        path=rule.location,
+                    )
+                )
 
-        return True
-
-    @staticmethod
-    def _check_presence(presence: PresenceTypeEnum, values: list[Any]) -> bool:
-        """
-        Check if values satisfy the presence requirement.
-
-        :param presence: The required presence type
-        :param values: The values to check
-        :return: True if the presence requirement is satisfied, False otherwise
-        """
-        if presence == PresenceTypeEnum.INCLUDED:
-            return len(values) > 0
-        elif presence == PresenceTypeEnum.EXCLUDED:
-            return not values
-        return True
+        return errors
 
     @staticmethod
     def _check_any(any_values: list[Any], values: list[Any]) -> bool:

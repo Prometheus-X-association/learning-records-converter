@@ -1,6 +1,7 @@
+from app.profile_enricher.repositories.contracts.repository import ProfileRepository
+
 from .exceptions import ProfilerException
-from .repositories.repository import ProfileRepository
-from .types import JsonType
+from .types import JsonType, ValidationError
 
 
 class Profiler:
@@ -36,7 +37,7 @@ class Profiler:
         except Exception as e:
             raise ProfilerException(f"Failed to enrich trace: {str(e)}") from e
 
-    def validate_trace(self, profile: str, trace: JsonType):
+    def validate_trace(self, profile: str, trace: JsonType) -> list[ValidationError]:
         """
         Validate a trace against the specified profile.
 
@@ -47,12 +48,12 @@ class Profiler:
         group_name, template_name = self._parse_profile(profile=profile)
 
         try:
-            is_valid = self.repository.validate_trace(
+            errors = self.repository.validate_trace(
                 group_name=group_name,
                 template_name=template_name,
                 trace=trace,
             )
-            return is_valid
+            return errors
         except Exception as e:
             raise ProfilerException("Failed to validate trace") from e
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..types import JsonType
+from app.profile_enricher.types import JsonType, ValidationError
 
 
 class ProfileRepository(ABC):
@@ -23,13 +23,13 @@ class ProfileRepository(ABC):
     @abstractmethod
     def validate_trace(
         self, group_name: str, template_name: str, trace: JsonType
-    ) -> bool:
+    ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :param trace: The trace to validate
-        :return: True if the trace is valid according to the profile, False otherwise
+        :return: A list of ValidationError objects. An empty list indicates a valid trace.
         """
         ...

@@ -2,8 +2,8 @@ import logging
 
 from utils.utils_dict import deep_merge
 
-from app.profile_enricher.repositories.repository import ProfileRepository
-from app.profile_enricher.types import JsonType
+from app.profile_enricher.repositories.contracts.repository import ProfileRepository
+from app.profile_enricher.types import JsonType, ValidationError
 
 from .profile_loader import ProfileLoader
 from .trace_enricher import TraceEnricher
@@ -54,14 +54,14 @@ class JsonLdProfileRepository(ProfileRepository):
 
     def validate_trace(
         self, group_name: str, template_name: str, trace: JsonType
-    ) -> bool:
+    ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :param trace: The trace to validate
-        :return: True if the trace is valid according to the profile, False otherwise
+        :return: A list of ValidationError objects. An empty list indicates a valid trace.
         :raises TemplateNotFoundException: If the specified template is not found
         :raises ProfileNotFoundException: If the profile is not found
         :raises InvalidJsonException: If the profile JSON is invalid
