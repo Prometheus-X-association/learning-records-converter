@@ -4,8 +4,8 @@ import os
 from functools import cache
 from pathlib import Path
 from typing import Optional
-from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.error import URLError, HTTPError
+from urllib.request import urlopen, Request
 
 from pydantic import ValidationError
 
@@ -116,9 +116,22 @@ class ProfileLoader:
             raise ProfileNotFoundException(f"URL not found for profile: {group_name}")
 
         try:
-            with urlopen(url) as response:
-                content = response.read()
+            request = Request(url=url)
+            with urlopen(request, timeout=10) as response:
+                if response.status != 200:
+                    raise ProfileNotFoundException(
+                        f"Failed to download profile for {group_name}: HTTP status {response.status}"
+                    )
+
+                content = response.read().decode('utf-8')
             return json.loads(content)
+        except HTTPError as e:
+            logger.error(
+                f"HTTP error occurred while downloading profile for {group_name}: {e}"
+            )
+            raise ProfileNotFoundException(
+                f"Failed to download profile for {group_name}: HTTP error {e.code}"
+            ) from e
         except URLError as e:
             logger.error(f"Failed to download profile for {group_name}: {e}")
             raise ProfileNotFoundException(

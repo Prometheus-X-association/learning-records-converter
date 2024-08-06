@@ -17,7 +17,7 @@ class Profiler:
         """
         self.repository = repository
 
-    def enrich_trace(self, profile: str, trace: JsonType):
+    def enrich_trace(self, profile: str, trace: JsonType) -> None:
         """
         Enrich a trace based on the specified profile.
 
@@ -57,16 +57,18 @@ class Profiler:
         except Exception as e:
             raise ProfilerException("Failed to validate trace") from e
 
-    def _parse_profile(self, profile: str) -> tuple[str, str]:
+    @staticmethod
+    def _parse_profile(profile: str) -> tuple[str, str]:
         """
         Parse a profile identifier in the format 'group_name.template_name'
         :param profile: The profile identifier
         :return: The group_name and the template_name
+        :raises ProfilerException: If the profile format is invalid
         """
         try:
             group_name, template_name = profile.split(".", 1)
         except ValueError as e:
             raise ProfilerException(
-                f"Invalid profile format : {str(e)}. Expected 'group_name.template_name', got: {profile}"
+                f"Invalid profile format: {str(e)}. Expected 'group_name.template_name', got: {profile}"
             ) from e
         return group_name, template_name

@@ -5,6 +5,11 @@ from utils.utils_dict import get_nested_from_flat
 from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemplate
 from app.profile_enricher.types import JsonType
 
+# Constants
+VERB_ID = "verb.id"
+VERB_DISPLAY = "verb.display.en-US"
+OBJECT_DEFINITION_TYPE = "object.definition.type"
+
 
 class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
@@ -18,9 +23,9 @@ class TraceEnricher:
         """
         # Build enriched data with template data
         enriched_data = {
-            "verb.id": str(template.verb),
-            "verb.display.en-US": template.prefLabel.en,
-            "object.definition.type": str(template.objectActivityType),
+            VERB_ID: str(template.verb),
+            VERB_DISPLAY: template.prefLabel.en,
+            OBJECT_DEFINITION_TYPE: str(template.objectActivityType),
         }
 
         # Enriched more for rules with only one value
