@@ -4,8 +4,8 @@ import os
 from functools import cache
 from pathlib import Path
 from typing import Optional
-from urllib.error import URLError, HTTPError
-from urllib.request import urlopen, Request
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from pydantic import ValidationError
 
@@ -103,7 +103,6 @@ class ProfileLoader:
         Download a profile file for a given group.
 
         :param group_name: The name of the group whose profile is to be downloaded.
-        :param destination_path: The path where the downloaded profile should be saved.
         :return: The contents of the downloaded profile as a dictionary.
         :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found.
         :raises InvalidJsonException: If the downloaded content is not valid JSON.
@@ -123,7 +122,7 @@ class ProfileLoader:
                         f"Failed to download profile for {group_name}: HTTP status {response.status}"
                     )
 
-                content = response.read().decode('utf-8')
+                content = response.read().decode("utf-8")
             return json.loads(content)
         except HTTPError as e:
             logger.error(
@@ -154,7 +153,7 @@ class ProfileLoader:
         """
         try:
             json_string = json.dumps(profile_json, ensure_ascii=False, indent=2)
-            file_path.write_text(json_string, encoding='utf-8')
+            file_path.write_text(json_string, encoding="utf-8")
             logger.info(f"Profile saved to {file_path}")
         except IOError as e:
             logger.error(f"Failed to save profile to {file_path}: {e}")

@@ -32,7 +32,8 @@ class TraceEnricher:
         if template.rules:
             for rule in template.rules:
                 if (
-                    rule.presence in [PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED]
+                    rule.presence
+                    in [PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED]
                     and rule.location
                 ):
                     if rule.any and len(rule.any) == 1:

@@ -472,20 +472,6 @@ class Profile(BaseModel):
     templates: Optional[list[StatementTemplate]] = None
     patterns: Optional[list[Pattern]] = None
 
-    @field_validator("seeAlso")
-    @staticmethod
-    def validate_see_also(
-        value: Optional[AnyUrl], info: ValidationInfo
-    ) -> Optional[AnyUrl]:
-        """
-        Validator to ensure that when 'seeAlso' is provided, the definition is short.
-        """
-        if value and len(info.data.get("definition", {}).get("en", "")) > 100:
-            raise ValueError(
-                "When seeAlso is provided, definition SHOULD only include a short description of the Profile"
-            )
-        return value
-
     @model_validator(mode="after")
     def unique_pattern_ids(self) -> "Profile":
         """

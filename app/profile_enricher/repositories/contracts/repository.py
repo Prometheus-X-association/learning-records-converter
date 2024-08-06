@@ -10,7 +10,9 @@ class ProfileRepository(ABC):
     """
 
     @abstractmethod
-    def enrich_trace(self, group_name: str, template_name: str, trace: JsonType) -> None:
+    def enrich_trace(
+        self, group_name: str, template_name: str, trace: JsonType
+    ) -> None:
         """
         Enrich a trace based on its profile.
 

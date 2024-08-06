@@ -27,7 +27,9 @@ class JsonLdProfileRepository(ProfileRepository):
         self.trace_enricher = TraceEnricher()
         self.trace_validator = TraceValidator()
 
-    def enrich_trace(self, group_name: str, template_name: str, trace: JsonType) -> None:
+    def enrich_trace(
+        self, group_name: str, template_name: str, trace: JsonType
+    ) -> None:
         """
         Enrich a trace based on its profile.
 

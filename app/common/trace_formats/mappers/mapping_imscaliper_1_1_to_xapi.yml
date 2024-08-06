@@ -216,128 +216,92 @@ mappings:
         # lms_downloaded_audio
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
           multiple:
-            - output_field: "verb.id"
-              value: "http://id.tincanapi.com/verb/downloaded"
-            - output_field: "verb.display.en-US"
-              value: "Downloaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/audio"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.downloaded-audio"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_downloaded_video
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
           multiple:
-            - output_field: "verb.id"
-              value: "http://id.tincanapi.com/verb/downloaded"
-            - output_field: "verb.display.en-US"
-              value: "Downloaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/video"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.downloaded-video"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_downloaded_document
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
           multiple:
-            - output_field: "verb.id"
-              value: "http://id.tincanapi.com/verb/downloaded"
-            - output_field: "verb.display.en-US"
-              value: "Downloaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/document"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.downloaded-document"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_downloaded_file
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/downloaded"
-            - output_field: "verb.display.en-US"
-              value: "Downloaded"
-            - output_field: "object.definition.type"
-              value: "http://activitystrea.ms/file"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.downloaded-file"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_accessed_file
         - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/accessed"
-            - output_field: "verb.display.en-US"
-              value: "Accessed"
-            - output_field: "object.definition.type"
-              value: "http://activitystrea.ms/file"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.accessed-file"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_uploaded_audio
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/uploaded"
-            - output_field: "verb.display.en-US"
-              value: "Uploaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/audio"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.uploaded-audio"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_uploaded_video
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/uploaded"
-            - output_field: "verb.display.en-US"
-              value: "Uploaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/video"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.uploaded-video"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_uploaded_document
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/uploaded"
-            - output_field: "verb.display.en-US"
-              value: "Uploaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/document"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.uploaded-document"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # lms_uploaded_file
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
           multiple:
-            - output_field: "verb.id"
-              value: "https://w3id.org/xapi/netc/verbs/uploaded"
-            - output_field: "verb.display.en-US"
-              value: "Uploaded"
-            - output_field: "object.definition.type"
-              value: "https://w3id.org/xapi/video/activity-type/video"
-            - output_field: "context.contextActivities.category.0.id"
-              value: "https://w3id.org/xapi/lms"
-            - output_field: "context.contextActivities.category.0.definition.type"
-              value: "http://adlnet.gov/expapi/activities/profile"
+            - profile: "lms.uploaded-file"
+            - output_field: "context.contextActivities.category.0"
+              value:
+                id: "https://w3id.org/xapi/lms"
+                definition:
+                  type: "http://adlnet.gov/expapi/activities/profile"
 
         # virtual_classroom_joined
         - condition: "lambda type, action, objectType: type in ['SessionEvent'] and action in ['LoggedIn']"
@@ -348,6 +312,7 @@ mappings:
               value: "Joined session"
             - output_field: "object.definition.type"
               value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+
         # virtual_classroom_left
         - condition: "lambda type, action, objectType: type in ['SessionEvent'] and action in ['LoggedOut']"
           multiple:
@@ -357,6 +322,7 @@ mappings:
               value: "Left session"
             - output_field: "object.definition.type"
               value: "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+
         # virtual_classroom_posted_public_message
         - condition: "lambda type, action, objectType: type in ['MessageEvent'] and action in ['Posted']"
           multiple:
