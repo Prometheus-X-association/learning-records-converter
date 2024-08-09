@@ -68,10 +68,10 @@ class JsonLdProfilesUpdater:
         :param prefix: The prefix to filter environment variables.
         :return: A list of matching environment variable names.
         """
-        return [key for key, value in os.environ.items() if key.startswith(prefix)]
+        return [key for key in os.environ.keys() if key.startswith(prefix)]
 
 
-def main(destination_dir: str = None) -> None:
+def main(destination_dir: str | None = None) -> None:
     """
     Main function to run the profile updater.
 

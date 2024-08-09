@@ -1,5 +1,4 @@
 import re
-from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Union, overload
 
 import yaml

@@ -197,6 +197,6 @@ class ProfileLoader:
             return None
         for profile_template in profile.templates:
             # Example: accessed-page in http://schema.dases.eu/xapi/profile/common/templates/accessed-page
-            if template_name in str(profile_template.id):
+            if str(profile_template.id).endswith(template_name):
                 return profile_template
         return None
