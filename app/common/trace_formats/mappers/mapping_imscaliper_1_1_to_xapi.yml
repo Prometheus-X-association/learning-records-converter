@@ -205,103 +205,43 @@ mappings:
       switch:
         # lms_accessed_page
         - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
-          multiple:
-            - profile: "lms.accessed-page"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.accessed-page"
 
         # lms_downloaded_audio
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
-          multiple:
-            - profile: "lms.downloaded-audio"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.downloaded-audio"
 
         # lms_downloaded_video
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['VideoObject']"
-          multiple:
-            - profile: "lms.downloaded-video"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.downloaded-video"
 
         # lms_downloaded_document
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['Document']"
-          multiple:
-            - profile: "lms.downloaded-document"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.downloaded-document"
 
         # lms_downloaded_file
         - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['DigitalResource', 'File']"
-          multiple:
-            - profile: "lms.downloaded-file"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.downloaded-file"
 
         # lms_accessed_file
         - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Downloaded'] and objectType in ['Document', 'MediaObject', 'AudioObject', 'VideoObject', 'ImageObject']"
-          multiple:
-            - profile: "lms.accessed-file"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.accessed-file"
 
         # lms_uploaded_audio
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['AudioObject']"
-          multiple:
-            - profile: "lms.uploaded-audio"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.uploaded-audio"
 
         # lms_uploaded_video
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['VideoObject']"
-          multiple:
-            - profile: "lms.uploaded-video"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.uploaded-video"
 
         # lms_uploaded_document
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['Document']"
-          multiple:
-            - profile: "lms.uploaded-document"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.uploaded-document"
 
         # lms_uploaded_file
         - condition: "lambda type, action, objectType: action in ['Uploaded'] and objectType in ['DigitalResource', 'File']"
-          multiple:
-            - profile: "lms.uploaded-file"
-            - output_field: "context.contextActivities.category.0"
-              value:
-                id: "https://w3id.org/xapi/lms"
-                definition:
-                  type: "http://adlnet.gov/expapi/activities/profile"
+          profile: "lms.uploaded-file"
 
         # virtual_classroom_joined
         - condition: "lambda type, action, objectType: type in ['SessionEvent'] and action in ['LoggedIn']"

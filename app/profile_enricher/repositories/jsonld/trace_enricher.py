@@ -6,26 +6,34 @@ from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemp
 from app.profile_enricher.types import JsonType
 
 # Constants
-VERB_ID = "verb.id"
-VERB_DISPLAY = "verb.display.en-US"
-OBJECT_DEFINITION_TYPE = "object.definition.type"
+CONTEXT_ACTIVITIES_CATEGORY_ID = "https://w3id.org/xapi"
+CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = "http://adlnet.gov/expapi/activities/profile"
 
 
 class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
-    def get_enriched_data(self, template: StatementTemplate) -> JsonType:
+    def get_enriched_data(
+        self, group_name: str, template: StatementTemplate
+    ) -> JsonType:
         """
         Get enriched data based on the given template.
 
+        :param: group_name: The group name of the template.
         :param template: The template to use for enrichment.
         :return: The enriched data.
         """
         # Build enriched data with template data
         enriched_data = {
-            VERB_ID: str(template.verb),
-            VERB_DISPLAY: template.prefLabel.en,
-            OBJECT_DEFINITION_TYPE: str(template.objectActivityType),
+            "verb.id": str(template.verb),
+            "verb.display.en-US": template.prefLabel.en,
+            "object.definition.type": str(template.objectActivityType),
+            "context.contextActivities.category.0": {
+                "id": f"{CONTEXT_ACTIVITIES_CATEGORY_ID}/{group_name}",
+                "definition": {
+                    "type": {CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE},
+                },
+            },
         }
 
         # Enriched more for rules with only one value

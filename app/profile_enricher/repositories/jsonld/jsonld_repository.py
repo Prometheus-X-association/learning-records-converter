@@ -48,7 +48,10 @@ class JsonLdProfileRepository(ProfileRepository):
         )
 
         # Build enriched data with template data
-        enriched_data = self.trace_enricher.get_enriched_data(template=template)
+        enriched_data = self.trace_enricher.get_enriched_data(
+            group_name=group_name,
+            template=template,
+        )
 
         # Merge recursively the original trace with enriched data
         deep_merge(target_dict=trace, merge_dct=enriched_data)
