@@ -1,26 +1,28 @@
-import re
-
 from utils.utils_dict import get_nested_from_flat
 
 from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemplate
 from app.profile_enricher.types import JsonType
+from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
 # Constants
 CONTEXT_ACTIVITIES_CATEGORY_ID = "https://w3id.org/xapi"
-CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = "http://adlnet.gov/expapi/activities/profile"
+CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = (
+    "http://adlnet.gov/expapi/activities/profile"
+)
 
 
 class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
     def get_enriched_data(
-        self, group_name: str, template: StatementTemplate
+        self, group_name: str, template: StatementTemplate, trace: JsonType
     ) -> JsonType:
         """
         Get enriched data based on the given template.
 
-        :param: group_name: The group name of the template.
+        :param group_name: The group name of the template.
         :param template: The template to use for enrichment.
+        :param trace: The trace that needs to be enriched.
         :return: The enriched data.
         """
         # Build enriched data with template data
@@ -43,39 +45,17 @@ class TraceEnricher:
                     rule.presence
                     in [PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED]
                     and rule.location
+                    and not JSONPathUtils.path_exists(path=rule.location, data=trace)
                 ):
+                    value = None
                     if rule.any and len(rule.any) == 1:
-                        enriched_data.update(
-                            self._transform_rule(rule.location, rule.any[0])
-                        )
+                        value = rule.any[0]
                     elif rule.all and len(rule.all) == 1:
+                        value = rule.all[0]
+
+                    if value:
                         enriched_data.update(
-                            self._transform_rule(rule.location, rule.all[0])
+                            JSONPathUtils.path_to_dict(path=rule.location, value=value)
                         )
 
         return get_nested_from_flat(flat_field=enriched_data)
-
-    @staticmethod
-    def _transform_rule(path: str, value: str) -> JsonType:
-        """
-        Transform a rule path and value into a JSON-LD compatible format.
-
-        :param path: The JSON path of the rule
-        :param value: The value to be set at the specified path
-        :return: A dictionary representing the transformed rule
-        """
-        # Remove the initial '$.' if present
-        path = path.removeprefix("$.")
-
-        # Split the main path and the part in brackets
-        # Example : $.object.definition.extensions['https://w3id.org/xapi/acrossx/extensions/type']
-        main_path, _, bracket_part = path.partition("[")
-
-        if bracket_part:
-            # Extract the key between single quotes
-            key_match = re.search(r"'([^']*)'", bracket_part)
-            if key_match:
-                return {main_path: {key_match.group(1): value}}
-
-        # If there's no part in brackets, set the value directly
-        return {path: value}

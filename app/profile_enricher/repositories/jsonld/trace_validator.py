@@ -1,11 +1,10 @@
 import logging
 from typing import Any
 
-import jsonpath_ng
-
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
                                                   StatementTemplateRule)
 from app.profile_enricher.types import JsonType, ValidationError
+from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
 logger = logging.getLogger(__name__)
 
@@ -146,19 +145,15 @@ class TraceValidator:
         :return: The results of applying the JSONPath
         :raises ValueError: If the JSONPath is invalid
         """
-        try:
-            results = jsonpath_ng.parse(path).find(data)
-            # Flatten the list if the result is a list of lists
-            return [
-                item
-                for result in results
-                for item in (
-                    result.value if isinstance(result.value, list) else [result.value]
-                )
-            ]
-        except Exception as e:
-            logger.error(f"Invalid JSONPath: {path}")
-            raise ValueError(f"Invalid JSONPath: {path}") from e
+        results = JSONPathUtils.parse_jsonpath(path).find(data)
+        # Flatten the list if the result is a list of lists
+        return [
+            item
+            for result in results
+            for item in (
+                result.value if isinstance(result.value, list) else [result.value]
+            )
+        ]
 
     def _apply_selector(self, values: list[Any], selector: str) -> list[Any]:
         """
