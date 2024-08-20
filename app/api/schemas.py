@@ -11,14 +11,14 @@ class TransformInputTraceRequestModel(BaseModel):
     input_trace: dict = Field(description="Input trace to convert in JSON format")
 
 
-class TransformInputTraceMetaModel(BaseModel):
+class TransformInputTraceResponseMetaModel(BaseModel):
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
     recommendations: list[ValidationRecommendation] = Field(description="List of recommendations to improve output trace")
 
 
 class TransformInputTraceResponseModel(BaseModel):
     output_trace: dict = Field(description="Transformed output trace in JSON format")
-    meta: TransformInputTraceMetaModel
+    meta: TransformInputTraceResponseMetaModel
 
 
 class ValidateInputTraceRequestModel(BaseModel):

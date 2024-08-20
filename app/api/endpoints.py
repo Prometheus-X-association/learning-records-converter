@@ -14,6 +14,7 @@ from app.api.exceptions import (
 )
 from app.api.handlers import get_format_from_trace
 from app.api.schemas import (
+    TransformInputTraceResponseMetaModel,
     TransformInputTraceRequestModel,
     TransformInputTraceResponseModel,
     ValidateInputTraceRequestModel,
@@ -93,18 +94,24 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     output_model = CustomTraceFormatModelEnum[query.output_format.name]
     # Get Mapping
     mapping_config = get_mapping_by_input_and_output_format(input_model, output_model)
-    # Apply Mapping
+
+    # Profile handling
     jsonld_repository = JsonLdProfileRepository(base_path=os.path.join('data', 'dases_profiles'))
     profiler = Profiler(repository=jsonld_repository)
+
+    # Apply Mapping
     mapper = MappingInput(
         input_format=input_model, mapping_to_apply=mapping_config, output_format=output_model, profile_enricher=profiler
     )
     response = mapper.run(query.input_trace)
+
+    # Metadata
     recommendations = mapper.get_recommendations(response)
-    meta = {
-        'input_format': query.input_format,
-        'recommendations': recommendations,
-    }
+    meta = TransformInputTraceResponseMetaModel(
+        input_format=query.input_format,
+        recommendations=recommendations,
+    )
+
     # Done
     return TransformInputTraceResponseModel(output_trace=response, meta= meta)
 
