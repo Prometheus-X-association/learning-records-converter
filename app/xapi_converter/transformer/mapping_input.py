@@ -5,6 +5,7 @@ from typing import List
 from pydantic import BaseModel
 
 from app.profile_enricher.profiler import Profiler
+from app.profile_enricher.types import ValidationRecommendation
 from app.xapi_converter.transformer import *
 from enums import (
     CustomTraceFormatModelEnum,
@@ -316,11 +317,16 @@ class MappingInput:
         # Return response
         return output_trace
 
-    def enrich_and_validate_with_profile(self, output_trace: dict):
-        # Enrich trace with profile
+    def _enrich_with_profile(self, output_trace: dict):
+        """
+        Enrich trace with profile
+        """
         self.profile_enricher.enrich_trace(profile=self.profile, trace=output_trace)
 
-        # Valid trace with profile
+    def _validate_with_profile(self, output_trace: dict):
+        """
+        Validate trace with profile
+        """
         errors = self.profile_enricher.validate_trace(
             profile=self.profile,
             trace=output_trace,
@@ -328,6 +334,17 @@ class MappingInput:
         if errors:
             raise ValueError(f"The trace does not match the profile: {errors}")
 
+    def get_recommendations(self, output_trace: dict) -> list[ValidationRecommendation]:
+        """
+        Get recommendations to improve the trace
+        """
+        if not self.profile:
+            return []
+
+        return self.profile_enricher.get_recommendations(
+            profile=self.profile,
+            trace=output_trace,
+        )
 
     def run(self, input_trace: dict) -> dict:
         ##### MAIN FUNCTION #####
@@ -347,7 +364,8 @@ class MappingInput:
         self.output_format.value(**output_trace)  # TODO: To test
 
         if self.profile is not None:
-            self.enrich_and_validate_with_profile(output_trace=output_trace)
+            self._enrich_with_profile(output_trace=output_trace)
+            self._validate_with_profile(output_trace=output_trace)
 
         # Check if output_trace match output_format (model validation)
         return output_trace

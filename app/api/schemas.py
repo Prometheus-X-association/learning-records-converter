@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.profile_enricher.types import ValidationRecommendation
 from enums.custom_trace_format import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
@@ -10,8 +11,14 @@ class TransformInputTraceRequestModel(BaseModel):
     input_trace: dict = Field(description="Input trace to convert in JSON format")
 
 
+class TransformInputTraceMetaModel(BaseModel):
+    input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
+    recommendations: list[ValidationRecommendation] = Field(description="List of recommendations to improve output trace")
+
+
 class TransformInputTraceResponseModel(BaseModel):
     output_trace: dict = Field(description="Transformed output trace in JSON format")
+    meta: TransformInputTraceMetaModel
 
 
 class ValidateInputTraceRequestModel(BaseModel):

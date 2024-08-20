@@ -3,7 +3,8 @@ import logging
 from utils.utils_dict import deep_merge
 
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
-from app.profile_enricher.types import JsonType, ValidationError
+from app.profile_enricher.types import (JsonType, ValidationError,
+                                        ValidationRecommendation)
 
 from .profile_loader import ProfileLoader
 from .trace_enricher import TraceEnricher
@@ -66,7 +67,7 @@ class JsonLdProfileRepository(ProfileRepository):
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :param trace: The trace to validate
-        :return: A list of ValidationError objects. An empty list indicates a valid trace.
+        :return: A list of ValidationError objects. An empty list indicates a valid trace
         :raises TemplateNotFoundException: If the specified template is not found
         :raises ProfileNotFoundException: If the profile is not found
         :raises InvalidJsonException: If the profile JSON is invalid
@@ -79,3 +80,25 @@ class JsonLdProfileRepository(ProfileRepository):
         )
 
         return self.trace_validator.validate_trace(template=template, trace=trace)
+
+    def get_recommendations(
+        self, group_name: str, template_name: str, trace: JsonType
+    ) -> list[ValidationRecommendation]:
+        """
+        Generate recommendations for a trace based on a specific template
+
+        :param group_name: The group name of the profile
+        :param template_name: The template name within the profile
+        :param trace: The trace data to generate recommendations for
+        :return: A list of ValidationRecommendation objects.
+        :raises TemplateNotFoundException: If the specified template is not found
+        :raises ProfileNotFoundException: If the specified group (profile) is not found
+        :raises InvalidJsonException: If the profile JSON is invalid
+        """
+        # Get the correct template model depending on group and template names
+        template = self.profile_loader.load_template(
+            group_name=group_name,
+            template_name=template_name,
+        )
+
+        return self.trace_validator.get_recommendations(template=template, trace=trace)

@@ -1,7 +1,7 @@
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
 
 from .exceptions import ProfilerException
-from .types import JsonType, ValidationError
+from .types import JsonType, ValidationError, ValidationRecommendation
 
 
 class Profiler:
@@ -43,6 +43,7 @@ class Profiler:
 
         :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The trace to validate
+        :return: A list of ValidationError objects.
         :raises ProfilerException: If validation fails
         """
         group_name, template_name = self._parse_profile(profile=profile)
@@ -57,6 +58,26 @@ class Profiler:
         except Exception as e:
             raise ProfilerException("Failed to validate trace") from e
 
+    def get_recommendations(
+        self, profile: str, trace: JsonType
+    ) -> list[ValidationRecommendation]:
+        """
+        Generate recommendations for a trace based on a specified profile.
+
+        :param profile: The profile identifier in the format 'group_name.template_name'
+        :param trace: The trace data to generate recommendations for
+        :return: A list of ValidationRecommendation objects.
+        :raises ProfilerException: If recommendation generation fails.
+        """
+        group_name, template_name = self._parse_profile(profile=profile)
+
+        recommendations = self.repository.get_recommendations(
+            group_name=group_name,
+            template_name=template_name,
+            trace=trace,
+        )
+        return recommendations
+
     @staticmethod
     def _parse_profile(profile: str) -> tuple[str, str]:
         """
@@ -67,6 +88,8 @@ class Profiler:
         """
         try:
             group_name, template_name = profile.split(".", 1)
+            if not group_name or not template_name:
+                raise ValueError("Group name and template name cannot be empty")
         except ValueError as e:
             raise ProfilerException(
                 f"Invalid profile format: {str(e)}. Expected 'group_name.template_name', got: {profile}"

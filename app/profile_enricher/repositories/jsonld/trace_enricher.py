@@ -7,7 +7,9 @@ from app.profile_enricher.types import JsonType
 
 # Constants
 CONTEXT_ACTIVITIES_CATEGORY_ID = "https://w3id.org/xapi"
-CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = "http://adlnet.gov/expapi/activities/profile"
+CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = (
+    "http://adlnet.gov/expapi/activities/profile"
+)
 
 
 class TraceEnricher:

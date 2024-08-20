@@ -1,4 +1,5 @@
 import os
+from importlib.metadata import metadata
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -100,8 +101,13 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
         input_format=input_model, mapping_to_apply=mapping_config, output_format=output_model, profile_enricher=profiler
     )
     response = mapper.run(query.input_trace)
+    recommendations = mapper.get_recommendations(response)
+    meta = {
+        'input_format': query.input_format,
+        'recommendations': recommendations,
+    }
     # Done
-    return TransformInputTraceResponseModel(output_trace=response)
+    return TransformInputTraceResponseModel(output_trace=response, meta= meta)
 
 
 @app.post(
