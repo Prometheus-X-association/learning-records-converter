@@ -1,5 +1,4 @@
 import os
-from importlib.metadata import metadata
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError

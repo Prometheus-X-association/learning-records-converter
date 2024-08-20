@@ -1,4 +1,5 @@
 import logging
+from functools import cache
 from typing import Any
 
 import jsonpath_ng
@@ -13,6 +14,13 @@ logger = logging.getLogger(__name__)
 
 class TraceValidator:
     """Class responsible for validating traces against templates."""
+
+    def __init__(self):
+        self.rule_checks: dict[str, callable[[list[Any], list[Any]], bool]] = {
+            "any": self._check_any,
+            "all": self._check_all,
+            "none": self._check_none,
+        }
 
     def validate_trace(
         self, template: StatementTemplate, trace: JsonType
@@ -80,9 +88,10 @@ class TraceValidator:
         :param values: The extracted values relevant to the rule.
         :return: List of errors
         """
-        errors: list[ValidationError] = []
-        if rule.presence == PresenceTypeEnum.RECOMMENDED:
+        if rule.presence not in [PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED]:
             return []
+
+        errors: list[ValidationError] = []
 
         # Check the "included" and "excluded" rules
         if rule.presence == PresenceTypeEnum.INCLUDED and not values:
@@ -105,29 +114,21 @@ class TraceValidator:
             )
 
         # Check the "any" / "all" / "none" rules
-        if rule.any and not self._check_any(any_values=rule.any, values=values):
-            errors.append(
-                ValidationError(
-                    rule="any", path=rule.location, expected=rule.any, actual=values
+        for check_type, check_method in self.rule_checks.items():
+            rule_values = getattr(rule, check_type)
+            if rule_values and not check_method(rule_values, values):
+                errors.append(
+                    ValidationError(
+                        rule=check_type,
+                        path=rule.location,
+                        expected=(
+                            f"no values from {rule.none}"
+                            if check_type == "none"
+                            else rule_values
+                        ),
+                        actual=values,
+                    )
                 )
-            )
-
-        if rule.all and not self._check_all(all_values=rule.all, values=values):
-            errors.append(
-                ValidationError(
-                    rule="all", path=rule.location, expected=rule.all, actual=values
-                )
-            )
-
-        if rule.none and not self._check_none(none_values=rule.none, values=values):
-            errors.append(
-                ValidationError(
-                    rule="none",
-                    path=rule.location,
-                    expected=f"no values from {rule.none}",
-                    actual=values,
-                )
-            )
 
         return errors
 
@@ -145,10 +146,10 @@ class TraceValidator:
         :param values: The extracted values relevant to the rule.
         :return: A list of ValidationRecommendation objects.
         """
-        recommendations: list[ValidationRecommendation] = []
-
         if rule.presence != PresenceTypeEnum.RECOMMENDED:
             return []
+
+        recommendations: list[ValidationRecommendation] = []
 
         if not values:
             recommendations.append(
@@ -160,27 +161,21 @@ class TraceValidator:
                 )
             )
         else:
-            if rule.any and not self._check_any(rule.any, values):
-                recommendations.append(
-                    ValidationRecommendation(
-                        rule="any", path=rule.location, expected=rule.any, actual=values
+            for check_type, check_method in self.rule_checks.items():
+                rule_values = getattr(rule, check_type)
+                if rule_values and not check_method(rule_values, values):
+                    recommendations.append(
+                        ValidationRecommendation(
+                            rule=check_type,
+                            path=rule.location,
+                            expected=(
+                                f"no values from {rule.none}"
+                                if check_type == "none"
+                                else rule_values
+                            ),
+                            actual=values,
+                        )
                     )
-                )
-            if rule.all and not self._check_all(rule.all, values):
-                recommendations.append(
-                    ValidationRecommendation(
-                        rule="all", path=rule.location, expected=rule.all, actual=values
-                    )
-                )
-            if rule.none and not self._check_none(rule.none, values):
-                recommendations.append(
-                    ValidationRecommendation(
-                        rule="none",
-                        path=rule.location,
-                        expected=f"no values from {rule.none}",
-                        actual=values,
-                    )
-                )
 
         return recommendations
 
@@ -217,7 +212,6 @@ class TraceValidator:
         """
         return not any(v in none_values for v in values)
 
-    # TODO CACHE
     def _get_values_for_rule(
         self, rule: StatementTemplateRule, trace: JsonType
     ) -> list[Any]:
@@ -246,16 +240,21 @@ class TraceValidator:
         :return: The results of applying the JSONPath
         :raises ValueError: If the JSONPath is invalid
         """
+        results = TraceValidator.parse_jsonpath(path).find(data)
+        # Flatten the list if the result is a list of lists
+        return [
+            item
+            for result in results
+            for item in (
+                result.value if isinstance(result.value, list) else [result.value]
+            )
+        ]
+
+    @staticmethod
+    @cache
+    def parse_jsonpath(path: str):
         try:
-            results = jsonpath_ng.parse(path).find(data)
-            # Flatten the list if the result is a list of lists
-            return [
-                item
-                for result in results
-                for item in (
-                    result.value if isinstance(result.value, list) else [result.value]
-                )
-            ]
+            return jsonpath_ng.parse(path)
         except Exception as e:
             logger.error(f"Invalid JSONPath: {path}")
             raise ValueError(f"Invalid JSONPath: {path}") from e
