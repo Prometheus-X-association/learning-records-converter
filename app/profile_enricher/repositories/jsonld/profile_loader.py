@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from functools import cache
 from pathlib import Path
@@ -9,6 +8,7 @@ from urllib.request import Request, urlopen
 
 from pydantic import ValidationError
 
+from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.exceptions import (InvalidJsonException,
                                              ProfileNotFoundException,
                                              ProfileValidationError,
@@ -16,14 +16,13 @@ from app.profile_enricher.exceptions import (InvalidJsonException,
 from app.profile_enricher.profiles.jsonld import Profile, StatementTemplate
 from app.profile_enricher.types import JsonType
 
-logger = logging.getLogger(__name__)
-
 
 class ProfileLoader:
     """Class responsible for loading profile's file."""
 
-    def __init__(self, base_path: str):
+    def __init__(self, base_path: str, logger: LoggerContract):
         self.base_path: Path = Path(base_path)
+        self.logger = logger
 
     @cache
     def load_template(self, group_name: str, template_name: str) -> StatementTemplate:
@@ -38,10 +37,15 @@ class ProfileLoader:
         :raises InvalidJsonException: If the profile JSON is invalid
         :raises ProfileValidationError: If the profile fails validation
         """
-        logger.debug(f"Load profile: {group_name}")
-
         # First, download the profile file if not exists or read it
         file_path = self.base_path.joinpath(f"{group_name}.jsonld")
+        log_context = {
+            "group": group_name,
+            "template": template_name,
+            "file": file_path,
+        }
+        self.logger.debug("Load profile file", log_context)
+
         if file_path.is_file():
             profile_json = self.read_profile_file(file_path=file_path)
         else:
@@ -54,7 +58,7 @@ class ProfileLoader:
         if not file_path.is_file():
             self.save_profile_file(file_path, profile_json)
 
-        logger.info(f"Profile '{group_name}' loaded'")
+        self.logger.info("Profile loaded", log_context)
 
         # Then, retrieve the correct template in the profile
         template = self._get_template_in_profile(
@@ -62,19 +66,15 @@ class ProfileLoader:
             template_name=template_name,
         )
         if template is None:
-            logger.error(
-                f"Template '{template_name}' not found in profile '{group_name}'"
-            )
+            self.logger.warning("Template not found", log_context)
             raise TemplateNotFoundException(
                 f"Template '{template_name}' not found in profile '{group_name}'"
             )
 
-        logger.info(f"Template '{template_name}' found'")
-
+        self.logger.info("Template found", log_context)
         return template
 
-    @staticmethod
-    def read_profile_file(file_path: Path) -> JsonType:
+    def read_profile_file(self, file_path: Path) -> JsonType:
         """
         Load a profile file from the file system.
 
@@ -83,22 +83,23 @@ class ProfileLoader:
         :raises ProfileNotFoundException: If the profile file is not found
         :raises InvalidJsonException: If the profile JSON is invalid
         """
+        log_context = {"path": file_path}
+        self.logger.debug("Read profile file", log_context)
         try:
             file_content = file_path.read_text(encoding="utf8")
             return json.loads(file_content)
         except FileNotFoundError as e:
-            logger.error(f"Profile file not found: {file_path}")
+            self.logger.exception("Profile file not found", e, log_context)
             raise ProfileNotFoundException(
                 f"Profile file not found: {file_path} {e}"
             ) from e
         except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in profile file: {file_path}")
+            self.logger.exception("Invalid JSON in profile file", e, log_context)
             raise InvalidJsonException(
                 f"Invalid JSON in profile file: {file_path} {e}"
             ) from e
 
-    @staticmethod
-    def download_profile(group_name: str) -> JsonType:
+    def download_profile(self, group_name: str) -> JsonType:
         """
         Download a profile file for a given group.
 
@@ -111,13 +112,19 @@ class ProfileLoader:
             - PROFILE_{GROUP_NAME}_URL: The URL from which to download the profile.
         """
         url = os.getenv(f"PROFILE_{group_name.upper()}_URL")
+
+        log_context = {"group": group_name, "url": url}
+        self.logger.debug("Profile file downloading", log_context)
+
         if not url:
+            self.logger.warning("URL not found for profile", log_context)
             raise ProfileNotFoundException(f"URL not found for profile: {group_name}")
 
         try:
             request = Request(url=url)
             with urlopen(request, timeout=10) as response:
                 if response.status != 200:
+                    self.logger.error("Failed to download profile", log_context)
                     raise ProfileNotFoundException(
                         f"Failed to download profile for {group_name}: HTTP status {response.status}"
                     )
@@ -125,25 +132,24 @@ class ProfileLoader:
                 content = response.read().decode("utf-8")
             return json.loads(content)
         except HTTPError as e:
-            logger.error(
-                f"HTTP error occurred while downloading profile for {group_name}: {e}"
+            self.logger.exception(
+                "HTTP error occurred while downloading profile", e, log_context
             )
             raise ProfileNotFoundException(
                 f"Failed to download profile for {group_name}: HTTP error {e.code}"
             ) from e
         except URLError as e:
-            logger.error(f"Failed to download profile for {group_name}: {e}")
+            self.logger.exception("Failed to download profile", e, log_context)
             raise ProfileNotFoundException(
                 f"Failed to download profile for {group_name}: {e}"
             ) from e
         except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in downloaded profile for {group_name}: {e}")
+            self.logger.exception("Invalid JSON in downloaded profile", e, log_context)
             raise InvalidJsonException(
                 f"Invalid JSON in downloaded profile for {group_name}: {e}"
             ) from e
 
-    @staticmethod
-    def save_profile_file(file_path: Path, profile_json: JsonType):
+    def save_profile_file(self, file_path: Path, profile_json: JsonType):
         """
         Save a profile file to the file system.
 
@@ -151,16 +157,16 @@ class ProfileLoader:
         :param profile_json: The profile data to save
         :raises IOError: If there's an error writing the file to the specified path.
         """
+        log_context = {"file_path": file_path}
         try:
             json_string = json.dumps(profile_json, ensure_ascii=False, indent=2)
             file_path.write_text(json_string, encoding="utf-8")
-            logger.info(f"Profile saved to {file_path}")
+            self.logger.info("Profile saved", log_context)
         except IOError as e:
-            logger.error(f"Failed to save profile to {file_path}: {e}")
+            self.logger.exception("Failed to save profile", e, log_context)
             raise
 
-    @staticmethod
-    def build_profile_model(profile_json: JsonType) -> Profile:
+    def build_profile_model(self, profile_json: JsonType) -> Profile:
         """
         Validate the profile JSON against the Profile model.
 
@@ -171,13 +177,13 @@ class ProfileLoader:
         try:
             return Profile(**profile_json)
         except ValidationError as e:
-            logger.error(f"Profile validation failed: {e}")
+            self.logger.exception("Profile validation failed", e)
             raise ProfileValidationError(f"Profile validation failed: {e}") from e
         except TypeError as e:
-            logger.error(f"Invalid data type in profile: {e}")
+            self.logger.exception("Invalid data type in profile", e)
             raise ProfileValidationError(f"Invalid data type in profile: {e}") from e
         except Exception as e:
-            logger.error(f"Unexpected error during profile validation: {e}")
+            self.logger.exception("Unexpected error during profile validation", e)
             raise ProfileValidationError(
                 f"Unexpected error during profile validation: {e}"
             ) from e

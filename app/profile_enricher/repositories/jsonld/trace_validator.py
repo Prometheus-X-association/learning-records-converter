@@ -1,19 +1,18 @@
-import logging
 from typing import Any
 
+from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
                                                   StatementTemplateRule)
 from app.profile_enricher.types import (JsonType, ValidationError,
                                         ValidationRecommendation)
 from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
-logger = logging.getLogger(__name__)
-
 
 class TraceValidator:
     """Class responsible for validating traces against templates."""
 
-    def __init__(self):
+    def __init__(self, logger: LoggerContract):
+        self.logger = logger
         self.rule_checks: dict[str, callable[[list[Any], list[Any]], bool]] = {
             "any": self._check_any,
             "all": self._check_all,
@@ -32,6 +31,9 @@ class TraceValidator:
         """
         errors: list[ValidationError] = []
 
+        log_context = {"template": template.id}
+        self.logger.debug("Start trace validation", log_context)
+
         if template.rules:
             for rule in template.rules:
                 # Apply the JSONPath to retrieve the field values to check
@@ -39,12 +41,10 @@ class TraceValidator:
 
                 rule_errors = self._validate_rule(rule=rule, values=values)
                 if rule_errors:
-                    logger.debug(f"Trace validation failed for rule: {rule}")
+                    self.logger.debug("Trace validation failed", {"rule": rule})
                     errors.extend(rule_errors)
         if not errors:
-            logger.debug(
-                f"Trace validated successfully against template '{template.id}'"
-            )
+            self.logger.debug("Trace validated successfully", log_context)
 
         return errors
 
@@ -64,6 +64,9 @@ class TraceValidator:
         """
         recommendations: list[ValidationRecommendation] = []
 
+        log_context = {"template": template.id}
+        self.logger.debug("Start trace recommendations", log_context)
+
         if template.rules:
             for rule in template.rules:
                 # Apply the JSONPath to retrieve the field values to check
@@ -72,6 +75,9 @@ class TraceValidator:
                 recommendations.extend(
                     self._get_rule_recommendations(rule=rule, values=values)
                 )
+
+        if not recommendations:
+            self.logger.debug("No trace recommendations", log_context)
 
         return recommendations
 
@@ -90,9 +96,11 @@ class TraceValidator:
             return []
 
         errors: list[ValidationError] = []
+        log_context = {"rule": rule.location, "presence": rule.presence}
 
         # Check the "included" and "excluded" rules
         if rule.presence == PresenceTypeEnum.INCLUDED and not values:
+            self.logger.debug("Found rule presence validation", log_context)
             errors.append(
                 ValidationError(
                     rule="presence",
@@ -102,6 +110,7 @@ class TraceValidator:
                 )
             )
         elif rule.presence == PresenceTypeEnum.EXCLUDED and values:
+            self.logger.debug("Found rule presence validation", log_context)
             errors.append(
                 ValidationError(
                     rule="presence",
@@ -115,6 +124,9 @@ class TraceValidator:
         for check_type, check_method in self.rule_checks.items():
             rule_values = getattr(rule, check_type)
             if rule_values and not check_method(rule_values, values):
+                log_context.update({"type": check_type})
+                self.logger.debug("Found rule presence validation", log_context)
+
                 errors.append(
                     ValidationError(
                         rule=check_type,
@@ -148,8 +160,10 @@ class TraceValidator:
             return []
 
         recommendations: list[ValidationRecommendation] = []
+        log_context = {"rule": rule.location}
 
         if not values:
+            self.logger.debug("Found rule presence recommendation", log_context)
             recommendations.append(
                 ValidationRecommendation(
                     rule="presence",
@@ -162,6 +176,9 @@ class TraceValidator:
             for check_type, check_method in self.rule_checks.items():
                 rule_values = getattr(rule, check_type)
                 if rule_values and not check_method(rule_values, values):
+                    log_context.update({"type": check_type})
+                    self.logger.debug("Found rule presence recommendation", log_context)
+
                     recommendations.append(
                         ValidationRecommendation(
                             rule=check_type,

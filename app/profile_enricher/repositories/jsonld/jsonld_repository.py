@@ -1,7 +1,6 @@
-import logging
-
 from utils.utils_dict import deep_merge
 
+from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
 from app.profile_enricher.types import (JsonType, ValidationError,
                                         ValidationRecommendation)
@@ -10,23 +9,23 @@ from .profile_loader import ProfileLoader
 from .trace_enricher import TraceEnricher
 from .trace_validator import TraceValidator
 
-logger = logging.getLogger(__name__)
-
 
 class JsonLdProfileRepository(ProfileRepository):
     """
     A repository for handling JSON-LD profiles.
     """
 
-    def __init__(self, base_path: str):
+    def __init__(self, base_path: str, logger: LoggerContract):
         """
         Initialize the JsonLdProfileRepository.
 
         :param base_path: Base path for profile files
+        :param logger: LoggerContract implementation for logging
         """
-        self.profile_loader = ProfileLoader(base_path=base_path)
-        self.trace_enricher = TraceEnricher()
-        self.trace_validator = TraceValidator()
+        self.logger = logger
+        self.profile_loader = ProfileLoader(base_path=base_path, logger=logger)
+        self.trace_enricher = TraceEnricher(logger=logger)
+        self.trace_validator = TraceValidator(logger=logger)
 
     def enrich_trace(
         self, group_name: str, template_name: str, trace: JsonType
@@ -43,10 +42,14 @@ class JsonLdProfileRepository(ProfileRepository):
         :raises ProfileValidationError: If the profile fails validation
         """
         # Get the correct template model depending on group and template names
-        template = self.profile_loader.load_template(
-            group_name=group_name,
-            template_name=template_name,
-        )
+        try:
+            template = self.profile_loader.load_template(
+                group_name=group_name,
+                template_name=template_name,
+            )
+        except Exception:
+            self.logger.error("Error while loading template")
+            return
 
         # Build enriched data with template data
         enriched_data = self.trace_enricher.get_enriched_data(
@@ -57,7 +60,7 @@ class JsonLdProfileRepository(ProfileRepository):
 
         # Merge recursively the original trace with enriched data
         deep_merge(target_dict=trace, merge_dct=enriched_data)
-        logger.debug(f"Trace enriched successfully for template: {template_name}")
+        self.logger.info("Trace enriched successfully", {"template": template_name})
 
     def validate_trace(
         self, group_name: str, template_name: str, trace: JsonType
@@ -75,10 +78,14 @@ class JsonLdProfileRepository(ProfileRepository):
         :raises ProfileValidationError: If the profile fails validation
         """
         # Get the correct template model depending on group and template names
-        template = self.profile_loader.load_template(
-            group_name=group_name,
-            template_name=template_name,
-        )
+        try:
+            template = self.profile_loader.load_template(
+                group_name=group_name,
+                template_name=template_name,
+            )
+        except Exception:
+            self.logger.error("Error while loading template")
+            return []
 
         return self.trace_validator.validate_trace(template=template, trace=trace)
 
@@ -97,9 +104,13 @@ class JsonLdProfileRepository(ProfileRepository):
         :raises InvalidJsonException: If the profile JSON is invalid
         """
         # Get the correct template model depending on group and template names
-        template = self.profile_loader.load_template(
-            group_name=group_name,
-            template_name=template_name,
-        )
+        try:
+            template = self.profile_loader.load_template(
+                group_name=group_name,
+                template_name=template_name,
+            )
+        except Exception:
+            self.logger.error("Error while loading template")
+            return []
 
         return self.trace_validator.get_recommendations(template=template, trace=trace)

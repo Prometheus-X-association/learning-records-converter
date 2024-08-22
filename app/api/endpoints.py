@@ -20,6 +20,7 @@ from app.api.schemas import (
     ValidateInputTraceRequestModel,
     ValidateInputTraceResponseModel,
 )
+from app.infrastructure.logging.jsonlogger import JsonLogger
 from app.profile_enricher.profiler import Profiler
 from app.profile_enricher.repositories.jsonld.jsonld_repository import JsonLdProfileRepository
 from app.xapi_converter.transformer.mapping_input import (
@@ -27,6 +28,9 @@ from app.xapi_converter.transformer.mapping_input import (
     get_mapping_by_input_and_output_format,
 )
 from enums.custom_trace_format import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
+
+logger = JsonLogger(__name__)
+logger.info("Application starting")
 
 ROOT_PATH = ""
 
@@ -89,6 +93,8 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     Returns:
         TransformInputTraceResponseModel: Response model
     """
+    logger.info("Convert endpoint called", {"input_format": query.input_format})
+
     input_model = handle_trace_and_format(trace=query.input_trace, format=query.input_format)
     # Get output format model
     output_model = CustomTraceFormatModelEnum[query.output_format.name]
@@ -96,7 +102,10 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     mapping_config = get_mapping_by_input_and_output_format(input_model, output_model)
 
     # Profile handling
-    jsonld_repository = JsonLdProfileRepository(base_path=os.path.join('data', 'dases_profiles'))
+    jsonld_repository = JsonLdProfileRepository(
+        base_path=os.path.join('data', 'dases_profiles'),
+        logger=logger,
+    )
     profiler = Profiler(repository=jsonld_repository)
 
     # Apply Mapping
@@ -113,6 +122,7 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     )
 
     # Done
+    logger.info("Convert endpoint done", {"input_format": query.input_format})
     return TransformInputTraceResponseModel(output_trace=response, meta= meta)
 
 
