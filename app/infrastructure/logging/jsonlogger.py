@@ -39,15 +39,16 @@ class JsonLogger(LoggerContract):
     This implementation formats logs as JSON and supports adding context to log messages.
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, level: str):
         """
         Initialize the JsonLogger.
 
         :param name: The name of the logger, typically __name__ of the calling module.
+        :param level: The minimum log level to output
         :type name: str
         """
         self._logger = logging.getLogger(name)
-        self._logger.setLevel(logging.DEBUG)  # TODO CONFIG
+        self._logger.setLevel(level)
 
         handler = logging.StreamHandler(sys.stdout)
         handler.setFormatter(JsonLoggingFormatter())

@@ -1,5 +1,6 @@
 from utils.utils_dict import deep_merge
 
+from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
 from app.profile_enricher.types import (JsonType, ValidationError,
@@ -15,15 +16,15 @@ class JsonLdProfileRepository(ProfileRepository):
     A repository for handling JSON-LD profiles.
     """
 
-    def __init__(self, base_path: str, logger: LoggerContract):
+    def __init__(self, logger: LoggerContract, config: ConfigContract):
         """
         Initialize the JsonLdProfileRepository.
 
-        :param base_path: Base path for profile files
         :param logger: LoggerContract implementation for logging
+        :param config: ConfigContract implementation for config
         """
         self.logger = logger
-        self.profile_loader = ProfileLoader(base_path=base_path, logger=logger)
+        self.profile_loader = ProfileLoader(logger=logger, config=config)
         self.trace_enricher = TraceEnricher(logger=logger)
         self.trace_validator = TraceValidator(logger=logger)
 

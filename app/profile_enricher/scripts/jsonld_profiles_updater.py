@@ -1,6 +1,9 @@
-import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+from app.infrastructure.config.contract import ConfigContract
+from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
 from app.infrastructure.logging.jsonlogger import JsonLogger
 from app.profile_enricher.exceptions import (ProfileNotFoundException,
@@ -13,18 +16,20 @@ class JsonLdProfilesUpdater:
     A class to update JSON-LD profiles based on environment variables.
     """
 
-    def __init__(self, destination_dir: str, logger: LoggerContract):
+    def __init__(
+        self, destination_dir: str, logger: LoggerContract, config: ConfigContract
+    ):
         """
         Initialize the JsonLdProfilesUpdater.
 
         :param destination_dir: The directory where profiles will be saved.
         :param logger: LoggerContract implementation for logging
+        :param config: ConfigContract implementation for config
         """
         self.destination_path: Path = Path(destination_dir)
         self.logger = logger
-        self.profile_loader: ProfileLoader = ProfileLoader(
-            base_path=destination_dir, logger=logger
-        )
+        self.config = config
+        self.profile_loader: ProfileLoader = ProfileLoader(logger=logger, config=config)
 
     def update_all_profiles(self) -> None:
         """
@@ -33,29 +38,28 @@ class JsonLdProfilesUpdater:
         self.logger.debug("Create path if not exists", {"path": self.destination_path})
         self.destination_path.mkdir(parents=True, exist_ok=True)
 
-        env_vars = self.get_env_vars_with_prefix("PROFILE")
-        for env_var in env_vars:
+        profiles = self.config.get_profiles_names()
+        for profile_name in profiles:
             try:
-                self.update_profile(env_var)
+                self.update_profile(profile_name=profile_name)
             except Exception as e:
                 self.logger.exception(
-                    "Failed to update profile file", e, {"env_var": env_var}
+                    "Failed to update profile file", e, {"profile": profile_name}
                 )
 
-    def update_profile(self, env_var: str) -> None:
+    def update_profile(self, profile_name: str) -> None:
         """
         Update a single profile based on the given environment variable.
 
-        :param env_var: The environment variable name for the profile.
+        :param profile_name: The profile name.
         """
-        profile = env_var.removeprefix("PROFILE_").split("_")[0]
-        file_path = self.destination_path.joinpath(f"{profile.lower()}.jsonld")
+        file_path = self.destination_path.joinpath(f"{profile_name.lower()}.jsonld")
 
-        log_context = {"env_var": env_var, "profile": profile, "file_path": file_path}
+        log_context = {"profile": profile_name, "file_path": file_path}
         self.logger.debug("Found variable", log_context)
 
         try:
-            profile_json = self.profile_loader.download_profile(group_name=profile)
+            profile_json = self.profile_loader.download_profile(group_name=profile_name)
             self.profile_loader.build_profile_model(profile_json)
             self.profile_loader.save_profile_file(
                 file_path=file_path, profile_json=profile_json
@@ -68,16 +72,6 @@ class JsonLdProfilesUpdater:
         except Exception as e:
             self.logger.exception("Unexpected error updating profile", e, log_context)
 
-    @staticmethod
-    def get_env_vars_with_prefix(prefix: str) -> list[str]:
-        """
-        Get a list of environment variable names that start with the given prefix.
-
-        :param prefix: The prefix to filter environment variables.
-        :return: A list of matching environment variable names.
-        """
-        return [key for key in os.environ.keys() if key.startswith(prefix)]
-
 
 def main(destination_dir: str | None = None) -> None:
     """
@@ -86,13 +80,18 @@ def main(destination_dir: str | None = None) -> None:
     :param destination_dir: Optional directory where profiles will be saved.
                             If not provided, a default directory is used.
     """
+    load_dotenv(dotenv_path=".env", verbose=True)
+    env_config = EnvConfig()
+
     if destination_dir is None:
-        destination_dir = os.path.join("data", "dases_profiles")
+        destination_dir = env_config.get_profiles_base_path()
 
-    logger = JsonLogger(__name__)
-    logger.info("Script starting", {"destination_dir": destination_dir})
+    json_logger = JsonLogger(name=__name__, level=env_config.get_log_level())
+    json_logger.info("Script starting", {"destination_dir": destination_dir})
 
-    updater = JsonLdProfilesUpdater(destination_dir=destination_dir, logger=logger)
+    updater = JsonLdProfilesUpdater(
+        destination_dir=destination_dir, logger=json_logger, config=env_config
+    )
     updater.update_all_profiles()
 
 

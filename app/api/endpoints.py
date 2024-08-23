@@ -20,6 +20,7 @@ from app.api.schemas import (
     ValidateInputTraceRequestModel,
     ValidateInputTraceResponseModel,
 )
+from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.jsonlogger import JsonLogger
 from app.profile_enricher.profiler import Profiler
 from app.profile_enricher.repositories.jsonld.jsonld_repository import JsonLdProfileRepository
@@ -29,8 +30,11 @@ from app.xapi_converter.transformer.mapping_input import (
 )
 from enums.custom_trace_format import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 
-logger = JsonLogger(__name__)
+config = EnvConfig()
+
+logger = JsonLogger(name=__name__, level=config.get_log_level())
 logger.info("Application starting")
+
 
 ROOT_PATH = ""
 
@@ -102,10 +106,7 @@ def transform_input_trace(query: TransformInputTraceRequestModel):
     mapping_config = get_mapping_by_input_and_output_format(input_model, output_model)
 
     # Profile handling
-    jsonld_repository = JsonLdProfileRepository(
-        base_path=os.path.join('data', 'dases_profiles'),
-        logger=logger,
-    )
+    jsonld_repository = JsonLdProfileRepository(logger=logger, config=config)
     profiler = Profiler(repository=jsonld_repository)
 
     # Apply Mapping

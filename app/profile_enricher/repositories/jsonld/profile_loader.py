@@ -1,5 +1,4 @@
 import json
-import os
 from functools import cache
 from pathlib import Path
 from typing import Optional
@@ -8,6 +7,7 @@ from urllib.request import Request, urlopen
 
 from pydantic import ValidationError
 
+from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.exceptions import (InvalidJsonException,
                                              ProfileNotFoundException,
@@ -20,9 +20,11 @@ from app.profile_enricher.types import JsonType
 class ProfileLoader:
     """Class responsible for loading profile's file."""
 
-    def __init__(self, base_path: str, logger: LoggerContract):
-        self.base_path: Path = Path(base_path)
+    def __init__(self, logger: LoggerContract, config: ConfigContract):
         self.logger = logger
+        self.config = config
+        self.base_path: Path = Path(config.get_profiles_base_path())
+        self.download_timeout = config.get_download_timeout()
 
     @cache
     def load_template(self, group_name: str, template_name: str) -> StatementTemplate:
@@ -111,7 +113,7 @@ class ProfileLoader:
         :Environment Variables:
             - PROFILE_{GROUP_NAME}_URL: The URL from which to download the profile.
         """
-        url = os.getenv(f"PROFILE_{group_name.upper()}_URL")
+        url = self.config.get_profile_url(group_name)
 
         log_context = {"group": group_name, "url": url}
         self.logger.debug("Profile file downloading", log_context)
@@ -122,7 +124,7 @@ class ProfileLoader:
 
         try:
             request = Request(url=url)
-            with urlopen(request, timeout=10) as response:
+            with urlopen(request, timeout=self.download_timeout) as response:
                 if response.status != 200:
                     self.logger.error("Failed to download profile", log_context)
                     raise ProfileNotFoundException(
