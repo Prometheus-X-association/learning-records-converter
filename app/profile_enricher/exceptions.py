@@ -26,3 +26,9 @@ class ProfileValidationError(ProfilerException):
     """Exception when a profile is not validated by Pydantic."""
 
     pass
+
+
+class BasePathException(ProfilerException):
+    """Exception for errors related to the base path for profiles."""
+
+    pass

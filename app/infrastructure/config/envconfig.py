@@ -1,5 +1,8 @@
 import os
+from pathlib import Path
 from typing import Any
+
+from app.profile_enricher.exceptions import BasePathException
 
 from .contract import ConfigContract
 
@@ -8,6 +11,7 @@ class EnvConfig(ConfigContract):
     """
     Implementation of ConfigContract that reads configuration from environment variables.
     """
+
     def __init__(self):
         self.env = os.environ
 
@@ -19,6 +23,22 @@ class EnvConfig(ConfigContract):
 
     def get_profiles_base_path(self) -> str:
         return self._get("PROFILES_BASE_PATH", os.path.join("data", "dases_profiles"))
+
+    def get_and_create_profiles_base_path(self) -> str:
+        path = self.get_profiles_base_path()
+        try:
+            Path(path).mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            raise BasePathException(
+                f"Permission denied when creating directory: {path}"
+            )
+        except OSError as e:
+            raise BasePathException(f"Failed to create directory {path}: {str(e)}")
+
+        if not os.access(path, os.W_OK):
+            raise BasePathException(f"Created directory {path} is not writable")
+
+        return path
 
     def get_profile_url(self, profile_name: str) -> str:
         return self._get(f"PROFILE_{profile_name.upper()}_URL", "")

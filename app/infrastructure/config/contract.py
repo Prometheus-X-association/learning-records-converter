@@ -34,6 +34,15 @@ class ConfigContract(ABC):
         ...
 
     @abstractmethod
+    def get_and_create_profiles_base_path(self) -> str:
+        """
+        Get the base path for profile files and create the directory if it doesn't exist.
+
+        :return: The base path as a string.
+        """
+        ...
+
+    @abstractmethod
     def get_profile_url(self, profile_name: str) -> str:
         """
         Get the URL for a specific profile.

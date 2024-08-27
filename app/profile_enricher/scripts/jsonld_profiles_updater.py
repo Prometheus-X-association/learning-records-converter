@@ -6,7 +6,8 @@ from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
 from app.infrastructure.logging.jsonlogger import JsonLogger
-from app.profile_enricher.exceptions import (ProfileNotFoundException,
+from app.profile_enricher.exceptions import (BasePathException,
+                                             ProfileNotFoundException,
                                              ProfileValidationError)
 from app.profile_enricher.repositories.jsonld.profile_loader import ProfileLoader
 
@@ -83,11 +84,15 @@ def main(destination_dir: str | None = None) -> None:
     load_dotenv(dotenv_path=".env", verbose=True)
     env_config = EnvConfig()
 
-    if destination_dir is None:
-        destination_dir = env_config.get_profiles_base_path()
-
     json_logger = JsonLogger(name=__name__, level=env_config.get_log_level())
     json_logger.info("Script starting", {"destination_dir": destination_dir})
+
+    if destination_dir is None:
+        try:
+            destination_dir: Path = Path(env_config.get_and_create_profiles_base_path())
+        except BasePathException as e:
+            json_logger.exception("Failed to create or access profiles directory", e)
+            raise
 
     updater = JsonLdProfilesUpdater(
         destination_dir=destination_dir, logger=json_logger, config=env_config

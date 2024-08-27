@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
-from app.profile_enricher.exceptions import (InvalidJsonException,
+from app.profile_enricher.exceptions import (BasePathException, InvalidJsonException,
                                              ProfileNotFoundException,
                                              ProfileValidationError,
                                              TemplateNotFoundException)
@@ -23,7 +23,13 @@ class ProfileLoader:
     def __init__(self, logger: LoggerContract, config: ConfigContract):
         self.logger = logger
         self.config = config
-        self.base_path: Path = Path(config.get_profiles_base_path())
+
+        try:
+            self.base_path: Path = Path(config.get_and_create_profiles_base_path())
+        except BasePathException as e:
+            self.logger.exception("Failed to create or access profiles directory", e)
+            raise
+
         self.download_timeout = config.get_download_timeout()
 
     @cache
