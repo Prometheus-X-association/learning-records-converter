@@ -99,7 +99,7 @@ class JsonLdProfileRepository(ProfileRepository):
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :param trace: The trace data to generate recommendations for
-        :return: A list of ValidationRecommendation objects.
+        :return: A list of ValidationRecommendation objects
         :raises TemplateNotFoundException: If the specified template is not found
         :raises ProfileNotFoundException: If the specified group (profile) is not found
         :raises InvalidJsonException: If the profile JSON is invalid

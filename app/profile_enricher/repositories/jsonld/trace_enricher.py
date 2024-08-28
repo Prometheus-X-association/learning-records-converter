@@ -24,10 +24,10 @@ class TraceEnricher:
         """
         Get enriched data based on the given template.
 
-        :param group_name: The group name of the template.
-        :param template: The template to use for enrichment.
-        :param trace: The trace that needs to be enriched.
-        :return: The enriched data.
+        :param group_name: The group name of the template
+        :param template: The template to use for enrichment
+        :param trace: The trace that needs to be enriched
+        :return: The enriched data
         """
         log_context = {
             "group": group_name,

@@ -78,8 +78,8 @@ def main(destination_dir: str | None = None) -> None:
     """
     Main function to run the profile updater.
 
-    :param destination_dir: Optional directory where profiles will be saved.
-                            If not provided, a default directory is used.
+    :param destination_dir: Optional directory where profiles will be saved
+                            If not provided, a default directory is used
     """
     load_dotenv(dotenv_path=".env", verbose=True)
     env_config = EnvConfig()

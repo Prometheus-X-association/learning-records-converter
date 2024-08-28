@@ -111,13 +111,11 @@ class ProfileLoader:
         """
         Download a profile file for a given group.
 
-        :param group_name: The name of the group whose profile is to be downloaded.
-        :return: The contents of the downloaded profile as a dictionary.
-        :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found.
-        :raises InvalidJsonException: If the downloaded content is not valid JSON.
+        :param group_name: The name of the group whose profile is to be downloaded
+        :return: The contents of the downloaded profile as a dictionary
+        :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found
+        :raises InvalidJsonException: If the downloaded content is not valid JSON
         """
-        url = self.config.get_profile_url(group_name)
-
         log_context = {"group": group_name, "url": url}
         self.logger.debug("Profile file downloading", log_context)
 
@@ -160,7 +158,7 @@ class ProfileLoader:
 
         :param file_path: The file path where to save the profile
         :param profile_json: The profile data to save
-        :raises IOError: If there's an error writing the file to the specified path.
+        :raises IOError: If there's an error writing the file to the specified path
         """
         log_context = {"file_path": file_path}
         try:
@@ -208,6 +206,11 @@ class ProfileLoader:
             return None
         for profile_template in profile.templates:
             # Example: accessed-page in http://schema.dases.eu/xapi/profile/common/templates/accessed-page
-            if str(profile_template.id).casefold().endswith(template_name.casefold()):
+            if (
+                str(profile_template.id)
+                .rstrip("/")
+                .casefold()
+                .endswith(template_name.casefold())
+            ):
                 return profile_template
         return None
