@@ -150,3 +150,6 @@ node_modules
 
 # JetBrains
 .idea
+
+# Project files
+data/dases_profiles
