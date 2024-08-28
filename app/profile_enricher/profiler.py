@@ -43,7 +43,7 @@ class Profiler:
 
         :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The trace to validate
-        :return: A list of ValidationError objects.
+        :return: A list of ValidationError objects
         :raises ProfilerException: If validation fails
         """
         group_name, template_name = self._parse_profile(profile=profile)
@@ -66,8 +66,8 @@ class Profiler:
 
         :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The trace data to generate recommendations for
-        :return: A list of ValidationRecommendation objects.
-        :raises ProfilerException: If recommendation generation fails.
+        :return: A list of ValidationRecommendation objects
+        :raises ProfilerException: If recommendation generation fails
         """
         group_name, template_name = self._parse_profile(profile=profile)
 

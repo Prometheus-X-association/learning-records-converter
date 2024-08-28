@@ -19,7 +19,7 @@ class JsonLdProfilesUpdater:
         """
         Initialize the JsonLdProfilesUpdater.
 
-        :param destination_dir: The directory where profiles will be saved.
+        :param destination_dir: The directory where profiles will be saved
         """
         self.destination_path: Path = Path(destination_dir)
         self.profile_loader: ProfileLoader = ProfileLoader(base_path=destination_dir)
@@ -41,7 +41,7 @@ class JsonLdProfilesUpdater:
         """
         Update a single profile based on the given environment variable.
 
-        :param env_var: The environment variable name for the profile.
+        :param env_var: The environment variable name for the profile
         """
         profile = env_var.removeprefix("PROFILE_").split("_")[0]
         file_path = self.destination_path.joinpath(f"{profile.lower()}.jsonld")
@@ -65,8 +65,8 @@ class JsonLdProfilesUpdater:
         """
         Get a list of environment variable names that start with the given prefix.
 
-        :param prefix: The prefix to filter environment variables.
-        :return: A list of matching environment variable names.
+        :param prefix: The prefix to filter environment variables
+        :return: A list of matching environment variable names
         """
         return [key for key in os.environ.keys() if key.startswith(prefix)]
 
@@ -75,8 +75,8 @@ def main(destination_dir: str | None = None) -> None:
     """
     Main function to run the profile updater.
 
-    :param destination_dir: Optional directory where profiles will be saved.
-                            If not provided, a default directory is used.
+    :param destination_dir: Optional directory where profiles will be saved
+                            If not provided, a default directory is used
     """
     if destination_dir is None:
         destination_dir = os.path.join("data", "dases_profiles")

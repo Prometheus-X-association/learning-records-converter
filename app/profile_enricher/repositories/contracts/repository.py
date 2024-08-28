@@ -33,7 +33,7 @@ class ProfileRepository(ABC):
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :param trace: The trace to validate
-        :return: A list of ValidationError objects. An empty list indicates a valid trace.
+        :return: A list of ValidationError objects. An empty list indicates a valid trace
         """
         ...
 
@@ -46,7 +46,7 @@ class ProfileRepository(ABC):
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
-        :param trace: The trace data to generate recommendations for.
-        :return: A list of ValidationRecommendation objects.
+        :param trace: The trace data to generate recommendations for
+        :return: A list of ValidationRecommendation objects
         """
         ...

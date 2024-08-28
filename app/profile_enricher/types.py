@@ -12,11 +12,11 @@ class ValidationResult:
     This class encapsulates information about a validation result, which can be
     either an error or an unmet recommendation.
 
-    :param rule: The type of rule that was checked (e.g., "presence", "any", "all", "none").
-    :param path: The JSONPath location in the trace where the result occurred.
-    :param expected: The expected value or condition as defined by the rule.
-    :param actual: The actual value found in the trace.
-    :param severity: Indicates whether this is an error or a recommendation.
+    :param rule: The type of rule that was checked (e.g., "presence", "any", "all", "none")
+    :param path: The JSONPath location in the trace where the result occurred
+    :param expected: The expected value or condition as defined by the rule
+    :param actual: The actual value found in the trace
+    :param severity: Indicates whether this is an error or a recommendation
     """
 
     rule: str

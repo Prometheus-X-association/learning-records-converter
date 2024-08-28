@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Callable
 
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
                                                   StatementTemplateRule)
@@ -14,7 +14,7 @@ class TraceValidator:
     """Class responsible for validating traces against templates."""
 
     def __init__(self):
-        self.rule_checks: dict[str, callable[[list[Any], list[Any]], bool]] = {
+        self.rule_checks: dict[str, Callable[[list[Any], list[Any]], bool]] = {
             "any": self._check_any,
             "all": self._check_all,
             "none": self._check_none,
@@ -26,9 +26,9 @@ class TraceValidator:
         """
         Validate a trace against a given template.
 
-        :param template: The template to validate against.
-        :param trace: The trace to validate.
-        :return: A list of ValidationError objects. An empty list indicates a valid trace.
+        :param template: The template to validate against
+        :param trace: The trace to validate
+        :return: A list of ValidationError objects. An empty list indicates a valid trace
         """
         errors: list[ValidationError] = []
 
@@ -58,9 +58,9 @@ class TraceValidator:
         and generates recommendations for fields that are marked as recommended
         but do not meet the specified criteria.
 
-        :param template: The template to validate against.
-        :param trace: The trace to validate.
-        :return: A list of ValidationRecommendation objects.
+        :param template: The template to validate against
+        :param trace: The trace to validate
+        :return: A list of ValidationRecommendation objects
         """
         recommendations: list[ValidationRecommendation] = []
 
@@ -83,7 +83,7 @@ class TraceValidator:
         See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid
 
         :param rule: The rule to check against
-        :param values: The extracted values relevant to the rule.
+        :param values: The extracted values relevant to the rule
         :return: List of errors
         """
         if rule.presence not in [PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED]:
@@ -140,9 +140,9 @@ class TraceValidator:
         the criteria specified by the rule. It generates appropriate
         recommendations if the criteria are not met.
 
-        :param rule: The rule to check against.
-        :param values: The extracted values relevant to the rule.
-        :return: A list of ValidationRecommendation objects.
+        :param rule: The rule to check against
+        :param values: The extracted values relevant to the rule
+        :return: A list of ValidationRecommendation objects
         """
         if rule.presence != PresenceTypeEnum.RECOMMENDED:
             return []
@@ -219,9 +219,9 @@ class TraceValidator:
         This method applies the JSONPath specified in the rule to the trace,
         and if a selector is present, further refines the extracted values.
 
-        :param trace: The trace data to extract values from.
-        :param rule: The StatementTemplateRule specifying how to extract values.
-        :return: A list of extracted values relevant to the rule.
+        :param trace: The trace data to extract values from
+        :param rule: The StatementTemplateRule specifying how to extract values
+        :return: A list of extracted values relevant to the rule
         """
         values = self._apply_jsonpath(data=trace, path=rule.location)
         if rule.selector:

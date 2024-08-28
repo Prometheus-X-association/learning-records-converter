@@ -102,13 +102,13 @@ class ProfileLoader:
         """
         Download a profile file for a given group.
 
-        :param group_name: The name of the group whose profile is to be downloaded.
-        :return: The contents of the downloaded profile as a dictionary.
-        :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found.
-        :raises InvalidJsonException: If the downloaded content is not valid JSON.
+        :param group_name: The name of the group whose profile is to be downloaded
+        :return: The contents of the downloaded profile as a dictionary
+        :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found
+        :raises InvalidJsonException: If the downloaded content is not valid JSON
 
         :Environment Variables:
-            - PROFILE_{GROUP_NAME}_URL: The URL from which to download the profile.
+            - PROFILE_{GROUP_NAME}_URL: The URL from which to download the profile
         """
         url = os.getenv(f"PROFILE_{group_name.upper()}_URL")
         if not url:
@@ -149,7 +149,7 @@ class ProfileLoader:
 
         :param file_path: The file path where to save the profile
         :param profile_json: The profile data to save
-        :raises IOError: If there's an error writing the file to the specified path.
+        :raises IOError: If there's an error writing the file to the specified path
         """
         try:
             json_string = json.dumps(profile_json, ensure_ascii=False, indent=2)
@@ -197,6 +197,11 @@ class ProfileLoader:
             return None
         for profile_template in profile.templates:
             # Example: accessed-page in http://schema.dases.eu/xapi/profile/common/templates/accessed-page
-            if str(profile_template.id).casefold().endswith(template_name.casefold()):
+            if (
+                str(profile_template.id)
+                .rstrip("/")
+                .casefold()
+                .endswith(template_name.casefold())
+            ):
                 return profile_template
         return None
