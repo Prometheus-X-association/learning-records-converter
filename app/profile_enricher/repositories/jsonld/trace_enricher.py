@@ -56,11 +56,12 @@ class TraceEnricher:
 
         return get_nested_from_flat(flat_field=enriched_data)
 
-    def _enrich_with_rules(self, template: StatementTemplate, trace: JsonType):
+    def _enrich_with_rules(
+        self, template: StatementTemplate, trace: JsonType
+    ) -> JsonType:
         """
         Get enriched data based on the template's rules than contain only one value
 
-        :param group_name: The group name of the template.
         :param template: The template to use for enrichment.
         :param trace: The trace that needs to be enriched.
         :return: The enriched data.

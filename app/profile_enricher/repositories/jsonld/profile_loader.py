@@ -115,9 +115,6 @@ class ProfileLoader:
         :return: The contents of the downloaded profile as a dictionary.
         :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found.
         :raises InvalidJsonException: If the downloaded content is not valid JSON.
-
-        :Environment Variables:
-            - PROFILE_{GROUP_NAME}_URL: The URL from which to download the profile.
         """
         url = self.config.get_profile_url(group_name)
 

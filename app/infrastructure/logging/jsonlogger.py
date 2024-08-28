@@ -19,9 +19,7 @@ class JsonLoggingFormatter(logging.Formatter):
         Format the specified log record as JSON.
 
         :param record: The log record to format.
-        :type record: logging.LogRecord
         :return: A JSON string representing the formatted log record.
-        :rtype: str
         """
         log_data = {
             "timestamp": self.formatTime(record=record, datefmt=self.datefmt),
@@ -45,7 +43,6 @@ class JsonLogger(LoggerContract):
 
         :param name: The name of the logger, typically __name__ of the calling module.
         :param level: The minimum log level to output
-        :type name: str
         """
         self._logger = logging.getLogger(name)
         self._logger.setLevel(level)
