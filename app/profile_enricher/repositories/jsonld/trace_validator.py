@@ -4,7 +4,7 @@ from typing import Any, Callable
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
                                                   StatementTemplateRule)
 from app.profile_enricher.types import (JsonType, ValidationError,
-                                        ValidationRecommendation)
+                                        ValidationRecommendation, ValidationResult)
 from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
 logger = logging.getLogger(__name__)
@@ -30,23 +30,17 @@ class TraceValidator:
         :param trace: The trace to validate
         :return: A list of ValidationError objects. An empty list indicates a valid trace
         """
-        errors: list[ValidationError] = []
-
-        if template.rules:
-            for rule in template.rules:
-                # Apply the JSONPath to retrieve the field values to check
-                values = self._get_values_for_rule(rule=rule, trace=trace)
-
-                rule_errors = self._validate_rule(rule=rule, values=values)
-                if rule_errors:
-                    logger.debug(f"Trace validation failed for rule: {rule}")
-                    errors.extend(rule_errors)
-        if not errors:
+        validation_results = self._apply_rules(
+            template=template,
+            trace=trace,
+            rule_types=[PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED],
+        )
+        if not validation_results:
             logger.debug(
                 f"Trace validated successfully against template '{template.id}'"
             )
 
-        return errors
+        return [ValidationError(**result.__dict__) for result in validation_results]
 
     def get_recommendations(
         self, template: StatementTemplate, trace: JsonType
@@ -62,22 +56,50 @@ class TraceValidator:
         :param trace: The trace to validate
         :return: A list of ValidationRecommendation objects
         """
-        recommendations: list[ValidationRecommendation] = []
+        validation_results = self._apply_rules(
+            template=template, trace=trace, rule_types=[PresenceTypeEnum.RECOMMENDED]
+        )
 
-        if template.rules:
-            for rule in template.rules:
-                # Apply the JSONPath to retrieve the field values to check
-                values = self._get_values_for_rule(rule=rule, trace=trace)
+        return [
+            ValidationRecommendation(**result.__dict__) for result in validation_results
+        ]
 
-                recommendations.extend(
-                    self._get_rule_recommendations(rule=rule, values=values)
-                )
+    def _apply_rules(
+        self,
+        template: StatementTemplate,
+        trace: JsonType,
+        rule_types: list[PresenceTypeEnum],
+    ) -> list[ValidationResult]:
+        """
+        Apply validation rules to a trace based on a given template and rule types.
 
-        return recommendations
+        :param template: The StatementTemplate containing the rules to apply
+        :param trace: The trace data to validate
+        :param rule_types: A list of PresenceTypeEnum values indicating which types of rules to apply
+        :return: A list of ValidationResult objects representing the outcome of applying the rules
+        """
+        if not template.rules:
+            return []
+
+        validation_results: list[ValidationResult] = []
+
+        for rule in template.rules:
+            # Apply the JSONPath to retrieve the field values to check
+            values = self._get_values_for_rule(rule=rule, trace=trace)
+
+            # Validate the rule
+            validation_results.extend(
+                self._validate_rule(rule=rule, values=values, rule_types=rule_types)
+            )
+
+        return validation_results
 
     def _validate_rule(
-        self, rule: StatementTemplateRule, values: list[Any]
-    ) -> list[ValidationError]:
+        self,
+        rule: StatementTemplateRule,
+        values: list[Any],
+        rule_types: list[PresenceTypeEnum],
+    ) -> list[ValidationResult]:
         """
         Check if a trace follows a specific rule.
         See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid
@@ -86,15 +108,18 @@ class TraceValidator:
         :param values: The extracted values relevant to the rule
         :return: List of errors
         """
-        if rule.presence not in [PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED]:
+        if rule.presence not in rule_types:
             return []
 
-        errors: list[ValidationError] = []
+        validation_results: list[ValidationResult] = []
 
-        # Check the "included" and "excluded" rules
-        if rule.presence == PresenceTypeEnum.INCLUDED and not values:
-            errors.append(
-                ValidationError(
+        # Check the "included", "excluded" and "recommended" rules
+        if (
+            rule.presence in [PresenceTypeEnum.INCLUDED, PresenceTypeEnum.RECOMMENDED]
+            and not values
+        ):
+            validation_results.append(
+                ValidationResult(
                     rule="presence",
                     path=rule.location,
                     expected="included",
@@ -102,8 +127,8 @@ class TraceValidator:
                 )
             )
         elif rule.presence == PresenceTypeEnum.EXCLUDED and values:
-            errors.append(
-                ValidationError(
+            validation_results.append(
+                ValidationResult(
                     rule="presence",
                     path=rule.location,
                     expected="excluded",
@@ -115,8 +140,8 @@ class TraceValidator:
         for check_type, check_method in self.rule_checks.items():
             rule_values = getattr(rule, check_type)
             if rule_values and not check_method(rule_values, values):
-                errors.append(
-                    ValidationError(
+                validation_results.append(
+                    ValidationResult(
                         rule=check_type,
                         path=rule.location,
                         expected=(
@@ -128,54 +153,7 @@ class TraceValidator:
                     )
                 )
 
-        return errors
-
-    def _get_rule_recommendations(
-        self, rule: StatementTemplateRule, values: list[Any]
-    ) -> list[ValidationRecommendation]:
-        """
-        Generate recommendations for a specific rule based on the extracted values.
-
-        This method checks if the rule is recommended and if the values meet
-        the criteria specified by the rule. It generates appropriate
-        recommendations if the criteria are not met.
-
-        :param rule: The rule to check against
-        :param values: The extracted values relevant to the rule
-        :return: A list of ValidationRecommendation objects
-        """
-        if rule.presence != PresenceTypeEnum.RECOMMENDED:
-            return []
-
-        recommendations: list[ValidationRecommendation] = []
-
-        if not values:
-            recommendations.append(
-                ValidationRecommendation(
-                    rule="presence",
-                    path=rule.location,
-                    expected="included",
-                    actual="missing",
-                )
-            )
-        else:
-            for check_type, check_method in self.rule_checks.items():
-                rule_values = getattr(rule, check_type)
-                if rule_values and not check_method(rule_values, values):
-                    recommendations.append(
-                        ValidationRecommendation(
-                            rule=check_type,
-                            path=rule.location,
-                            expected=(
-                                f"no values from {rule.none}"
-                                if check_type == "none"
-                                else rule_values
-                            ),
-                            actual=values,
-                        )
-                    )
-
-        return recommendations
+        return validation_results
 
     @staticmethod
     def _check_any(any_values: list[Any], values: list[Any]) -> bool:
