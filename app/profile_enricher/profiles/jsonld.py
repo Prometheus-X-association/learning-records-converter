@@ -457,8 +457,7 @@ class Profile(BaseModel):
 
     id: AnyUrl
     context: Annotated[AnyUrl, Literal[PROFILE_CONTEXT_URL]] = Field(
-        default=PROFILE_CONTEXT_URL,
-        alias="@context"
+        default=PROFILE_CONTEXT_URL, alias="@context"
     )
     type: ProfileTypeEnum
     conformsTo: Annotated[AnyUrl, Literal[PROFILE_CONFORMS_TO_URL]] = Field(

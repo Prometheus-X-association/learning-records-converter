@@ -98,9 +98,6 @@ class TraceValidator:
                 self._validate_rule(rule=rule, values=values, rule_types=rule_types)
             )
 
-        if not validation_results:
-            self.logger.debug("No trace recommendations", log_context)
-
         return validation_results
 
     def _validate_rule(
