@@ -190,7 +190,7 @@ class Extension(ProfileElement):
     iriSchema: Optional[AnyUrl] = Field(
         default=None, alias="schema"
     )  # Rename internal Pydantic field
-    inlineSchema: Optional[dict] = None
+    inlineSchema: Optional[str] = None
 
     @field_validator("recommendedActivityTypes")
     @staticmethod
@@ -457,7 +457,8 @@ class Profile(BaseModel):
 
     id: AnyUrl
     context: Annotated[AnyUrl, Literal[PROFILE_CONTEXT_URL]] = Field(
-        default=PROFILE_CONTEXT_URL
+        default=PROFILE_CONTEXT_URL,
+        alias="@context"
     )
     type: ProfileTypeEnum
     conformsTo: Annotated[AnyUrl, Literal[PROFILE_CONFORMS_TO_URL]] = Field(
