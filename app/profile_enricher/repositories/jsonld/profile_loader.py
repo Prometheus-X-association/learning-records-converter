@@ -116,6 +116,8 @@ class ProfileLoader:
         :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found
         :raises InvalidJsonException: If the downloaded content is not valid JSON
         """
+        url = self.config.get_profile_url(profile_name=group_name)
+
         log_context = {"group": group_name, "url": url}
         self.logger.debug("Profile file downloading", log_context)
 

@@ -1,6 +1,5 @@
-from app.profile_enricher.repositories.contracts.repository import ProfileRepository
-
 from .exceptions import ProfilerException
+from .repositories.contracts.repository import ProfileRepository
 from .types import JsonType, ValidationError, ValidationRecommendation
 
 

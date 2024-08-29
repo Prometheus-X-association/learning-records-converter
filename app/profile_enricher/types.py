@@ -4,7 +4,7 @@ from typing import Any, TypeAlias
 JsonType: TypeAlias = dict[str, Any]
 
 
-@dataclass
+@dataclass(frozen=True)
 class ValidationResult:
     """
     Represents a result of trace validation against a profile rule.
@@ -16,7 +16,6 @@ class ValidationResult:
     :param path: The JSONPath location in the trace where the result occurred
     :param expected: The expected value or condition as defined by the rule
     :param actual: The actual value found in the trace
-    :param severity: Indicates whether this is an error or a recommendation
     """
 
     rule: str
