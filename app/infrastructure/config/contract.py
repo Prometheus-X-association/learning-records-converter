@@ -24,6 +24,15 @@ class ConfigContract(ABC):
         """
         ...
 
+    def get_cors_allowed_origins(self) -> list[str]:
+        """
+        Get the allowed origins for CORS.
+
+        :return: A list of allowed origins URLs.
+        """
+        ...
+
+
     @abstractmethod
     def get_profiles_base_path(self) -> str:
         """

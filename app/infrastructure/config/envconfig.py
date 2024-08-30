@@ -21,6 +21,10 @@ class EnvConfig(ConfigContract):
     def get_download_timeout(self) -> int:
         return int(self._get("DOWNLOAD_TIMEOUT", 10))
 
+    def get_cors_allowed_origins(self) -> list[str]:
+        origins = self._get("CORS_ALLOWED_ORIGINS", [])
+        return [origin.strip() for origin in origins.split(",")]
+
     def get_profiles_base_path(self) -> str:
         return self._get("PROFILES_BASE_PATH", os.path.join("data", "dases_profiles"))
 
