@@ -91,7 +91,9 @@ class ExtendedTypeBaseModel(BaseModel):
             Any: Either returns a model instance with the valid data or the exact passed value
         """
         # Get FieldInfo
-        field = cls.model_fields.get(extra_info.field_name if extra_info.field_name else "", None)
+        field = cls.model_fields.get(
+            extra_info.field_name if extra_info.field_name else "", None
+        )
 
         # Check if condition gathered to treat
         if isinstance(field, FieldInfo) and (

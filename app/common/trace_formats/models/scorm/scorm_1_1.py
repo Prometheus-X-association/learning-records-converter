@@ -54,15 +54,21 @@ class CMIScore(BaseModel):
         None, title="Raw Score", description="Reflects the performance of the learner."
     )
     max: Optional[float] = Field(
-        None, title="Maximum Score", description="Maximum value in the range for the raw score."
+        None,
+        title="Maximum Score",
+        description="Maximum value in the range for the raw score.",
     )
     min: Optional[float] = Field(
-        None, title="Minimum Score", description="Minimum value in the range for the raw score."
+        None,
+        title="Minimum Score",
+        description="Minimum value in the range for the raw score.",
     )
 
 
 class CMIObjective(BaseModel):
-    id: str = Field(..., title="Objective ID", description="Unique label for the objective.")
+    id: str = Field(
+        ..., title="Objective ID", description="Unique label for the objective."
+    )
     score: CMIScore = Field(
         ..., title="Objective Score", description="Score related to the objective."
     )
@@ -72,7 +78,9 @@ class CMIObjective(BaseModel):
 
 
 class CMIInteraction(BaseModel):
-    id: str = Field(..., title="Interaction ID", description="Unique label for the interaction.")
+    id: str = Field(
+        ..., title="Interaction ID", description="Unique label for the interaction."
+    )
     time: str = Field(..., title="Interaction Time", description="Time of interaction.")
     type: InteractionType = Field(
         ..., title="Interaction Type", description="Type of interaction."
@@ -80,14 +88,20 @@ class CMIInteraction(BaseModel):
     correct_responses: List[str] = Field(
         ..., title="Correct Responses", description="List of correct responses."
     )
-    weighting: float = Field(..., title="Weighting", description="Weight of the interaction.")
+    weighting: float = Field(
+        ..., title="Weighting", description="Weight of the interaction."
+    )
     student_response: str = Field(
         ..., title="Student Response", description="Response given by the student."
     )
     result: str = Field(
-        ..., title="Result", description="Judgment of the correctness of the learner response."
+        ...,
+        title="Result",
+        description="Judgment of the correctness of the learner response.",
     )
-    latency: str = Field(..., title="Latency", description="Time taken for the response.")
+    latency: str = Field(
+        ..., title="Latency", description="Time taken for the response."
+    )
 
 
 # SCORM 1.1 Main Data Model
@@ -99,7 +113,10 @@ class SCORMDataModel(BaseModel):
         ..., max_length=255, title="Student Name", description="Name of the student."
     )
     lesson_location: str = Field(
-        ..., max_length=255, title="Lesson Location", description="Current location in the SCO."
+        ...,
+        max_length=255,
+        title="Lesson Location",
+        description="Current location in the SCO.",
     )
     credit: Credit = Field(
         ..., title="Credit", description="Indicates if credit is given for SCO."
@@ -112,7 +129,9 @@ class SCORMDataModel(BaseModel):
     total_time: str = Field(
         ..., title="Total Time", description="Total time spent by the learner."
     )
-    lesson_mode: LessonMode = Field(..., title="Lesson Mode", description="Mode of the lesson.")
+    lesson_mode: LessonMode = Field(
+        ..., title="Lesson Mode", description="Mode of the lesson."
+    )
     exit: ExitMode = Field(
         ..., title="Exit Mode", description="How or why the learner exited the SCO."
     )
@@ -120,16 +139,25 @@ class SCORMDataModel(BaseModel):
         ..., title="Session Time", description="Time spent in the current session."
     )
     suspend_data: str = Field(
-        ..., max_length=4096, title="Suspend Data", description="Data stored between sessions."
+        ...,
+        max_length=4096,
+        title="Suspend Data",
+        description="Data stored between sessions.",
     )
     launch_data: str = Field(
-        ..., max_length=4096, title="Launch Data", description="Data provided upon launch."
+        ...,
+        max_length=4096,
+        title="Launch Data",
+        description="Data provided upon launch.",
     )
     comments: str = Field(
         ..., max_length=4096, title="Comments", description="Comments from the learner."
     )
     comments_from_lms: str = Field(
-        ..., max_length=4096, title="Comments from LMS", description="Comments from the LMS."
+        ...,
+        max_length=4096,
+        title="Comments from LMS",
+        description="Comments from the LMS.",
     )
     objectives: List[CMIObjective] = Field(
         ..., title="Objectives", description="List of objectives."

@@ -79,21 +79,31 @@ class SuccessStatus(StrEnum):
 # SCORM 2004 Data Model Elements
 class CMIScore(BaseModel):
     scaled: float = Field(
-        ..., title="Raw Score", description="Reflects the performance of the learner.", ge=0, le=1
+        ...,
+        title="Raw Score",
+        description="Reflects the performance of the learner.",
+        ge=0,
+        le=1,
     )
     raw: float = Field(
         ..., title="Raw Score", description="Reflects the performance of the learner."
     )
     max: float = Field(
-        ..., title="Maximum Score", description="Maximum value in the range for the raw score."
+        ...,
+        title="Maximum Score",
+        description="Maximum value in the range for the raw score.",
     )
     min: float = Field(
-        ..., title="Minimum Score", description="Minimum value in the range for the raw score."
+        ...,
+        title="Minimum Score",
+        description="Minimum value in the range for the raw score.",
     )
 
 
 class CMIObjectiveIDOnly(BaseModel):
-    id: str = Field(..., title="Objective ID", description="Unique label for the objective.")
+    id: str = Field(
+        ..., title="Objective ID", description="Unique label for the objective."
+    )
 
 
 class CMIObjective(CMIObjectiveIDOnly):
@@ -101,10 +111,14 @@ class CMIObjective(CMIObjectiveIDOnly):
         ..., title="Objective Score", description="Score related to the objective."
     )
     success_status: SuccessStatus = Field(
-        ..., title="Objective success Status", description="Success status of the objective."
+        ...,
+        title="Objective success Status",
+        description="Success status of the objective.",
     )
     completion_status: CompletionStatus = Field(
-        ..., title="Objective completion Status", description="Completion status of the objective."
+        ...,
+        title="Objective completion Status",
+        description="Completion status of the objective.",
     )
     progress_measure: float = Field(
         ...,
@@ -114,7 +128,10 @@ class CMIObjective(CMIObjectiveIDOnly):
         le=1,
     )
     description: str = Field(
-        ..., max_length=250, title="Description", description="Description of the objective."
+        ...,
+        max_length=250,
+        title="Description",
+        description="Description of the objective.",
     )
 
 
@@ -135,16 +152,22 @@ class CMIInteraction(BaseModel):
     objectives: List[CMIObjectiveIDOnly] = Field(
         ..., title="Objectives", description="List of objectives."
     )
-    timestamp: int = Field(..., title="Interaction Time", description="Time of interaction.")
+    timestamp: int = Field(
+        ..., title="Interaction Time", description="Time of interaction."
+    )
     correct_responses: List[CMICorrectResponses] = Field(
         ..., title="Correct Responses", description="List of correct responses."
     )
-    weighting: float = Field(..., title="Weighting", description="Weight of the interaction.")
+    weighting: float = Field(
+        ..., title="Weighting", description="Weight of the interaction."
+    )
     learner_response: Any = Field(
         ..., title="Learner Response", description="Response given by the learner."
     )
     result: InteractionResult = Field(
-        ..., title="Result", description="Judgment of the correctness of the learner response."
+        ...,
+        title="Result",
+        description="Judgment of the correctness of the learner response.",
     )
     latency: float = Field(
         ...,
@@ -152,7 +175,10 @@ class CMIInteraction(BaseModel):
         description="Time taken for the response (timeinterval(second,10,2)).",
     )
     description: str = Field(
-        ..., max_length=250, title="Description", description="Description of the interaction."
+        ...,
+        max_length=250,
+        title="Description",
+        description="Description of the interaction.",
     )
 
 
@@ -208,7 +234,9 @@ class SCORM2004DataModel(BaseModel):
     credit: Optional[Credit] = Field(
         None, title="Credit", description="Indicates if credit is given for SCO."
     )
-    entry: Optional[Entry] = Field(None, title="Entry", description="Entry status of the learner.")
+    entry: Optional[Entry] = Field(
+        None, title="Entry", description="Entry status of the learner."
+    )
     exit: Optional[ExitMode] = Field(
         None, title="Exit Mode", description="How or why the learner exited the SCO."
     )
@@ -216,7 +244,10 @@ class SCORM2004DataModel(BaseModel):
         None, title="Interactions", description="List of interactions."
     )
     launch_data: Optional[str] = Field(
-        None, max_length=4000, title="Launch Data", description="Data provided upon launch."
+        None,
+        max_length=4000,
+        title="Launch Data",
+        description="Data provided upon launch.",
     )
     learner_id: Optional[str] = Field(
         None, max_length=4000, title="Learner ID", description="Identifies the learner."
@@ -256,7 +287,9 @@ class SCORM2004DataModel(BaseModel):
         ge=-1,
         le=1,
     )
-    score: Optional[CMIScore] = Field(None, title="Score", description="Score of the learner.")
+    score: Optional[CMIScore] = Field(
+        None, title="Score", description="Score of the learner."
+    )
     session_time: Optional[float] = Field(
         None,
         title="Session Time",
@@ -266,7 +299,10 @@ class SCORM2004DataModel(BaseModel):
         None, title="Success Status", description="Completion status of the SCO."
     )
     suspend_data: Optional[str] = Field(
-        None, max_length=64000, title="Suspend Data", description="Data stored between sessions."
+        None,
+        max_length=64000,
+        title="Suspend Data",
+        description="Data stored between sessions.",
     )
     time_limit_action: Optional[TimeLimitAction] = Field(
         None,

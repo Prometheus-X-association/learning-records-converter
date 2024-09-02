@@ -8,11 +8,8 @@ from pydantic.fields import FieldInfo
 from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
 
-from .ims_caliper_1_1 import (
-    StatusTermEnum,
-    RoleTermEnum,
-)
 from ..base import ExtendedTypeBaseModel
+from .ims_caliper_1_1 import RoleTermEnum, StatusTermEnum
 
 
 #############################################################
@@ -259,7 +256,8 @@ class TextPositionSelectorModel(ExtendedTypeBaseModel):
         description="The starting position of the selected text MUST be specified. The first character in the full text is character position 0.",
     )
     end: int = Field(
-        alias="end", description="The end position of the selected text MUST be specified."
+        alias="end",
+        description="The end position of the selected text MUST be specified.",
     )
 
 
@@ -282,8 +280,12 @@ class EntityModel(ExtendedTypeBaseModel):
         alias="@context",
         examples=["http://purl.imsglobal.org/ctx/caliper/v1p2"],
     )
-    id: str = Field(alias="id", examples=["urn:instructure:canvas:user:21070000000000001"])
-    type: Literal[TypeTermEnum.ENTITY] = Field(alias="type", examples=[TypeTermEnum.PERSON.value])
+    id: str = Field(
+        alias="id", examples=["urn:instructure:canvas:user:21070000000000001"]
+    )
+    type: Literal[TypeTermEnum.ENTITY] = Field(
+        alias="type", examples=[TypeTermEnum.PERSON.value]
+    )
     name: str = Field(default=None, alias="name")
     description: str = Field(default=None, alias="description")
     date_created: str = Field(default=None, alias="dateCreated")  # Datetime
@@ -295,11 +297,15 @@ class EntityModel(ExtendedTypeBaseModel):
 
 
 class AgentModel(EntityModel):
-    type: Literal[TypeTermEnum.AGENT] = Field(alias="type", examples=[TypeTermEnum.AGENT.value])
+    type: Literal[TypeTermEnum.AGENT] = Field(
+        alias="type", examples=[TypeTermEnum.AGENT.value]
+    )
 
 
 class PersonModel(AgentModel):
-    type: Literal[TypeTermEnum.PERSON] = Field(alias="type", examples=[TypeTermEnum.PERSON.value])
+    type: Literal[TypeTermEnum.PERSON] = Field(
+        alias="type", examples=[TypeTermEnum.PERSON.value]
+    )
 
 
 class SoftwareApplicationModel(AgentModel):
@@ -330,7 +336,9 @@ class AggregateMeasureModel(EntityModel):
 
 
 class OrganizationModel(AgentModel):
-    type: Literal[TypeTermEnum.ORGANIZATION] = Field(alias="type", examples=[TypeTermEnum.ORGANIZATION.value])
+    type: Literal[TypeTermEnum.ORGANIZATION] = Field(
+        alias="type", examples=[TypeTermEnum.ORGANIZATION.value]
+    )
     sub_organization_of: Union[OrganizationModel, str] = Field(
         default=None, alias="subOrganizationOf"
     )
@@ -338,7 +346,9 @@ class OrganizationModel(AgentModel):
 
 
 class DigitalResourceModel(EntityModel):
-    type: Literal[TypeTermEnum.DIGITALRESOURCE] = Field(alias="type", examples=[TypeTermEnum.DIGITALRESOURCE.value])
+    type: Literal[TypeTermEnum.DIGITALRESOURCE] = Field(
+        alias="type", examples=[TypeTermEnum.DIGITALRESOURCE.value]
+    )
     storage_name: str = Field(
         default=None,
         alias="storageName",
@@ -382,7 +392,9 @@ class DigitalResourceModel(EntityModel):
 
 
 class QuestionModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.QUESTION] = Field(alias="type", examples=[TypeTermEnum.QUESTION.value])
+    type: Literal[TypeTermEnum.QUESTION] = Field(
+        alias="type", examples=[TypeTermEnum.QUESTION.value]
+    )
     question_posed: str = Field(
         default=None,
         alias="questionPosed",
@@ -391,7 +403,9 @@ class QuestionModel(DigitalResourceModel):
 
 
 class AnnotationModel(EntityModel):
-    type: Literal[TypeTermEnum.ANNOTATION] = Field(alias="type", examples=[TypeTermEnum.ANNOTATION.value])
+    type: Literal[TypeTermEnum.ANNOTATION] = Field(
+        alias="type", examples=[TypeTermEnum.ANNOTATION.value]
+    )
     annotator: Union[PersonModel, str] = Field(
         default=None,
         alias="annotator",
@@ -405,7 +419,9 @@ class AnnotationModel(EntityModel):
 
 
 class AttemptModel(EntityModel):
-    type: Literal[TypeTermEnum.ATTEMPT] = Field(alias="type", examples=[TypeTermEnum.ATTEMPT.value])
+    type: Literal[TypeTermEnum.ATTEMPT] = Field(
+        alias="type", examples=[TypeTermEnum.ATTEMPT.value]
+    )
     assignee: Union[PersonModel, str] = Field(
         default=None,
         alias="assignee",
@@ -439,7 +455,9 @@ class AttemptModel(EntityModel):
 
 
 class CollectionModel(EntityModel):
-    type: Literal[TypeTermEnum.COLLECTION] = Field(alias="type", examples=[TypeTermEnum.COLLECTION.value])
+    type: Literal[TypeTermEnum.COLLECTION] = Field(
+        alias="type", examples=[TypeTermEnum.COLLECTION.value]
+    )
     items: List[Union[EntityModel, str]] = Field(
         default=None,
         alias="items",
@@ -448,7 +466,9 @@ class CollectionModel(EntityModel):
 
 
 class CommentModel(EntityModel):
-    type: Literal[TypeTermEnum.COMMENT] = Field(alias="type", examples=[TypeTermEnum.COMMENT.value])
+    type: Literal[TypeTermEnum.COMMENT] = Field(
+        alias="type", examples=[TypeTermEnum.COMMENT.value]
+    )
     commenter: Union[PersonModel, str] = Field(
         default=None,
         alias="commenter",
@@ -467,19 +487,29 @@ class CommentModel(EntityModel):
 
 
 class LinkModel(EntityModel):
-    type: Literal[TypeTermEnum.LINK] = Field(alias="type", examples=[TypeTermEnum.LINK.value])
+    type: Literal[TypeTermEnum.LINK] = Field(
+        alias="type", examples=[TypeTermEnum.LINK.value]
+    )
 
 
 class MembershipModel(EntityModel):
-    type: Literal[TypeTermEnum.MEMBERSHIP] = Field(alias="type", examples=[TypeTermEnum.MEMBERSHIP.value])
-    organization: Union[OrganizationModel, str] = Field(default=None, alias="organization")
+    type: Literal[TypeTermEnum.MEMBERSHIP] = Field(
+        alias="type", examples=[TypeTermEnum.MEMBERSHIP.value]
+    )
+    organization: Union[OrganizationModel, str] = Field(
+        default=None, alias="organization"
+    )
     member: Union[PersonModel, str] = Field(default=None, alias="member")
-    roles: List[RoleTermEnum] = Field(default=None, alias="roles", examples=[["Learner"]])
+    roles: List[RoleTermEnum] = Field(
+        default=None, alias="roles", examples=[["Learner"]]
+    )
     status: StatusTermEnum = Field(default=None, alias="status")
 
 
 class QueryModel(EntityModel):
-    type: Literal[TypeTermEnum.QUERY] = Field(alias="type", examples=[TypeTermEnum.QUERY.value])
+    type: Literal[TypeTermEnum.QUERY] = Field(
+        alias="type", examples=[TypeTermEnum.QUERY.value]
+    )
     creator: Union[PersonModel, str] = Field(
         default=None,
         alias="creator",
@@ -498,7 +528,9 @@ class QueryModel(EntityModel):
 
 
 class RatingModel(EntityModel):
-    type: Literal[TypeTermEnum.RATING] = Field(alias="type", examples=[TypeTermEnum.RATING.value])
+    type: Literal[TypeTermEnum.RATING] = Field(
+        alias="type", examples=[TypeTermEnum.RATING.value]
+    )
     rater: Union[PersonModel, str] = Field(
         default=None,
         alias="rater",
@@ -527,7 +559,9 @@ class RatingModel(EntityModel):
 
 
 class ResponseModel(EntityModel):
-    type: Literal[TypeTermEnum.RESPONSE] = Field(alias="type", examples=[TypeTermEnum.RESPONSE.value])
+    type: Literal[TypeTermEnum.RESPONSE] = Field(
+        alias="type", examples=[TypeTermEnum.RESPONSE.value]
+    )
     attempt: Union[AttemptModel, str] = Field(
         default=None,
         alias="attempt",
@@ -551,7 +585,9 @@ class ResponseModel(EntityModel):
 
 
 class SessionModel(EntityModel):
-    type: Literal[TypeTermEnum.SESSION] = Field(alias="type", examples=[TypeTermEnum.SESSION.value])
+    type: Literal[TypeTermEnum.SESSION] = Field(
+        alias="type", examples=[TypeTermEnum.SESSION.value]
+    )
     user: Union[PersonModel, str] = Field(default=None, alias="user")
     client: SoftwareApplicationModel = Field(default=None, alias="client")
     started_at_time: str = Field(default=None, alias="startedAtTime")  # Datetime
@@ -560,7 +596,9 @@ class SessionModel(EntityModel):
 
 
 class ResultModel(EntityModel):
-    type: Literal[TypeTermEnum.RESULT] = Field(alias="type", examples=[TypeTermEnum.RESULT.value])
+    type: Literal[TypeTermEnum.RESULT] = Field(
+        alias="type", examples=[TypeTermEnum.RESULT.value]
+    )
     attempt: Union[AttemptModel, str] = Field(
         default=None,
         alias="attempt",
@@ -582,16 +620,22 @@ class ResultModel(EntityModel):
         description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
     )
     comment: str = Field(
-        default=None, alias="comment", description="Plain text feedback provided by the scorer."
+        default=None,
+        alias="comment",
+        description="Plain text feedback provided by the scorer.",
     )
 
 
 class ScaleModel(EntityModel):
-    type: Literal[TypeTermEnum.SCALE] = Field(alias="type", examples=[TypeTermEnum.SCALE.value])
+    type: Literal[TypeTermEnum.SCALE] = Field(
+        alias="type", examples=[TypeTermEnum.SCALE.value]
+    )
 
 
 class ScoreModel(EntityModel):
-    type: Literal[TypeTermEnum.SCORE] = Field(alias="type", examples=[TypeTermEnum.SCORE.value])
+    type: Literal[TypeTermEnum.SCORE] = Field(
+        alias="type", examples=[TypeTermEnum.SCORE.value]
+    )
     attempt: Union[AttemptModel, str] = Field(
         default=None,
         alias="attempt",
@@ -613,12 +657,16 @@ class ScoreModel(EntityModel):
         description="The Agent who scored or graded the Attempt. The  scoredBy value MUST be expressed either as an object or as a string corresponding to the scorer's IRI.",
     )
     comment: str = Field(
-        default=None, alias="comment", description="Plain text feedback provided by the scorer."
+        default=None,
+        alias="comment",
+        description="Plain text feedback provided by the scorer.",
     )
 
 
 class SearchResponseModel(EntityModel):
-    type: Literal[TypeTermEnum.SEARCHRESPONSE] = Field(alias="type", examples=[TypeTermEnum.SEARCHRESPONSE.value])
+    type: Literal[TypeTermEnum.SEARCHRESPONSE] = Field(
+        alias="type", examples=[TypeTermEnum.SEARCHRESPONSE.value]
+    )
     search_provider: Union[SoftwareApplicationModel, str] = Field(
         default=None,
         alias="searchProvider",
@@ -640,11 +688,15 @@ class SearchResponseModel(EntityModel):
 
 
 class PageModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.PAGE] = Field(alias="type", examples=[TypeTermEnum.PAGE.value])
+    type: Literal[TypeTermEnum.PAGE] = Field(
+        alias="type", examples=[TypeTermEnum.PAGE.value]
+    )
 
 
 class LtiSessionModel(SessionModel):
-    type: Literal[TypeTermEnum.LTISESSION] = Field(alias="type", examples=[TypeTermEnum.LTISESSION.value])
+    type: Literal[TypeTermEnum.LTISESSION] = Field(
+        alias="type", examples=[TypeTermEnum.LTISESSION.value]
+    )
     message_parameters: dict = Field(
         default=None,
         alias="messageParameters",
@@ -694,7 +746,9 @@ class AssignableDigitalResourceModel(DigitalResourceModel):
 
 
 class AssessmentItemModel(AssignableDigitalResourceModel):
-    type: Literal[TypeTermEnum.ASSESSMENTITEM] = Field(alias="type", examples=[TypeTermEnum.ASSESSMENTITEM.value])
+    type: Literal[TypeTermEnum.ASSESSMENTITEM] = Field(
+        alias="type", examples=[TypeTermEnum.ASSESSMENTITEM.value]
+    )
     is_time_dependent: bool = Field(
         default=None,
         alias="isTimeDependent",
@@ -725,7 +779,9 @@ class AggregateMeasureCollectionModel(CollectionModel):
 
 
 class AssessmentModel(AssignableDigitalResourceModel, DigitalResourceCollectionModel):
-    type: Literal[TypeTermEnum.ASSESSMENT] = Field(alias="type", examples=[TypeTermEnum.ASSESSMENT.value])
+    type: Literal[TypeTermEnum.ASSESSMENT] = Field(
+        alias="type", examples=[TypeTermEnum.ASSESSMENT.value]
+    )
     items: List[Union[AssessmentItemModel, str]] = Field(
         default=None,
         alias="items",
@@ -734,7 +790,9 @@ class AssessmentModel(AssignableDigitalResourceModel, DigitalResourceCollectionM
 
 
 class MediaObjectModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.MEDIAOBJECT] = Field(alias="type", examples=[TypeTermEnum.MEDIAOBJECT.value])
+    type: Literal[TypeTermEnum.MEDIAOBJECT] = Field(
+        alias="type", examples=[TypeTermEnum.MEDIAOBJECT.value]
+    )
     duration: str = Field(
         default=None,
         alias="duration",
@@ -743,7 +801,9 @@ class MediaObjectModel(DigitalResourceModel):
 
 
 class AudioObjectModel(MediaObjectModel):
-    type: Literal[TypeTermEnum.AUDIOOBJECT] = Field(alias="type", examples=[TypeTermEnum.AUDIOOBJECT.value])
+    type: Literal[TypeTermEnum.AUDIOOBJECT] = Field(
+        alias="type", examples=[TypeTermEnum.AUDIOOBJECT.value]
+    )
     volume_level: str = Field(
         default=None,
         alias="volumeLevel",
@@ -778,11 +838,15 @@ class BookmarkAnnotationModel(AnnotationModel):
 
 
 class ChapterModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.CHAPTER] = Field(alias="type", examples=[TypeTermEnum.CHAPTER.value])
+    type: Literal[TypeTermEnum.CHAPTER] = Field(
+        alias="type", examples=[TypeTermEnum.CHAPTER.value]
+    )
 
 
 class CourseOfferingModel(OrganizationModel):
-    type: Literal[TypeTermEnum.COURSEOFFERING] = Field(alias="type", examples=[TypeTermEnum.COURSEOFFERING.value])
+    type: Literal[TypeTermEnum.COURSEOFFERING] = Field(
+        alias="type", examples=[TypeTermEnum.COURSEOFFERING.value]
+    )
     course_number: str = Field(
         default=None,
         alias="courseNumber",
@@ -796,7 +860,9 @@ class CourseOfferingModel(OrganizationModel):
 
 
 class CourseSectionModel(CourseOfferingModel):
-    type: Literal[TypeTermEnum.COURSESECTION] = Field(alias="type", examples=[TypeTermEnum.COURSESECTION.value])
+    type: Literal[TypeTermEnum.COURSESECTION] = Field(
+        alias="type", examples=[TypeTermEnum.COURSESECTION.value]
+    )
     category: str = Field(
         default=None,
         alias="category",
@@ -814,7 +880,9 @@ class DateTimeQuestionModel(QuestionModel):
         description="A DateTime value used to determine the minimum value allowed.",
     )  # DateTime
     min_label: str = Field(
-        default=None, alias="minLabel", description="The label for the minimum DateTime."
+        default=None,
+        alias="minLabel",
+        description="The label for the minimum DateTime.",
     )
     max_date_time: str = Field(
         default=None,
@@ -838,7 +906,9 @@ class DateTimeResponseModel(ResponseModel):
 
 
 class DocumentModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.DOCUMENT] = Field(alias="type", examples=[TypeTermEnum.DOCUMENT.value])
+    type: Literal[TypeTermEnum.DOCUMENT] = Field(
+        alias="type", examples=[TypeTermEnum.DOCUMENT.value]
+    )
 
 
 class FillinBlankResponseModel(ResponseModel):
@@ -853,7 +923,9 @@ class FillinBlankResponseModel(ResponseModel):
 
 
 class MessageModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.MESSAGE] = Field(alias="type", examples=[TypeTermEnum.MESSAGE.value])
+    type: Literal[TypeTermEnum.MESSAGE] = Field(
+        alias="type", examples=[TypeTermEnum.MESSAGE.value]
+    )
     reply_to: Union[MessageModel, str] = Field(
         default=None,
         alias="replyTo",
@@ -872,7 +944,9 @@ class MessageModel(DigitalResourceModel):
 
 
 class ThreadModel(DigitalResourceCollectionModel):
-    type: Literal[TypeTermEnum.THREAD] = Field(alias="type", examples=[TypeTermEnum.THREAD.value])
+    type: Literal[TypeTermEnum.THREAD] = Field(
+        alias="type", examples=[TypeTermEnum.THREAD.value]
+    )
     items: List[Union[MessageModel, str]] = Field(
         default=None,
         alias="items",
@@ -881,7 +955,9 @@ class ThreadModel(DigitalResourceCollectionModel):
 
 
 class ForumModel(DigitalResourceCollectionModel):
-    type: Literal[TypeTermEnum.FORUM] = Field(alias="type", examples=[TypeTermEnum.FORUM.value])
+    type: Literal[TypeTermEnum.FORUM] = Field(
+        alias="type", examples=[TypeTermEnum.FORUM.value]
+    )
     items: List[Union[ThreadModel, str]] = Field(
         default=None,
         alias="items",
@@ -890,7 +966,9 @@ class ForumModel(DigitalResourceCollectionModel):
 
 
 class FrameModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.FRAME] = Field(alias="type", examples=[TypeTermEnum.FRAME.value])
+    type: Literal[TypeTermEnum.FRAME] = Field(
+        alias="type", examples=[TypeTermEnum.FRAME.value]
+    )
     index: int = Field(
         default=None,
         alias="index",
@@ -899,7 +977,9 @@ class FrameModel(DigitalResourceModel):
 
 
 class GroupModel(OrganizationModel):
-    type: Literal[TypeTermEnum.GROUP] = Field(alias="type", examples=[TypeTermEnum.GROUP.value])
+    type: Literal[TypeTermEnum.GROUP] = Field(
+        alias="type", examples=[TypeTermEnum.GROUP.value]
+    )
 
 
 class HighlightAnnotationModel(AnnotationModel):
@@ -914,11 +994,15 @@ class HighlightAnnotationModel(AnnotationModel):
 
 
 class ImageObjectModel(MediaObjectModel):
-    type: Literal[TypeTermEnum.IMAGEOBJECT] = Field(alias="type", examples=[TypeTermEnum.IMAGEOBJECT.value])
+    type: Literal[TypeTermEnum.IMAGEOBJECT] = Field(
+        alias="type", examples=[TypeTermEnum.IMAGEOBJECT.value]
+    )
 
 
 class LikertScaleModel(ScaleModel):
-    type: Literal[TypeTermEnum.LIKERTSCALE] = Field(alias="type", examples=[TypeTermEnum.LIKERTSCALE.value])
+    type: Literal[TypeTermEnum.LIKERTSCALE] = Field(
+        alias="type", examples=[TypeTermEnum.LIKERTSCALE.value]
+    )
     scale_points: int = Field(
         default=None,
         alias="scalePoints",
@@ -937,7 +1021,9 @@ class LikertScaleModel(ScaleModel):
 
 
 class LtiLinkModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.LTILINK] = Field(alias="type", examples=[TypeTermEnum.LTILINK.value])
+    type: Literal[TypeTermEnum.LTILINK] = Field(
+        alias="type", examples=[TypeTermEnum.LTILINK.value]
+    )
     message_type: LtiMessageTypesEnum = Field(
         default=None,
         alias="messageType",
@@ -1047,7 +1133,9 @@ class MultiselectScaleModel(ScaleModel):
 
 
 class NumericScaleModel(ScaleModel):
-    type: Literal[TypeTermEnum.NUMERICSCALE] = Field(alias="type", examples=[TypeTermEnum.NUMERICSCALE.value])
+    type: Literal[TypeTermEnum.NUMERICSCALE] = Field(
+        alias="type", examples=[TypeTermEnum.NUMERICSCALE.value]
+    )
     min_value: float = Field(
         default=None,
         alias="minValue",
@@ -1108,7 +1196,9 @@ class QuestionnaireItemModel(DigitalResourceModel):
 
 
 class QuestionnaireModel(DigitalResourceCollectionModel):
-    type: Literal[TypeTermEnum.QUESTIONNAIRE] = Field(alias="type", examples=[TypeTermEnum.QUESTIONNAIRE.value])
+    type: Literal[TypeTermEnum.QUESTIONNAIRE] = Field(
+        alias="type", examples=[TypeTermEnum.QUESTIONNAIRE.value]
+    )
     items: List[Union[QuestionnaireItemModel, str]] = Field(
         alias="items",
         description="An array of one or more QuestionnaireItem entities that together comprise the Questionnaire. The object value MUST be expressed either as an object or as a string corresponding to the resource's IRI.",
@@ -1160,7 +1250,9 @@ class SharedAnnotationModel(AnnotationModel):
 
 
 class SurveyModel(CollectionModel):
-    type: Literal[TypeTermEnum.SURVEY] = Field(alias="type", examples=[TypeTermEnum.SURVEY.value])
+    type: Literal[TypeTermEnum.SURVEY] = Field(
+        alias="type", examples=[TypeTermEnum.SURVEY.value]
+    )
     items: List[Union[QuestionnaireModel, str]] = Field(
         default=None,
         alias="items",
@@ -1195,7 +1287,9 @@ class SurveyInvitationModel(DigitalResourceModel):
 
 
 class TagAnnotationModel(AnnotationModel):
-    type: Literal[TypeTermEnum.TAGANNOTATION] = Field(alias="type", examples=[TypeTermEnum.TAGANNOTATION.value])
+    type: Literal[TypeTermEnum.TAGANNOTATION] = Field(
+        alias="type", examples=[TypeTermEnum.TAGANNOTATION.value]
+    )
     tags: List[str] = Field(
         default=None,
         alias="tags",
@@ -1215,11 +1309,15 @@ class TrueFalseResponseModel(ResponseModel):
 
 
 class VideoObjectModel(MediaObjectModel):
-    type: Literal[TypeTermEnum.VIDEOOBJECT] = Field(alias="type", examples=[TypeTermEnum.VIDEOOBJECT.value])
+    type: Literal[TypeTermEnum.VIDEOOBJECT] = Field(
+        alias="type", examples=[TypeTermEnum.VIDEOOBJECT.value]
+    )
 
 
 class WebPageModel(DigitalResourceModel):
-    type: Literal[TypeTermEnum.WEBPAGE] = Field(alias="type", examples=[TypeTermEnum.WEBPAGE.value])
+    type: Literal[TypeTermEnum.WEBPAGE] = Field(
+        alias="type", examples=[TypeTermEnum.WEBPAGE.value]
+    )
 
 
 ##################################################
@@ -1316,7 +1414,9 @@ class EventModel(ExtendedTypeBaseModel):
 
 
 class AnnotationEventModel(EventModel):
-    type: Literal[TypeTermEnum.ANNOTATIONEVENT] = Field(alias="type", examples=[TypeTermEnum.ANNOTATIONEVENT.value])
+    type: Literal[TypeTermEnum.ANNOTATIONEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.ANNOTATIONEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1347,7 +1447,9 @@ class AnnotationEventModel(EventModel):
 
 
 class AssessmentEventModel(EventModel):
-    type: Literal[TypeTermEnum.ASSESSMENTEVENT] = Field(alias="type", examples=[TypeTermEnum.ASSESSMENTEVENT.value])
+    type: Literal[TypeTermEnum.ASSESSMENTEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.ASSESSMENTEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1407,7 +1509,9 @@ class AssessmentItemEventModel(EventModel):
 
 
 class AssignableEventModel(EventModel):
-    type: Literal[TypeTermEnum.ASSIGNABLEEVENT] = Field(alias="type", examples=[TypeTermEnum.ASSIGNABLEEVENT.value])
+    type: Literal[TypeTermEnum.ASSIGNABLEEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.ASSIGNABLEEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1440,7 +1544,9 @@ class AssignableEventModel(EventModel):
 
 
 class FeedbackEventModel(EventModel):
-    type: Literal[TypeTermEnum.FEEDBACKEVENT] = Field(alias="type", examples=[TypeTermEnum.FEEDBACKEVENT.value])
+    type: Literal[TypeTermEnum.FEEDBACKEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.FEEDBACKEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1469,7 +1575,9 @@ class FeedbackEventModel(EventModel):
 
 
 class ForumEventModel(EventModel):
-    type: Literal[TypeTermEnum.FORUMEVENT] = Field(alias="type", examples=[TypeTermEnum.FORUMEVENT.value])
+    type: Literal[TypeTermEnum.FORUMEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.FORUMEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1488,14 +1596,14 @@ class ForumEventModel(EventModel):
 
 
 class GradeEventModel(EventModel):
-    type: Literal[TypeTermEnum.GRADEEVENT] = Field(alias="type", examples=[TypeTermEnum.GRADEEVENT.value])
+    type: Literal[TypeTermEnum.GRADEEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.GRADEEVENT.value]
+    )
     actor: Union[AgentModel, str] = Field(
         alias="actor",
         description="An Agent, typically Person or SoftwareApplication, MUST be specified as the actor. The  actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
-    action: Literal[
-        ActionTermEnum.GRADED,
-    ] = Field(
+    action: Literal[ActionTermEnum.GRADED,] = Field(
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Graded action only.",
     )
@@ -1511,7 +1619,9 @@ class GradeEventModel(EventModel):
 
 
 class MediaEventModel(EventModel):
-    type: Literal[TypeTermEnum.MEDIAEVENT] = Field(alias="type", examples=[TypeTermEnum.MEDIAEVENT.value])
+    type: Literal[TypeTermEnum.MEDIAEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.MEDIAEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1552,7 +1662,9 @@ class MediaEventModel(EventModel):
 
 
 class MessageEventModel(EventModel):
-    type: Literal[TypeTermEnum.MESSAGEEVENT] = Field(alias="type", examples=[TypeTermEnum.MESSAGEEVENT.value])
+    type: Literal[TypeTermEnum.MESSAGEEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.MESSAGEEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1572,14 +1684,14 @@ class MessageEventModel(EventModel):
 
 
 class NavigationEventModel(EventModel):
-    type: Literal[TypeTermEnum.NAVIGATIONEVENT] = Field(alias="type", examples=[TypeTermEnum.NAVIGATIONEVENT.value])
+    type: Literal[TypeTermEnum.NAVIGATIONEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.NAVIGATIONEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
-    action: Literal[
-        ActionTermEnum.NAVIGATEDTO,
-    ] = Field(
+    action: Literal[ActionTermEnum.NAVIGATEDTO,] = Field(
         alias="action",
         description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the actions: NavigatedTo.",
     )
@@ -1688,18 +1800,20 @@ class ResourceManagementEventModel(EventModel):
     def generated_required_condition(cls, generated, values):
         """Required when the action value is Copied, otherwise optional"""
         if values.data.get("action", "") == ActionTermEnum.COPIED and not generated:
-            raise ValueError(f"generated cannot be empty if action is {ActionTermEnum.COPIED}")
+            raise ValueError(
+                f"generated cannot be empty if action is {ActionTermEnum.COPIED}"
+            )
 
 
 class SearchEventModel(EventModel):
-    type: Literal[TypeTermEnum.SEARCHEVENT] = Field(alias="type", examples=[TypeTermEnum.SEARCHEVENT.value])
+    type: Literal[TypeTermEnum.SEARCHEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.SEARCHEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
-    action: Literal[
-        ActionTermEnum.SEARCHED,
-    ] = Field(
+    action: Literal[ActionTermEnum.SEARCHED,] = Field(
         alias="action",
         description="The action or predicate that binds the actor or subject to the  object. The value range is limited to the Searched action only.",
     )
@@ -1715,7 +1829,9 @@ class SearchEventModel(EventModel):
 
 
 class SessionEventModel(EventModel):
-    type: Literal[TypeTermEnum.SESSIONEVENT] = Field(alias="type", examples=[TypeTermEnum.SESSIONEVENT.value])
+    type: Literal[TypeTermEnum.SESSIONEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.SESSIONEVENT.value]
+    )
     actor: Union[PersonModel, SoftwareApplicationModel, str] = Field(
         alias="actor",
         description="The Agent who initiated the action. For LoggedIn and LoggedOut actions a Person MUST be specified as the actor. For a TimedOut action a SoftwareApplication MUST be specified as the actor. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1745,7 +1861,9 @@ class SessionEventModel(EventModel):
 
 
 class SurveyEventModel(EventModel):
-    type: Literal[TypeTermEnum.SURVEYEVENT] = Field(alias="type", examples=[TypeTermEnum.SURVEYEVENT.value])
+    type: Literal[TypeTermEnum.SURVEYEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.SURVEYEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1786,7 +1904,9 @@ class SurveyInvitationEventModel(EventModel):
 
 
 class ThreadEventModel(EventModel):
-    type: Literal[TypeTermEnum.THREADEVENT] = Field(alias="type", examples=[TypeTermEnum.THREADEVENT.value])
+    type: Literal[TypeTermEnum.THREADEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.THREADEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1805,7 +1925,9 @@ class ThreadEventModel(EventModel):
 
 
 class ToolLaunchEventModel(EventModel):
-    type: Literal[TypeTermEnum.TOOLLAUNCHEVENT] = Field(alias="type", examples=[TypeTermEnum.TOOLLAUNCHEVENT.value])
+    type: Literal[TypeTermEnum.TOOLLAUNCHEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.TOOLLAUNCHEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
@@ -1839,7 +1961,10 @@ class ToolLaunchEventModel(EventModel):
     @field_validator("federated_session")
     def federated_session_required_condition(cls, federated_session, values):
         """Required when the action value is Launched, otherwise optional"""
-        if values.data.get("action", "") == ActionTermEnum.LAUNCHED and not federated_session:
+        if (
+            values.data.get("action", "") == ActionTermEnum.LAUNCHED
+            and not federated_session
+        ):
             raise ValueError(
                 f"federated_session cannot be empty if action is {ActionTermEnum.LAUNCHED}"
             )
@@ -1847,14 +1972,14 @@ class ToolLaunchEventModel(EventModel):
 
 
 class ToolUseEventModel(EventModel):
-    type: Literal[TypeTermEnum.TOOLUSEEVENT] = Field(alias="type", examples=[TypeTermEnum.TOOLUSEEVENT.value])
+    type: Literal[TypeTermEnum.TOOLUSEEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.TOOLUSEEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor’s IRI.",
     )
-    action: Literal[
-        ActionTermEnum.USED,
-    ] = Field(
+    action: Literal[ActionTermEnum.USED,] = Field(
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the Used action only.",
     )
@@ -1875,14 +2000,14 @@ class ToolUseEventModel(EventModel):
 
 
 class ViewEventModel(EventModel):
-    type: Literal[TypeTermEnum.VIEWEVENT] = Field(alias="type", examples=[TypeTermEnum.VIEWEVENT.value])
+    type: Literal[TypeTermEnum.VIEWEVENT] = Field(
+        alias="type", examples=[TypeTermEnum.VIEWEVENT.value]
+    )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
         description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
-    action: Literal[
-        ActionTermEnum.VIEWED,
-    ] = Field(
+    action: Literal[ActionTermEnum.VIEWED,] = Field(
         alias="action",
         description="The action or predicate that binds the actor or subject to the object. The value range is limited to the actions: Viewed.",
     )
@@ -1904,7 +2029,9 @@ class IMSCaliperModel(BaseModel):
     sensor: str = Field(alias="sensor", examples=["http://oxana.instructure.com/"])
 
     @field_validator("data", mode="before")
-    def validation(cls, value: List[EventModel], extra_info: ValidationInfo) -> List[EventModel]:
+    def validation(
+        cls, value: List[EventModel], extra_info: ValidationInfo
+    ) -> List[EventModel]:
         """Pydantic does not allow a model to use a discriminator and a field_validator with mode=`before`.
 
         This validator will act as a custom discriminator to apply the correct model to all
@@ -1918,12 +2045,16 @@ class IMSCaliperModel(BaseModel):
             List[EventModel]: List of data in the correct EventModel instance
         """
         # Get FieldInfo
-        field = cls.model_fields.get(extra_info.field_name if extra_info.field_name else "", None)
+        field = cls.model_fields.get(
+            extra_info.field_name if extra_info.field_name else "", None
+        )
 
         if isinstance(field, FieldInfo):
             # Get child classes
             list_event_model = set()
-            list_event_model.update(ExtendedTypeBaseModel._get_subclasses(field.annotation))
+            list_event_model.update(
+                ExtendedTypeBaseModel._get_subclasses(field.annotation)
+            )
             list_event_model = list(list_event_model)
 
             # Generate a dict to act as pydantic's discriminator (to know with model to apply)
@@ -1939,7 +2070,9 @@ class IMSCaliperModel(BaseModel):
                 new_value = []
                 for each_value in value:
                     if isinstance(each_value, dict) and (
-                        event_model := dict_discriminator.get(each_value.get("type", ""), None)
+                        event_model := dict_discriminator.get(
+                            each_value.get("type", ""), None
+                        )
                     ):
                         each_value = event_model(**each_value)
                     new_value.append(each_value)
