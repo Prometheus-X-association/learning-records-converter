@@ -1,5 +1,7 @@
 from typing import Any
 
+EMPTY_STRINGS = {"nan", "none", "nat", "null", ""}
+
 
 def is_empty(x: Any) -> bool:
     """Check if an element is empty
@@ -10,17 +12,11 @@ def is_empty(x: Any) -> bool:
     Returns:
         bool: Element is empty (True) or not (False)
     """
-    value = (
-        x is None
-        or x == ""
-        or x == {}
-        or x == []
-        or str(x).casefold() == "nan".casefold()
-        or str(x).casefold() == "none".casefold()
-        or str(x).casefold() == "nat".casefold()
-        or str(x).casefold() == "null".casefold()
-    )
-    return value
+    if x is None:
+        return True
+    if isinstance(x, (str, list, dict, set, tuple)):
+        return len(x) == 0
+    return str(x).lower() in EMPTY_STRINGS
 
 
 def replace_empty(value: Any, replace_value: Any = "") -> Any:

@@ -1,63 +1,9 @@
 import re
-from typing import Any, Dict, List, Tuple, Union, overload
+from typing import Any, Dict, Union, overload
 
 import yaml
 
 from .utils_general import is_empty
-
-
-def get_flat_from_nested(
-    nested_content: dict,
-    flat_non_nested_list: bool = True,
-    flat_nested_list: bool = True
-) -> dict:
-    """Generate flatten json from a nested json
-
-    Args:
-        nested_content (dict):
-            Nested dict.
-            Example: {'url': {'main': '', 'secondary': [1, 2]}}
-        flat_non_nested_list (bool):
-            Also flat non nested list element.
-            Example:
-                if True, {'url': [1, 2]} becomes {"url.0": 1, "url.1": 2}
-                else, {'url': [1, 2]} becomes {'url': [1, 2]}
-            Default value is True.
-
-    Returns:
-        dict: Flatten dict
-            Example: {'url.main': '', 'url.secondary.0': 1, 'url.secondary.1': 2}}
-    """
-
-    flatten_field = {}
-
-    def recursive_flat_from_nested(content, field_name=""):
-        # If dict type
-        if isinstance(content, dict) and content:
-            for key in content:
-                key_encoded = key.replace(".", r"\.")
-                recursive_flat_from_nested(content[key], field_name + key_encoded + ".")
-
-        # If list type
-        elif isinstance(content, list) and content:
-            list_element_nested = [isinstance(element, (list, dict)) for element in content]
-
-            if (
-                (flat_nested_list and flat_non_nested_list)
-                or (flat_nested_list and any(list_element_nested))
-                or (flat_non_nested_list and not all(list_element_nested))
-            ):
-                for index, value in enumerate(content):
-                    recursive_flat_from_nested(value, field_name + str(index) + ".")
-            else:
-                flatten_field[field_name[:-1]] = content
-
-        # Final value
-        else:
-            flatten_field[field_name[:-1]] = content
-
-    recursive_flat_from_nested(nested_content)
-    return flatten_field
 
 
 @overload
@@ -89,7 +35,8 @@ def remove_empty_elements(dictionnary: Union[list, dict]) -> Union[list, dict]:
         return {
             key: value
             for key, value in (
-                (key, remove_empty_elements(value)) for key, value in dictionnary.items()
+                (key, remove_empty_elements(value))
+                for key, value in dictionnary.items()
             )
             if not is_empty(value)
         }
@@ -187,10 +134,15 @@ def set_value_from_flat_key(
         # If not overwrite but found element is not list, dict or None, return
         if (
             not overwrite
-            and not (isinstance(dict_list_element, list) or isinstance(dict_list_element, dict))
+            and not (
+                isinstance(dict_list_element, list)
+                or isinstance(dict_list_element, dict)
+            )
             and not is_empty(dict_list_element)  # before : None
         ):
-            print("> Warning - an item already have value and behavior is : NOT overwriting")
+            print(
+                "> Warning - an item already have value and behavior is : NOT overwriting"
+            )
             # Return current value
             return dict_list_element
 
@@ -202,7 +154,9 @@ def set_value_from_flat_key(
                 dict_list_element = []
             # If all indexes not there, create them
             if len(dict_list_element) - 1 < index:
-                dict_list_element.extend([None for i in range(len(dict_list_element), index + 1)])
+                dict_list_element.extend(
+                    [None for i in range(len(dict_list_element), index + 1)]
+                )
 
             try:
                 dict_list_element[index] = set_value_from_flat_key(
@@ -239,7 +193,9 @@ def set_value_from_flat_key(
 
     # Error during split
     else:
-        raise ValueError("> Empty split not possible, something went wrong while setting dot dict")
+        raise ValueError(
+            "> Empty split not possible, something went wrong while setting dot dict"
+        )
 
     # Final return to get full dict or list
     return dict_list_element
@@ -282,137 +238,15 @@ def get_nested_from_flat(
         if all(all_field_start_with_numeric):
             nested_field = []
         elif any(all_field_start_with_numeric):
-            raise ValueError("Either all fields starts with a numerical value, or none of them do")
+            raise ValueError(
+                "Either all fields starts with a numerical value, or none of them do"
+            )
         else:
             nested_field = {}
     # Build for each field
     for key, value in flat_field.items():
         nested_field = set_value_from_flat_key(nested_field, key, value)
     return nested_field
-
-
-def drop_duplicates_in_list_on_field(
-    list_dict_content: list, list_field: list, keep_first: bool = True
-) -> list:
-    """Drop duplicates in a list of dicts based on one or several fields.
-
-    The key in a dictionnary is unique. This algorithme is based on that rule.
-    We create a temporary dictionnary where the key is the concatination of all fields values,
-    and the value is the dictionnary itself.
-
-    We then get all values in order to get only single occurence of
-    a dictionnary depending on specific fields.
-
-    CAUTION:
-        If an undefied field is passed, no error will be raised.
-        It will be considered to have a "None" value
-
-    TODO:
-        Keep first, or keep last param? default keep last
-
-    Args:
-        list_dict_content (list): list of dictionnary to drop duplilcate on
-        list_field (list): list of fields (string) to base unicity on.
-            Fields can be nested by using the "dot syntax" (field_a.field_b)
-        keep_first (bool): Keep first occurence (True) or last (False). Default value : True
-
-    Returns:
-        list: list of unique dictionnary
-    """
-    dict_temp = {}
-    for dict_content in list_dict_content:
-        new_key = "_".join(
-            [str(get_value_from_flat_key(dict_content, field)) for field in list_field]
-        )
-        if not keep_first or new_key not in dict_temp:
-            dict_temp[new_key] = dict_content
-
-    return list(dict_temp.values())
-
-
-def is_flat_key_in_dict(list_dict_content: Union[dict, list], flat_key: str) -> bool:
-    """Check if a flatten key is in a nested element
-
-    Args:
-        list_dict_content (Union[dict, list]): element to search in
-        flat_key (str): concerned key
-
-    Returns:
-        bool: If key is found return True, else False
-    """
-    list_split_key = flat_key.split(".")
-    for key in list_split_key:
-        # Index and List
-        if key.isnumeric() and isinstance(list_dict_content, list):
-            try:
-                list_dict_content = list_dict_content[int(key)]
-            except IndexError as ie:
-                return False
-        # Key and Dict
-        elif not key.isnumeric() and isinstance(list_dict_content, dict):
-            try:
-                list_dict_content = list_dict_content[key]
-            except KeyError as ke:
-                return False
-        # None of the above
-        else:
-            return False
-    return True
-
-
-def get_value_from_first_key_available(
-    json_element: dict, base_field: str, keys_tuple: Union[Tuple[str, ...], List[str]]
-) -> Tuple[Any, str]:
-    """
-    Get the first non empty field subvalue of a dict element,
-    based on a tuple of subfields to check,
-    and the chosen key that leads to this value.
-
-    Ex: base_field = "department" / keys_tuple = ("code", "base")
-    department.code is returned if not empty, else department.base
-
-    If all values are empty, ("", "") is returned.
-
-    Args:
-        json_element (dict): Full dict with data.
-        base_field (str): Name of the main field.
-            If "", will look up for fields in keys_tuple directly.
-        keys_tuple (Union[Tuple[str], List[str]]): Tuple of subfields to check.
-            A list of subfields is also allowed.
-
-    Returns:
-        Tuple[Any, str]: Tuple based on (value, key) with :
-            value = Dict value if not empty, else "".
-            key = base_field with the chosen key added if possible, else "".
-    """
-    value = ""
-    current_key = ""
-
-    if isinstance(json_element, dict) and isinstance(keys_tuple, (tuple, list)):
-        if isinstance(base_field, str):
-            if not is_empty(base_field):
-                base_field += "."
-        else:
-            # Allow "" to loop only over fields in keys_tuple
-            base_field = ""
-
-        for key in keys_tuple:
-            # Sanitize 'key' entry
-            if is_empty(key):
-                key = ""
-            else:
-                key = str(key)
-
-            current_key = base_field + key
-            value = get_value_from_flat_key(json_element, current_key, default_value="")
-            if not is_empty(value):
-                # Return value and chosen key
-                return value, current_key
-            else:
-                # Reaffect default values
-                current_key = ""
-                value = ""
-    return value, current_key
 
 
 def convert_yaml_file_to_json(yaml_path: str) -> dict:
@@ -436,7 +270,7 @@ def convert_yaml_file_to_json(yaml_path: str) -> dict:
 
 
 def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
-    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
+    """Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
     to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
     ``dct``.
@@ -445,7 +279,11 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
     :return: None
     """
     for k, v in merge_dct.items():
-        if k in target_dict and isinstance(target_dict[k], dict) and isinstance(merge_dct[k], dict):  #noqa
+        if (
+            k in target_dict
+            and isinstance(target_dict[k], dict)
+            and isinstance(merge_dct[k], dict)
+        ):  # noqa
             deep_merge(target_dict[k], merge_dct[k])
         else:
             target_dict[k] = merge_dct[k]

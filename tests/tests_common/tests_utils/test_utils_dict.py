@@ -1,11 +1,7 @@
 import pytest
 from utils.utils_dict import (
-    drop_duplicates_in_list_on_field,
-    get_flat_from_nested,
     get_nested_from_flat,
-    get_value_from_first_key_available,
     get_value_from_flat_key,
-    is_flat_key_in_dict,
     remove_empty_elements,
     set_value_from_flat_key,
 )
@@ -263,150 +259,9 @@ def test_get_value_from_flat_key(args, expected):
     assert get_value_from_flat_key(**params) == expected
 
 
-##################################################
-#           get_value_from_first_key_available
-##################################################
-@pytest.mark.parametrize(
-    "args, expected",
-    [
-        (
-            {
-                "json_element": {"codepostal": {"code": "90", "base": "Nom", "test": "oui"}},
-                "base_field": "codepostal",
-                "keys_tuple": ("code", "base"),
-            },
-            ("90", "codepostal.code"),
-        ),
-        (
-            {
-                "json_element": {"codepostal": {"code": "", "base": "Nom", "test": "oui"}},
-                "base_field": "codepostal",
-                "keys_tuple": ("code", "base"),
-            },
-            ("Nom", "codepostal.base"),
-        ),
-        (
-            {
-                "json_element": {"codepostal": {"code": "90", "base": "Nom", "test": "oui"}},
-                "base_field": "codepostal",
-                "keys_tuple": ("non", "autre", "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {},
-                "base_field": "codepostal",
-                "keys_tuple": ("non", "autre", "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": None,
-                "base_field": "codepostal",
-                "keys_tuple": ("non", "autre", "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {"codepostal": {"code": "90", "base": "Nom", "test": "oui"}},
-                "base_field": "department",
-                "keys_tuple": ("non", "autre", "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": "",
-                "keys_tuple": ("autre", "non", "inokufu"),
-            },
-            ("test externe", "non"),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": None,
-                "keys_tuple": ("autre", "non", "inokufu"),
-            },
-            ("test externe", "non"),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": None,
-                "keys_tuple": ["autre", None, "inokufu"],
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": None,
-                "keys_tuple": ["autre", "non", "inokufu"],
-            },
-            ("test externe", "non"),
-        ),
-        (
-            {
-                "json_element": ["inofuku", "codepostal"],
-                "base_field": None,
-                "keys_tuple": ("autre", "non", "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": "codepostal",
-                "keys_tuple": ("autre", ["non"], "inokufu"),
-            },
-            ("", ""),
-        ),
-        (
-            {
-                "json_element": {
-                    "codepostal": {"code": "90", "base": "Nom", "test": "oui"},
-                    "non": "test externe",
-                },
-                "base_field": "codepostal",
-                "keys_tuple": ("autre", ["non"], 8.9, {"test2": "dico"}, ("tuple", "secondaire")),
-            },
-            ("", ""),
-        ),
-    ],
-)
-def test_get_value_from_first_key_available(args, expected):
-    assert (
-        get_value_from_first_key_available(
-            args["json_element"], args["base_field"], args["keys_tuple"]
-        )
-        == expected
-    )
-
-
 # TODO:
 """
-get_flat_from_nested,
+get_nested_from_flat
 remove_empty_elements,
 get_nested_from_flat,
-drop_duplicates_in_list_on_field,
-is_flat_key_in_dict,
 """
