@@ -1,6 +1,6 @@
 from utils.utils_dict import deep_merge
 
-from app.common.type.types import JsonType
+from app.common.models.trace import Trace
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
@@ -28,9 +28,7 @@ class JsonLdProfileRepository(ProfileRepository):
         self.trace_enricher = TraceEnricher(logger=logger)
         self.trace_validator = TraceValidator(logger=logger)
 
-    def enrich_trace(
-        self, group_name: str, template_name: str, trace: JsonType
-    ) -> None:
+    def enrich_trace(self, group_name: str, template_name: str, trace: Trace) -> None:
         """
         Enrich a trace based on its profile.
 
@@ -60,11 +58,11 @@ class JsonLdProfileRepository(ProfileRepository):
         )
 
         # Merge recursively the original trace with enriched data
-        deep_merge(target_dict=trace, merge_dct=enriched_data)
+        deep_merge(target_dict=trace.data, merge_dct=enriched_data)
         self.logger.info("Trace enriched successfully", {"template": template_name})
 
     def validate_trace(
-        self, group_name: str, template_name: str, trace: JsonType
+        self, group_name: str, template_name: str, trace: Trace
     ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
@@ -91,7 +89,7 @@ class JsonLdProfileRepository(ProfileRepository):
         return self.trace_validator.validate_trace(template=template, trace=trace)
 
     def get_recommendations(
-        self, group_name: str, template_name: str, trace: JsonType
+        self, group_name: str, template_name: str, trace: Trace
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specific template

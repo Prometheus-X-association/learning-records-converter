@@ -1,5 +1,6 @@
 from utils.utils_dict import deep_merge, get_nested_from_flat
 
+from app.common.models.trace import Trace
 from app.common.type.types import JsonType
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemplate
@@ -19,7 +20,7 @@ class TraceEnricher:
         self.logger = logger
 
     def get_enriched_data(
-        self, group_name: str, template: StatementTemplate, trace: JsonType
+        self, group_name: str, template: StatementTemplate, trace: Trace
     ) -> JsonType:
         """
         Get enriched data based on the given template.
@@ -56,9 +57,7 @@ class TraceEnricher:
 
         return get_nested_from_flat(flat_field=enriched_data)
 
-    def _enrich_with_rules(
-        self, template: StatementTemplate, trace: JsonType
-    ) -> JsonType:
+    def _enrich_with_rules(self, template: StatementTemplate, trace: Trace) -> JsonType:
         """
         Get enriched data based on the template's rules than contain only one value
 
@@ -72,7 +71,7 @@ class TraceEnricher:
                 rule.presence
                 in [PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED]
                 and rule.location
-                and not JSONPathUtils.path_exists(path=rule.location, data=trace)
+                and not JSONPathUtils.path_exists(path=rule.location, data=trace.data)
             ):
                 value = None
                 if rule.any and len(rule.any) == 1:

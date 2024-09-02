@@ -98,9 +98,9 @@ class LRCAPIRouter:
             output_format=output_format,
             profile_enricher=profiler,
         )
-        response = mapper.run(input_trace=query.input_trace)
+        output_trace = mapper.run(input_trace=input_trace)
 
-        recommendations = mapper.get_recommendations(output_trace=response)
+        recommendations = mapper.get_recommendations(output_trace=output_trace)
         meta = TransformInputTraceResponseMetaModel(
             input_format=query.input_format,
             recommendations=recommendations,
@@ -109,7 +109,9 @@ class LRCAPIRouter:
         self.logger.info(
             "Convert endpoint completed", {"input_format": query.input_format}
         )
-        return TransformInputTraceResponseModel(output_trace=response, meta=meta)
+        return TransformInputTraceResponseModel(
+            output_trace=output_trace.data, meta=meta
+        )
 
 
 def create_app() -> FastAPI:
@@ -170,10 +172,10 @@ def create_app() -> FastAPI:
         else:
             message = "; ".join(exc.args) if exc.args else str(exc)
 
-        logger.error(
+        logger.exception(
             "HTTP Error sent",
+            exc,
             {
-                "error_type": exc_type.__name__,
                 "message": message,
                 "status_code": status_code,
             },

@@ -1,5 +1,6 @@
 from typing import Any, Callable
 
+from app.common.models.trace import Trace
 from app.common.type.types import JsonType
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
@@ -21,7 +22,7 @@ class TraceValidator:
         }
 
     def validate_trace(
-        self, template: StatementTemplate, trace: JsonType
+        self, template: StatementTemplate, trace: Trace
     ) -> list[ValidationError]:
         """
         Validate a trace against a given template.
@@ -44,7 +45,7 @@ class TraceValidator:
         return [ValidationError(**result.__dict__) for result in validation_results]
 
     def get_recommendations(
-        self, template: StatementTemplate, trace: JsonType
+        self, template: StatementTemplate, trace: Trace
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a given template.
@@ -74,7 +75,7 @@ class TraceValidator:
     def _apply_rules(
         self,
         template: StatementTemplate,
-        trace: JsonType,
+        trace: Trace,
         rule_types: list[PresenceTypeEnum],
     ) -> list[ValidationResult]:
         """
@@ -202,7 +203,7 @@ class TraceValidator:
         return not any(v in none_values for v in values)
 
     def _get_values_for_rule(
-        self, rule: StatementTemplateRule, trace: JsonType
+        self, rule: StatementTemplateRule, trace: Trace
     ) -> list[Any]:
         """
         Extract values from the trace that are relevant to a specific rule.
@@ -214,7 +215,7 @@ class TraceValidator:
         :param rule: The StatementTemplateRule specifying how to extract values
         :return: A list of extracted values relevant to the rule
         """
-        values = self._apply_jsonpath(data=trace, path=rule.location)
+        values = self._apply_jsonpath(data=trace.data, path=rule.location)
         if rule.selector:
             values = self._apply_selector(values=values, selector=rule.selector)
         return values

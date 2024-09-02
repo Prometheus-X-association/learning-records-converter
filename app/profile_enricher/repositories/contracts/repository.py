@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.common.type.types import JsonType
+from app.common.models.trace import Trace
 from app.profile_enricher.types import ValidationError, ValidationRecommendation
 
 
@@ -11,9 +11,7 @@ class ProfileRepository(ABC):
     """
 
     @abstractmethod
-    def enrich_trace(
-        self, group_name: str, template_name: str, trace: JsonType
-    ) -> None:
+    def enrich_trace(self, group_name: str, template_name: str, trace: Trace) -> None:
         """
         Enrich a trace based on its profile.
 
@@ -25,7 +23,7 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def validate_trace(
-        self, group_name: str, template_name: str, trace: JsonType
+        self, group_name: str, template_name: str, trace: Trace
     ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
@@ -39,7 +37,7 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def get_recommendations(
-        self, group_name: str, template_name: str, trace: JsonType
+        self, group_name: str, template_name: str, trace: Trace
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specific template.

@@ -12,6 +12,7 @@ from enums import (
     CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,
 )
+from app.common.models.trace import Trace
 from trace_formats.enums import TraceFormatEnum
 from trace_formats.models.mapping_config import (
     CompleteConfigModel,
@@ -302,7 +303,7 @@ class MappingInput:
     # Ajouter les outputs partout où il faut
     # Transformation : "bob" par défaut c'est transformation: value: "bob", faire/mettre en place la prise en compte.
 
-    def mapping(self, input_trace):
+    def mapping(self, input_trace) -> Trace:
         # Mapping
         # TODO: Sortir ce bloc de mapping
         # TODO: Regarder pour donner la possibilité de faire de mapping sans forcément être dans l'Enum
@@ -315,15 +316,15 @@ class MappingInput:
         output_trace = self.handle_default(self.mapping_to_apply.default_values, output_trace)
 
         # Return response
-        return output_trace
+        return Trace(data=output_trace, format=CustomTraceFormatStrEnum(self.output_format.name))
 
-    def _enrich_with_profile(self, output_trace: dict):
+    def _enrich_with_profile(self, output_trace: Trace):
         """
         Enrich trace with profile
         """
         self.profile_enricher.enrich_trace(profile=self.profile, trace=output_trace)
 
-    def _validate_with_profile(self, output_trace: dict):
+    def _validate_with_profile(self, output_trace: Trace):
         """
         Validate trace with profile
         """
@@ -346,7 +347,7 @@ class MappingInput:
             trace=output_trace,
         )
 
-    def run(self, input_trace: dict) -> dict:
+    def run(self, input_trace: Trace) -> Trace:
         ##### MAIN FUNCTION #####
         if not self.input_format or not self.output_format or not self.mapping_to_apply:
             raise ValueError(
@@ -355,13 +356,13 @@ class MappingInput:
 
         # Check if input_trace match input_format (model validation)
         # An exception will be raised of not correct model
-        self.input_format.value(**input_trace)  # TODO: To test
+        self.input_format.value(**input_trace.data)  # TODO: To test
 
-        output_trace = self.mapping(input_trace)
+        output_trace = self.mapping(input_trace.data)
 
         # Output format (always xAPI non?)
         # An exception will be raised of not correct model
-        self.output_format.value(**output_trace)  # TODO: To test
+        self.output_format.value(**output_trace.data)  # TODO: To test
 
         if self.profile is not None:
             self._enrich_with_profile(output_trace=output_trace)

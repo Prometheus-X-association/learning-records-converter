@@ -1,4 +1,4 @@
-from app.common.type.types import JsonType
+from app.common.models.trace import Trace
 
 from .exceptions import ProfilerException
 from .repositories.contracts.repository import ProfileRepository
@@ -18,7 +18,7 @@ class Profiler:
         """
         self.repository = repository
 
-    def enrich_trace(self, profile: str, trace: JsonType) -> None:
+    def enrich_trace(self, profile: str, trace: Trace) -> None:
         """
         Enrich a trace based on the specified profile.
 
@@ -38,7 +38,7 @@ class Profiler:
         except Exception as e:
             raise ProfilerException(f"Failed to enrich trace: {str(e)}") from e
 
-    def validate_trace(self, profile: str, trace: JsonType) -> list[ValidationError]:
+    def validate_trace(self, profile: str, trace: Trace) -> list[ValidationError]:
         """
         Validate a trace against the specified profile.
 
@@ -60,7 +60,7 @@ class Profiler:
             raise ProfilerException("Failed to validate trace") from e
 
     def get_recommendations(
-        self, profile: str, trace: JsonType
+        self, profile: str, trace: Trace
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specified profile.
