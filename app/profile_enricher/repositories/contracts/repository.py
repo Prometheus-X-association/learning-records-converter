@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from app.profile_enricher.types import (JsonType, ValidationError,
-                                        ValidationRecommendation)
+from app.common.type.types import JsonType
+from app.profile_enricher.types import ValidationError, ValidationRecommendation
 
 
 class ProfileRepository(ABC):

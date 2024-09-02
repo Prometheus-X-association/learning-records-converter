@@ -7,6 +7,7 @@ from urllib.request import Request, urlopen
 
 from pydantic import ValidationError
 
+from app.common.type.types import JsonType
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.exceptions import (BasePathException, InvalidJsonException,
@@ -14,7 +15,6 @@ from app.profile_enricher.exceptions import (BasePathException, InvalidJsonExcep
                                              ProfileValidationError,
                                              TemplateNotFoundException)
 from app.profile_enricher.profiles.jsonld import Profile, StatementTemplate
-from app.profile_enricher.types import JsonType
 
 
 class ProfileLoader:

@@ -170,12 +170,14 @@ def create_app() -> FastAPI:
         else:
             message = "; ".join(exc.args) if exc.args else str(exc)
 
-        logger.error("HTTP Error sent", {
-            "error_type": exc_type.__name__,
-            "message": message,
-            "status_code": status_code,
-
-        })
+        logger.error(
+            "HTTP Error sent",
+            {
+                "error_type": exc_type.__name__,
+                "message": message,
+                "status_code": status_code,
+            },
+        )
         return JSONResponse({"msg": message}, status_code=status_code)
 
     @app.exception_handler(Exception)

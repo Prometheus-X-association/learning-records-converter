@@ -1,10 +1,10 @@
 from utils.utils_dict import deep_merge
 
+from app.common.type.types import JsonType
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.repositories.contracts.repository import ProfileRepository
-from app.profile_enricher.types import (JsonType, ValidationError,
-                                        ValidationRecommendation)
+from app.profile_enricher.types import ValidationError, ValidationRecommendation
 
 from .profile_loader import ProfileLoader
 from .trace_enricher import TraceEnricher

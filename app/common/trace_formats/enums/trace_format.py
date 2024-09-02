@@ -1,12 +1,8 @@
 from enum import Enum
 
-from trace_formats.models import (
-    BaseXapiStatement,
-    IMSCaliperSensorModel1_1,
-    IMSCaliperSensorModel1_2,
-    SCORM2004DataModel,
-    SCORMDataModel,
-)
+from trace_formats.models import (BaseXapiStatement, IMSCaliperSensorModel1_1,
+                                  IMSCaliperSensorModel1_2, SCORM2004DataModel,
+                                  SCORMDataModel)
 
 
 class TraceFormatEnum(Enum):
@@ -22,16 +18,16 @@ class TraceFormatModelEnum(TraceFormatEnum):
 
 
 class TraceFormatToXapiMappingEnum(TraceFormatEnum):
-    SCORM_1_1 = "app/common/trace_formats/mappers/mapping_scorm_1_1_to_xapi.yml"
-    SCORM_2004 = "app/common/trace_formats/mappers/mapping_scorm2004_to_xapi.yml"
+    SCORM_1_1 = "data/mappers/mapping_scorm_1_1_to_xapi.yml"
+    SCORM_2004 = "data/mappers/mapping_scorm2004_to_xapi.yml"
     XAPI = ""
-    IMSCALIPER1_2 = "app/common/trace_formats/mappers/mapping_imscaliper_1_1_to_xapi.yml"
-    IMSCALIPER1_1 = "app/common/trace_formats/mappers/mapping_imscaliper_1_1_to_xapi.yml"
+    IMSCALIPER1_2 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
+    IMSCALIPER1_1 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
 
 
 class TraceFormatToScorm11MappingEnum(TraceFormatEnum):
     SCORM_1_1 = ""
-    XAPI = "app/common/trace_formats/mappers/mapping_xapi_to_scorm_1_1.yml"
+    XAPI = "data/mappers/mapping_xapi_to_scorm_1_1.yml"
 
 
 class TraceFormatOutputMappingEnum(TraceFormatEnum):

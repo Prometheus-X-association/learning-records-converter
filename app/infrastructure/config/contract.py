@@ -32,7 +32,6 @@ class ConfigContract(ABC):
         """
         ...
 
-
     @abstractmethod
     def get_profiles_base_path(self) -> str:
         """

@@ -1,6 +1,8 @@
+from app.common.type.types import JsonType
+
 from .exceptions import ProfilerException
 from .repositories.contracts.repository import ProfileRepository
-from .types import JsonType, ValidationError, ValidationRecommendation
+from .types import ValidationError, ValidationRecommendation
 
 
 class Profiler:

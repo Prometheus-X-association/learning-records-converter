@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, TypeAlias
-
-JsonType: TypeAlias = dict[str, Any]
+from typing import Any
 
 
 @dataclass(frozen=True)

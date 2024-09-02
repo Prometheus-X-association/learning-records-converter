@@ -5,6 +5,8 @@ from enums.custom_trace_format import (CustomTraceFormatModelEnum,
 from pydantic import BaseModel, ValidationError
 from pydantic.v1 import ValidationError as V1ValidationError
 
+from app.common.type.types import JsonType
+
 
 class Trace(BaseModel):
     """
@@ -16,7 +18,8 @@ class Trace(BaseModel):
     :param data: The raw trace data
     :param format: The format of the trace
     """
-    data: dict[str, Any]
+
+    data: JsonType
     format: CustomTraceFormatStrEnum
 
     @classmethod
