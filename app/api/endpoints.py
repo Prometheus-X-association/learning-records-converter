@@ -1,4 +1,3 @@
-from enums.custom_trace_format import CustomTraceFormatModelEnum
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,11 +14,11 @@ from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
 from app.infrastructure.logging.jsonlogger import JsonLogger
+from app.mapper.mapper import Mapper
+from app.mapper.repositories.yaml.yaml_repository import YamlMappingRepository
 from app.profile_enricher.profiler import Profiler
 from app.profile_enricher.repositories.jsonld.jsonld_repository import \
     JsonLdProfileRepository
-from app.xapi_converter.transformer.mapping_input import (
-    MappingInput, get_mapping_by_input_and_output_format)
 
 
 class LRCAPIRouter:
@@ -82,32 +81,28 @@ class LRCAPIRouter:
 
         input_trace = query.get_trace()
 
-        output_format = CustomTraceFormatModelEnum[query.output_format.name]
-        mapping_config = get_mapping_by_input_and_output_format(
-            input_format=input_trace.format, output_format=output_format
+        profiler = Profiler(
+            repository=JsonLdProfileRepository(logger=self.logger, config=self.config)
         )
 
-        jsonld_repository = JsonLdProfileRepository(
-            logger=self.logger, config=self.config
-        )
-        profiler = Profiler(repository=jsonld_repository)
-
-        mapper = MappingInput(
-            input_format=CustomTraceFormatModelEnum[input_trace.format.name],
-            mapping_to_apply=mapping_config,
-            output_format=output_format,
+        mapper = Mapper(
+            repository=YamlMappingRepository(logger=self.logger),
             profile_enricher=profiler,
         )
-        output_trace = mapper.run(input_trace=input_trace)
+        output_trace = mapper.convert(
+            input_trace=input_trace,
+            output_format=query.output_format,
+        )
 
-        recommendations = mapper.get_recommendations(output_trace=output_trace)
         meta = TransformInputTraceResponseMetaModel(
-            input_format=query.input_format,
-            recommendations=recommendations,
+            input_format=input_trace.format,
+            recommendations=profiler.get_recommendations(
+                trace=output_trace,
+            ),
         )
 
         self.logger.info(
-            "Convert endpoint completed", {"input_format": query.input_format}
+            "Convert endpoint completed", {"input_format": input_trace.format}
         )
         return TransformInputTraceResponseModel(
             output_trace=output_trace.data, meta=meta

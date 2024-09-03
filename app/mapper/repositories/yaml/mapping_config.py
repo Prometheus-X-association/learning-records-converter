@@ -3,19 +3,12 @@ from typing import Any, List, Optional
 from pydantic import BaseModel, Field, model_validator
 
 
-# TODO : DOCUMENTATION
-# TODO : TESTING
-# TODO : CHECK IF COMPLIANT IF YAML
 class BasicModel(BaseModel):
     description: Optional[str] = Field(
         default=None,
         description="Description of the mapping.",
         examples=["Convert SCORM student ID to xAPI actor mbox"],
     )
-
-
-class BasicTransformationModel(BaseModel):
-    pass
 
 
 class OutputMappingModel(BasicModel):
@@ -63,16 +56,12 @@ class OutputMappingModel(BasicModel):
             values.get("custom"),
             values.get("switch"),
             values.get("multiple"),
-            values.get("profile")
+            values.get("profile"),
         )
         if (output_field or value or custom or switch) and multiple:
-            raise ValueError(
-                "Only one mapping should be provided."
-            )
+            raise ValueError("Only one mapping should be provided.")
         if not (output_field or value or custom or switch or profile or multiple):
-            raise ValueError(
-                "A mapping should be provided."
-            )
+            raise ValueError("A mapping should be provided.")
 
         return values
 
@@ -86,12 +75,11 @@ class ConditionOutputMappingModel(OutputMappingModel):
 
     @model_validator(mode="before")
     def validate_output_field_transformation(cls, values):
-        output_field, value, custom, switch, multiple = (
+        output_field, value, custom, switch = (
             values.get("output_field"),
             values.get("value"),
             values.get("custom"),
             values.get("switch"),
-            values.get("multiple"),
         )
         if (value or custom or switch) and not output_field:
             raise ValueError(
@@ -132,9 +120,6 @@ class MetadataModel(BasicModel):
         description="Author of the transformation config.",
         examples=["Your Name"],
     )
-    # version: float = Field(
-    #     ..., description="Version of the transformation config.", examples=[1.0]
-    # )
     date: MetadataDateModel = Field(
         ...,
         description="Dates related to the transformation config.",

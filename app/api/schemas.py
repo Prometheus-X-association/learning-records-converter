@@ -1,4 +1,5 @@
-from typing import Any
+from email.policy import default
+from typing import Any, Optional
 
 from enums.custom_trace_format import CustomTraceFormatStrEnum
 from models.trace import Trace
@@ -39,6 +40,7 @@ class TransformInputTraceRequestModel(InputTraceRequestModel):
 class TransformInputTraceResponseMetaModel(BaseModel):
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
     recommendations: list[ValidationRecommendation] = Field(
+        default_factory=list,
         description="List of recommendations to improve output trace"
     )
 

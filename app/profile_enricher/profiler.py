@@ -18,15 +18,16 @@ class Profiler:
         """
         self.repository = repository
 
-    def enrich_trace(self, profile: str, trace: Trace) -> None:
+    def enrich_trace(self, trace: Trace) -> None:
         """
-        Enrich a trace based on the specified profile.
+        Enrich a trace.
 
-        :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The original trace to enrich
         :raises ProfilerException: If enrichment fails
         """
-        group_name, template_name = self._parse_profile(profile=profile)
+        if not trace.profile:
+            raise ProfilerException("No profile associated with the trace")
+        group_name, template_name = self._parse_profile(profile=trace.profile)
 
         try:
             enriched_trace = self.repository.enrich_trace(
@@ -38,16 +39,17 @@ class Profiler:
         except Exception as e:
             raise ProfilerException(f"Failed to enrich trace: {str(e)}") from e
 
-    def validate_trace(self, profile: str, trace: Trace) -> list[ValidationError]:
+    def validate_trace(self, trace: Trace) -> list[ValidationError]:
         """
-        Validate a trace against the specified profile.
+        Validate a trace.
 
-        :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The trace to validate
         :return: A list of ValidationError objects
         :raises ProfilerException: If validation fails
         """
-        group_name, template_name = self._parse_profile(profile=profile)
+        if not trace.profile:
+            return []
+        group_name, template_name = self._parse_profile(profile=trace.profile)
 
         try:
             errors = self.repository.validate_trace(
@@ -59,18 +61,18 @@ class Profiler:
         except Exception as e:
             raise ProfilerException("Failed to validate trace") from e
 
-    def get_recommendations(
-        self, profile: str, trace: Trace
-    ) -> list[ValidationRecommendation]:
+    def get_recommendations(self, trace: Trace) -> list[ValidationRecommendation]:
         """
-        Generate recommendations for a trace based on a specified profile.
+        Generate recommendations for a trace.
 
-        :param profile: The profile identifier in the format 'group_name.template_name'
         :param trace: The trace data to generate recommendations for
         :return: A list of ValidationRecommendation objects
         :raises ProfilerException: If recommendation generation fails
         """
-        group_name, template_name = self._parse_profile(profile=profile)
+        if not trace.profile:
+            return []
+
+        group_name, template_name = self._parse_profile(profile=trace.profile)
 
         recommendations = self.repository.get_recommendations(
             group_name=group_name,

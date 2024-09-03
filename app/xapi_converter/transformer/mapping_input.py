@@ -4,23 +4,18 @@ from typing import List
 
 from pydantic import BaseModel
 
-from app.profile_enricher.profiler import Profiler
-from app.profile_enricher.types import ValidationRecommendation
 from app.xapi_converter.transformer import *
 from enums import (
     CustomTraceFormatModelEnum,
-    CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,
 )
 from app.common.models.trace import Trace
-from trace_formats.enums import TraceFormatEnum
-from trace_formats.models.mapping_config import (
+from app.mapper.repositories.yaml.mapping_config import (
     CompleteConfigModel,
     MainMappingModel,
     OutputMappingModel, ConditionOutputMappingModel,
 )
 from utils.utils_dict import (
-    convert_yaml_file_to_json,
     get_value_from_flat_key,
     set_value_from_flat_key,
 )
@@ -38,65 +33,6 @@ class FinalMappingModel(BaseModel):
 
 DEFAULT_CONDITION = "default"
 
-
-def get_config_model_from_yaml_file(file_path: str) -> CompleteConfigModel:
-    """From a file path (for a YAML file) get the CompleteConfigModel used for the mapping process
-
-    Args:
-        file_path (str): YAML file path
-
-    Returns:
-        CompleteConfigModel: Model used to map input trace
-    """
-    json_config = convert_yaml_file_to_json(file_path)
-    # Load mapping in Model
-    return CompleteConfigModel(**json_config)
-
-
-def get_mapping_by_input_and_output_format(
-    input_format: str | TraceFormatEnum, output_format: str | TraceFormatEnum
-) -> CompleteConfigModel:
-    """From the input_format and the output_format, retrieve the correct mapping config (if exists)
-
-    Args:
-        input_format (str | TraceFormatEnum): Trace input format
-        output_format (str | TraceFormatEnum): Trace output format
-
-    Raises:
-        ValueError: No mapping for this output format found.
-        ValueError: No mapping from this input to this output format found.
-        ValueError: Mapping unloadable (empty file, wrong path...)
-
-    Returns:
-        CompleteConfigModel: Mapping config model
-    """
-    # Get correct mapping enum
-    mapping_config = None
-    try:
-        if isinstance(output_format, str):
-            enum_key = CustomTraceFormatStrEnum(output_format).name
-            mappings = CustomTraceFormatOutputMappingEnum[enum_key].value
-        elif isinstance(output_format, TraceFormatEnum):
-            mappings = CustomTraceFormatOutputMappingEnum[output_format.name].value
-    except (ValueError, KeyError) as e:
-        raise ValueError(f"Output mapping enum to {output_format} not found")
-
-    try:
-        if isinstance(input_format, str):
-            enum_key = CustomTraceFormatStrEnum(input_format).name
-            mapping_config = mappings[enum_key]
-        elif isinstance(input_format, TraceFormatEnum):
-            mapping_config = mappings[input_format.name]
-    except (ValueError, KeyError) as e:
-        raise ValueError(f"Mapping from {input_format} to {output_format} not found")
-
-    # Read config file
-    if isinstance(mapping_config, TraceFormatEnum):
-        return get_config_model_from_yaml_file(mapping_config.value)
-    else:
-        raise ValueError("Could not load mapping config into model")
-
-
 class MappingInput:
     """This class handles mapping from an input format to an output format, using a config model.
 
@@ -108,12 +44,10 @@ class MappingInput:
         input_format: CustomTraceFormatModelEnum,
         mapping_to_apply: CompleteConfigModel,
         output_format: CustomTraceFormatModelEnum,  # = TraceFormatModelEnum.XAPI,
-        profile_enricher: Profiler
     ) -> None:
         self.input_format = input_format
         self.output_format = output_format
         self.mapping_to_apply = mapping_to_apply
-        self.profile_enricher = profile_enricher
         self.profile = None
 
     def transformation_custom(
@@ -318,34 +252,6 @@ class MappingInput:
         # Return response
         return Trace(data=output_trace, format=CustomTraceFormatStrEnum(self.output_format.name))
 
-    def _enrich_with_profile(self, output_trace: Trace):
-        """
-        Enrich trace with profile
-        """
-        self.profile_enricher.enrich_trace(profile=self.profile, trace=output_trace)
-
-    def _validate_with_profile(self, output_trace: Trace):
-        """
-        Validate trace with profile
-        """
-        errors = self.profile_enricher.validate_trace(
-            profile=self.profile,
-            trace=output_trace,
-        )
-        if errors:
-            raise ValueError(f"The trace does not match the profile: {errors}")
-
-    def get_recommendations(self, output_trace: dict) -> list[ValidationRecommendation]:
-        """
-        Get recommendations to improve the trace
-        """
-        if not self.profile:
-            return []
-
-        return self.profile_enricher.get_recommendations(
-            profile=self.profile,
-            trace=output_trace,
-        )
 
     def run(self, input_trace: Trace) -> Trace:
         ##### MAIN FUNCTION #####
@@ -364,9 +270,8 @@ class MappingInput:
         # An exception will be raised of not correct model
         self.output_format.value(**output_trace.data)  # TODO: To test
 
-        if self.profile is not None:
-            self._enrich_with_profile(output_trace=output_trace)
-            self._validate_with_profile(output_trace=output_trace)
+        if self.profile:
+            output_trace.profile = self.profile
 
         # Check if output_trace match output_format (model validation)
         return output_trace

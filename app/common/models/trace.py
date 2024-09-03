@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from enums.custom_trace_format import (CustomTraceFormatModelEnum,
                                        CustomTraceFormatStrEnum)
@@ -17,10 +17,12 @@ class Trace(BaseModel):
 
     :param data: The raw trace data
     :param format: The format of the trace
+    :param profile: The profile associated with this trace, if any
     """
 
     data: JsonType
     format: CustomTraceFormatStrEnum
+    profile: Optional[str] = None
 
     @classmethod
     def create_with_format_detection(cls, data: dict[str, Any]) -> "Trace":
