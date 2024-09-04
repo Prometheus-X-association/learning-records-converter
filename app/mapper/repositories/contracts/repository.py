@@ -1,23 +1,28 @@
 from abc import ABC, abstractmethod
 
 from app.common.enums import CustomTraceFormatStrEnum
-from app.common.models.trace import Trace
+from app.mapper.mapping_schema import MappingSchema
 
 
 class MappingRepository(ABC):
     """
-    An abstract base class defining the interface for mapper repositories.
+    Abstract base class for mapping repositories.
+
+    This class defines the interface for loading and checking the existence of mapping schemas.
     """
 
     @abstractmethod
-    def convert(
-        self, input_trace: Trace, output_format: CustomTraceFormatStrEnum
-    ) -> Trace:
+    def load_schema(
+        self,
+        input_format: CustomTraceFormatStrEnum,
+        output_format: CustomTraceFormatStrEnum,
+    ) -> MappingSchema:
         """
-        Convert an input trace to the specified output format.
+        Load a mapping schema for the given input and output formats.
 
-        :param input_trace: The input trace to be converted
-        :param output_format: The desired output format for the trace
-        :return: The converted trace
+        :param input_format: The format of the input trace
+        :param output_format: The desired output format
+        :return: The loaded mapping schema
         """
+
         ...

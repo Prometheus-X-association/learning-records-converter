@@ -70,7 +70,7 @@ class LRCAPIRouter:
         self, query: TransformInputTraceRequestModel
     ) -> TransformInputTraceResponseModel:
         """
-        Transform a trace from one format to another.
+        Transform and enrich a trace from one format to another.
 
         :param query: The request query model
         :return: The response model containing the transformed trace
@@ -81,24 +81,36 @@ class LRCAPIRouter:
 
         input_trace = query.get_trace()
 
-        profiler = Profiler(
-            repository=JsonLdProfileRepository(logger=self.logger, config=self.config)
-        )
-
         mapper = Mapper(
             repository=YamlMappingRepository(logger=self.logger),
-            profile_enricher=profiler,
         )
+
+        # Convert
         output_trace = mapper.convert(
             input_trace=input_trace,
             output_format=query.output_format,
         )
+        # Enrich and validate
+        recommendations = []
+        if output_trace.profile:
+            profiler = Profiler(
+                repository=JsonLdProfileRepository(
+                    logger=self.logger, config=self.config
+                )
+            )
+            profiler.enrich_trace(trace=output_trace)
+
+            errors = profiler.validate_trace(trace=output_trace)
+            if errors:
+                raise ValueError(f"The trace does not match the profile: {errors}")
+
+            recommendations = profiler.get_recommendations(
+                trace=output_trace,
+            )
 
         meta = TransformInputTraceResponseMetaModel(
             input_format=input_trace.format,
-            recommendations=profiler.get_recommendations(
-                trace=output_trace,
-            ),
+            recommendations=recommendations,
         )
 
         self.logger.info(

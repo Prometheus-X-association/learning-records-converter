@@ -126,7 +126,7 @@ class MetadataModel(BasicModel):
     )
 
 
-class CompleteConfigModel(BaseModel):
+class MappingSchema(BaseModel):
     version: float = Field(
         ...,
         description="Version of the transformation config.",

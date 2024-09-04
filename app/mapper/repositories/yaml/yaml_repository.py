@@ -4,62 +4,50 @@ from pydantic import ValidationError
 from trace_formats.enums import TraceFormatEnum
 from utils.utils_dict import convert_yaml_file_to_json
 
-from app.common.enums import (CustomTraceFormatModelEnum,
-                              CustomTraceFormatOutputMappingEnum,
+from app.common.enums import (CustomTraceFormatOutputMappingEnum,
                               CustomTraceFormatStrEnum)
-from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 from app.mapper.exceptions import MappingConfigToModelException
+from app.mapper.mapping_schema import MappingSchema
 from app.mapper.repositories.contracts.repository import MappingRepository
-from app.xapi_converter.transformer.mapping_input import MappingInput
-
-from .mapping_config import CompleteConfigModel
 
 
 class YamlMappingRepository(MappingRepository):
     """
     A concrete implementation of MappingRepository that uses YAML configuration files for mapping.
 
-    This class handles the conversion of traces based on YAML mapping configurations.
-
-    :param logger: An instance of LoggerContract for logging
+    This class handles the loading of mapping schemas from YAML files based on input and output formats.
     """
 
     def __init__(self, logger: LoggerContract):
+        """
+        Initialize the YamlMappingRepository.
+
+        :param logger: An instance of LoggerContract for logging
+        """
         self.logger = logger
 
-    def convert(
-        self, input_trace: Trace, output_format: CustomTraceFormatStrEnum
-    ) -> Trace:
+    def load_schema(
+        self,
+        input_format: CustomTraceFormatStrEnum,
+        output_format: CustomTraceFormatStrEnum,
+    ) -> MappingSchema:
         """
-        Convert an input trace to the specified output format using YAML mapping configurations.
+        Load a mapping schema for the given input and output formats from a YAML file.
 
-        :param input_trace: The input trace to be converted
-        :param output_format: The desired output format for the trace
-        :return: The converted trace
+        :param input_format: The format of the input trace
+        :param output_format: The desired output format
+        :return: The loaded mapping schema
         :raises ValueError: If the mapping configuration is not found
+        :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
         """
-
-        log_context = {
-            "input_format": input_trace.format,
-            "output_format": output_format,
-        }
 
         mapping_path = self._get_mapping_by_input_and_output_format(
-            input_format=input_trace.format, output_format=output_format
+            input_format=input_format, output_format=output_format
         )
         mapping_config = self._get_config_model_from_yaml_file(file_path=mapping_path)
 
-        self.logger.debug("Mapping start", log_context)
-        mapping = MappingInput(
-            input_format=CustomTraceFormatModelEnum[input_trace.format.name],
-            mapping_to_apply=mapping_config,
-            output_format=CustomTraceFormatModelEnum[output_format.name],
-        )
-        output_trace = mapping.run(input_trace=input_trace)
-        self.logger.info("Mapping done", log_context)
-
-        return output_trace
+        return mapping_config
 
     def _get_mapping_by_input_and_output_format(
         self,
@@ -110,7 +98,7 @@ class YamlMappingRepository(MappingRepository):
 
         return Path(mapping_path)
 
-    def _get_config_model_from_yaml_file(self, file_path: Path) -> CompleteConfigModel:
+    def _get_config_model_from_yaml_file(self, file_path: Path) -> MappingSchema:
         """
         Load and validate a YAML configuration file into a CompleteConfigModel.
 
@@ -122,7 +110,7 @@ class YamlMappingRepository(MappingRepository):
         self.logger.info("Mapping config loaded", {"path": file_path})
         # Load mapping in Model
         try:
-            return CompleteConfigModel(**json_config)
+            return MappingSchema(**json_config)
         except ValidationError as e:
             self.logger.exception("Mapping validation failed", e)
             raise MappingConfigToModelException(

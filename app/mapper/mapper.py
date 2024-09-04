@@ -1,53 +1,45 @@
-from typing import Optional
+from enums import CustomTraceFormatModelEnum
 
 from app.common.enums import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
-from app.mapper.repositories.contracts.repository import MappingRepository
-from app.profile_enricher.profiler import Profiler
+
+from .mapping_engine import MappingEngine
+from .repositories.contracts.repository import MappingRepository
 
 
 class Mapper:
     """
-    A class for converting traces between different formats and enriching them with profile information.
+    Class responsible for orchestrating the mapping process.
 
-    This class uses a repository for conversion and an optional profile enricher to enhance and validate traces.
-
-    :param repository: An instance of MappingRepository for trace conversion
-    :param profile_enricher: An optional instance of Profiler for trace enrichment and validation
+    This class uses a MappingRepository to load schemas and a MappingEngine to perform the actual conversion.
     """
 
-    def __init__(
-        self,
-        repository: MappingRepository,
-        profile_enricher: Optional[Profiler] = None,
-    ):
+    def __init__(self, repository: MappingRepository):
+        """
+        Initialize the Mapper with a MappingRepository.
+
+        :param repository: The repository to use for loading mapping schemas
+        """
         self.repository = repository
-        self.profile_enricher = profile_enricher
 
     def convert(
         self, input_trace: Trace, output_format: CustomTraceFormatStrEnum
     ) -> Trace:
         """
-        Convert an input trace to the specified output format and optionally enrich it.
+        Convert an input trace to the specified output format.
 
         :param input_trace: The input trace to be converted
-        :param output_format: The desired output format for the trace
-        :return: The converted (and possibly enriched) trace
-        :raises ValueError: If the converted trace does not match the profile
+        :param output_format: The desired output format
+        :return: The converted trace
         """
-        # Convert
-        converted_trace = self.repository.convert(
-            input_trace=input_trace, output_format=output_format
+        schema = self.repository.load_schema(
+            input_format=input_trace.format, output_format=output_format
         )
 
-        # Enrich and validate
-        if self.profile_enricher and converted_trace.profile:
-            self.profile_enricher.enrich_trace(trace=converted_trace)
-
-            errors = self.profile_enricher.validate_trace(
-                trace=converted_trace,
-            )
-            if errors:
-                raise ValueError(f"The trace does not match the profile: {errors}")
-
+        engine = MappingEngine(
+            input_format=CustomTraceFormatModelEnum[input_trace.format.name],
+            mapping_to_apply=schema,
+            output_format=CustomTraceFormatModelEnum[output_format.name],
+        )
+        converted_trace = engine.run(input_trace=input_trace)
         return converted_trace
