@@ -1,11 +1,11 @@
 from pathlib import Path
 
 from pydantic import ValidationError
-from trace_formats.enums import TraceFormatEnum
 from utils.utils_dict import convert_yaml_file_to_json
 
-from app.common.enums import (CustomTraceFormatOutputMappingEnum,
-                              CustomTraceFormatStrEnum)
+from app.common.enums.custom_trace_format import (CustomTraceFormatOutputMappingEnum,
+                                                  CustomTraceFormatStrEnum)
+from app.common.trace_formats.enums import TraceFormatEnum
 from app.infrastructure.logging.contract import LoggerContract
 from app.mapper.exceptions import MappingConfigToModelException
 from app.mapper.mapping_schema import MappingSchema

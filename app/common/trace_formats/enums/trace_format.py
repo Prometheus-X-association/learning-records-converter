@@ -1,11 +1,9 @@
 from enum import Enum
 
-from trace_formats.models import (
-    BaseXapiStatement,
-    IMSCaliperSensorModel1_1,
-    IMSCaliperSensorModel1_2,
-    SCORM2004DataModel,
-)
+from app.common.trace_formats.models import (BaseXapiStatement,
+                                             IMSCaliperSensorModel1_1,
+                                             IMSCaliperSensorModel1_2,
+                                             SCORM2004DataModel)
 
 
 class TraceFormatEnum(Enum):

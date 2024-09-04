@@ -1,7 +1,7 @@
-from models.custom_trace_formats import *
-from trace_formats.enums import (TraceFormatEnum, TraceFormatModelEnum,
-                                 TraceFormatOutputMappingEnum)
-from utils.utils_enum import CaseInsensitiveStrEnum, extend_enum, str_enum
+from app.common.models.custom_trace_formats import *
+from app.common.trace_formats.enums import (TraceFormatEnum, TraceFormatModelEnum,
+                                            TraceFormatOutputMappingEnum)
+from app.common.utils.utils_enum import CaseInsensitiveStrEnum, extend_enum, str_enum
 
 
 @extend_enum(TraceFormatModelEnum, enum_class=TraceFormatEnum)

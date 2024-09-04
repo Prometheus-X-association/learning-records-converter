@@ -1,10 +1,9 @@
-from email.policy import default
-from typing import Any, Optional
+from typing import Any
 
 from enums.custom_trace_format import CustomTraceFormatStrEnum
-from models.trace import Trace
 from pydantic import BaseModel, Field
 
+from app.common.models.trace import Trace
 from app.profile_enricher.types import ValidationRecommendation
 
 
@@ -41,7 +40,7 @@ class TransformInputTraceResponseMetaModel(BaseModel):
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
     recommendations: list[ValidationRecommendation] = Field(
         default_factory=list,
-        description="List of recommendations to improve output trace"
+        description="List of recommendations to improve output trace",
     )
 
 
