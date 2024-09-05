@@ -8,15 +8,16 @@ start = "uvicorn app.api.endpoints:app --host 0.0.0.0 --port 8000 --reload"
 test = "python -m pytest --cov"
 
 [packages]
-fastapi = "==0.104.1"
-pyyaml = "==6.0.1"
-langcodes = "==3.2.0"
+fastapi = "==0.112.4"
+pyyaml = "==6.0.2"
+langcodes = "==3.4.0"
 rfc3987 = "==1.3.8"
 "pydantic[email]" = "==2.5.3"
-uvicorn = {extras = ["standard"], version = "==0.27.0"}
+uvicorn = {extras = ["standard"], version = "==0.30.6"}
 aenum = "==2.2.6"
 typing_extensions = ">4"
 jsonpath-ng = "==1.6.1"
+python-dotenv = "==1.0.1"
 
 [dev-packages]
 black = "*"
