@@ -38,8 +38,8 @@ class TraceEnricher:
         # Build enriched data with template data
         enriched_data = {
             "verb.id": str(template.verb),
-            "verb.display.en-US": template.prefLabel.en,
-            "object.definition.type": str(template.objectActivityType),
+            "verb.display.en-US": template.pref_label.en,
+            "object.definition.type": str(template.object_activity_type),
             "context.contextActivities.category.0": {
                 "id": f"{CONTEXT_ACTIVITIES_CATEGORY_ID}/{group_name}",
                 "definition": {
