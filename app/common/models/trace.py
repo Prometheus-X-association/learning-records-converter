@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import BaseModel, ValidationError
@@ -24,7 +24,7 @@ class Trace(BaseModel):
     profile: Optional[str] = None
 
     @classmethod
-    def create_with_format_detection(cls, data: dict[str, Any]) -> "Trace":
+    def create_with_format_detection(cls, data: JsonType) -> "Trace":
         """
         Create a Trace instance with automatic format detection.
 

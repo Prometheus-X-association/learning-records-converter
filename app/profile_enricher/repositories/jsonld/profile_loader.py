@@ -99,12 +99,12 @@ class ProfileLoader:
         except FileNotFoundError as e:
             self.logger.exception("Profile file not found", e, log_context)
             raise ProfileNotFoundException(
-                f"Profile file not found: {file_path} {e}"
+                f"Profile file not found: {file_path}"
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in profile file", e, log_context)
             raise InvalidJsonException(
-                f"Invalid JSON in profile file: {file_path} {e}"
+                f"Invalid JSON in profile file: {file_path}"
             ) from e
 
     def download_profile(self, group_name: str) -> JsonType:
@@ -146,12 +146,12 @@ class ProfileLoader:
         except URLError as e:
             self.logger.exception("Failed to download profile", e, log_context)
             raise ProfileNotFoundException(
-                f"Failed to download profile for {group_name}: {e}"
+                f"Failed to download profile for {group_name}"
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in downloaded profile", e, log_context)
             raise InvalidJsonException(
-                f"Invalid JSON in downloaded profile for {group_name}: {e}"
+                f"Invalid JSON in downloaded profile for {group_name}"
             ) from e
 
     def save_profile_file(self, file_path: Path, profile_json: JsonType):
@@ -183,14 +183,14 @@ class ProfileLoader:
             return Profile(**profile_json)
         except ValidationError as e:
             self.logger.exception("Profile validation failed", e)
-            raise ProfileValidationError(f"Profile validation failed: {e}") from e
+            raise ProfileValidationError("Profile validation failed") from e
         except TypeError as e:
             self.logger.exception("Invalid data type in profile", e)
-            raise ProfileValidationError(f"Invalid data type in profile: {e}") from e
+            raise ProfileValidationError("Invalid data type in profile") from e
         except Exception as e:
             self.logger.exception("Unexpected error during profile validation", e)
             raise ProfileValidationError(
-                f"Unexpected error during profile validation: {e}"
+                "Unexpected error during profile validation"
             ) from e
 
     @staticmethod

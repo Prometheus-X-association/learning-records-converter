@@ -31,17 +31,10 @@ class CustomTraceFormatOutputMappingEnum(TraceFormatEnum):
 class CaseInsensitiveStrTraceFormatEnum(TraceFormatEnum, CaseInsensitiveStrEnum):
     """Inherit TraceFormatEnum and CaseInsensitiveStrEnum for typing"""
 
-    pass
-
 
 @str_enum(CustomTraceFormatModelEnum, enum_class=CaseInsensitiveStrTraceFormatEnum)
 class CustomTraceFormatStrEnum(TraceFormatEnum):
     """
     All trace format stringed name
     CAUTION : DO NOT MODIFY IF NOT NEEDED. This Enum is automatically filled
-
-    Args:
-        TraceFormatEnum (_type_): _description_
     """
-
-    pass

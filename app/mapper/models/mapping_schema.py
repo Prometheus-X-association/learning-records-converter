@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -24,23 +24,23 @@ class OutputMappingModel(BasicModel):
         examples=["http://example.com/xapi/verbs/completed"],
     )
 
-    custom: Optional[List[str]] = Field(
+    custom: Optional[list[str]] = Field(
         default=None,
-        description="List of custom lambda (python) code?",
+        description="list of custom lambda (python) code?",
         examples=[
             "lambda val: 'http://example.com/xapi/verbs/completed' if val == 'completed' else None"
         ],
     )
 
-    switch: Optional[List["ConditionOutputMappingModel"]] = Field(
+    switch: Optional[list["ConditionOutputMappingModel"]] = Field(
         default=None,
         description="Static value",
         examples=["http://example.com/xapi/verbs/completed"],
     )
 
-    multiple: Optional[List["OutputMappingModel"]] = Field(
+    multiple: Optional[list["OutputMappingModel"]] = Field(
         default=[],
-        description="List of multiple output mapping.",
+        description="list of multiple output mapping.",
     )
 
     profile: str = Field(
@@ -90,7 +90,7 @@ class ConditionOutputMappingModel(OutputMappingModel):
 
 
 class MainMappingModel(BasicModel):
-    input_fields: List[str] = Field(
+    input_fields: list[str] = Field(
         ...,
         description="Input field for the switch.",
         examples=["cmi.object.type"],
@@ -142,13 +142,13 @@ class MappingSchema(BaseModel):
         description="Output format for the transformation.",
         examples=["xAPI"],
     )
-    mappings: List[MainMappingModel] = Field(
+    mappings: list[MainMappingModel] = Field(
         ...,
-        description="List of mappings.",
+        description="list of mappings.",
     )
-    default_values: List[OutputMappingModel] = Field(
+    default_values: list[OutputMappingModel] = Field(
         default=[],
-        description="List of default values.",
+        description="list of default values.",
     )
     metadata: MetadataModel = Field(
         ...,

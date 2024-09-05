@@ -37,7 +37,7 @@ class Profiler:
             )
             return enriched_trace
         except Exception as e:
-            raise ProfilerException(f"Failed to enrich trace: {str(e)}") from e
+            raise ProfilerException("Failed to enrich trace") from e
 
     def validate_trace(self, trace: Trace) -> list[ValidationError]:
         """
@@ -95,6 +95,6 @@ class Profiler:
                 raise ValueError("Group name and template name cannot be empty")
         except ValueError as e:
             raise ProfilerException(
-                f"Invalid profile format: {str(e)}. Expected 'group_name.template_name', got: {profile}"
+                f"Invalid profile format. Expected 'group_name.template_name', got: {profile}"
             ) from e
         return group_name, template_name

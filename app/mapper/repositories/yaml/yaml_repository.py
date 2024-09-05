@@ -75,16 +75,14 @@ class YamlMappingRepository(MappingRepository):
                 output_format.name
             ].value
         except (ValueError, KeyError) as e:
-            self.logger.exception("Mapping not found", e, log_context)
-            raise ValueError(f"Output mapping enum to {output_format} not found")
+            self.logger.exception("Output mapping not found", e, log_context)
+            raise ValueError("Output mapping enum not found") from e
 
         try:
             mapping_config = output_format_mappings[input_format.name]
         except (ValueError, KeyError) as e:
             self.logger.exception("Mapping config not found", e, log_context)
-            raise ValueError(
-                f"Mapping from {input_format} to {output_format} not found"
-            )
+            raise ValueError("Mapping config not found") from e
 
         # Read config file
         if isinstance(mapping_config, TraceFormatEnum):
@@ -107,23 +105,19 @@ class YamlMappingRepository(MappingRepository):
         :return: A validated CompleteConfigModel instance
         :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
         """
-        json_config = convert_yaml_file_to_json(yaml_path=file_path)
+        json_config = convert_yaml_file_to_json(yaml_path=str(file_path))
         self.logger.info("Mapping config loaded", {"path": file_path})
         # Load mapping in Model
         try:
             return MappingSchema(**json_config)
         except ValidationError as e:
             self.logger.exception("Mapping validation failed", e)
-            raise MappingConfigToModelException(
-                f"Mapping validation failed: {e}"
-            ) from e
+            raise MappingConfigToModelException("Mapping validation failed") from e
         except TypeError as e:
             self.logger.exception("Invalid data type in mapping", e)
-            raise MappingConfigToModelException(
-                f"Invalid data type in profile: {e}"
-            ) from e
+            raise MappingConfigToModelException("Invalid data type in mapping") from e
         except Exception as e:
             self.logger.exception("Unexpected error during mapping file validation", e)
             raise MappingConfigToModelException(
-                f"Unexpected error during profile validation: {e}"
+                "Unexpected error during mapping file validation"
             ) from e

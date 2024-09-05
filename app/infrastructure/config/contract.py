@@ -13,7 +13,7 @@ class ConfigContract(ABC):
 
         :return: The log level as a string.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def get_download_timeout(self) -> int:
@@ -22,15 +22,15 @@ class ConfigContract(ABC):
 
         :return: The download timeout in seconds.
         """
-        ...
+        raise NotImplementedError
 
-    def get_cors_allowed_origins(self) -> list[str]:
+    def get_cors_allowed_origins(self) -> set[str]:
         """
         Get the allowed origins for CORS.
 
         :return: A list of allowed origins URLs.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def get_profiles_base_path(self) -> str:
@@ -39,7 +39,7 @@ class ConfigContract(ABC):
 
         :return: The base path as a string.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def get_and_create_profiles_base_path(self) -> str:
@@ -48,7 +48,7 @@ class ConfigContract(ABC):
 
         :return: The base path as a string.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def get_profile_url(self, profile_name: str) -> str:
@@ -58,13 +58,13 @@ class ConfigContract(ABC):
         :param profile_name: The name of the profile.
         :return: The URL of the profile as a string.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
-    def get_profiles_names(self) -> list[str]:
+    def get_profiles_names(self) -> set[str]:
         """
         Get the names of all profiles.
 
         :return: A list of profile names.
         """
-        ...
+        raise NotImplementedError

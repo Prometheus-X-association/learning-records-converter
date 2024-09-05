@@ -1,7 +1,8 @@
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import ValidationError
+from type.types import JsonType
 from utils.utils_dict import (get_value_from_flat_key, remove_empty_elements,
                               set_value_from_flat_key)
 
@@ -79,12 +80,12 @@ class MappingEngine:
             self.input_format.value(**input_trace.data)
         except ValidationError as e:
             self.logger.exception("Input format validation failed", e, self.log_context)
-            raise InputTraceToModelException(f"Input format validation failed") from e
+            raise InputTraceToModelException("Input format validation failed") from e
         except TypeError as e:
             self.logger.exception(
                 "Invalid data type in input trace", e, self.log_context
             )
-            raise InputTraceToModelException(f"Invalid data type in input trace") from e
+            raise InputTraceToModelException("Invalid data type in input trace") from e
         except Exception as e:
             self.logger.exception(
                 "Input trace does not match the specified input format",
@@ -92,11 +93,11 @@ class MappingEngine:
                 self.log_context,
             )
             raise InputTraceToModelException(
-                f"Input trace does not match the specified input format"
+                "Input trace does not match the specified input format"
             ) from e
         self.logger.debug("Input trace is valid against his format", self.log_context)
 
-    def _apply_mapping(self, input_data: dict[str, Any]) -> dict[str, Any]:
+    def _apply_mapping(self, input_data: JsonType) -> JsonType:
         """
         Apply the mapping to the input trace.
 
@@ -117,18 +118,18 @@ class MappingEngine:
             )
         return output_trace
 
-    def _post_process(self, mapped_data: dict[str, Any]) -> dict[str, Any]:
+    def _post_process(self, mapped_data: JsonType) -> JsonType:
         """
         Apply post-processing to the mapped data.
 
         :param mapped_data: The mapped data to post-process
         :return: The post-processed data
         """
-        output_trace = remove_empty_elements(dictionnary=mapped_data)
+        output_trace = remove_empty_elements(dictionary=mapped_data)
         output_trace = self._apply_default_values(output_trace=output_trace)
         return output_trace
 
-    def _apply_default_values(self, output_trace: dict[str, Any]) -> dict[str, Any]:
+    def _apply_default_values(self, output_trace: JsonType) -> JsonType:
         """
         Apply default values to the output trace.
 
@@ -142,7 +143,7 @@ class MappingEngine:
             )
         return output_trace
 
-    def _create_output_trace(self, output_data: dict[str, Any]) -> Trace:
+    def _create_output_trace(self, output_data: JsonType) -> Trace:
         """
         Create the final output trace.
 
@@ -157,13 +158,13 @@ class MappingEngine:
             self.logger.exception(
                 "Output format validation failed", e, self.log_context
             )
-            raise OutputTraceToModelException(f"Output format validation failed") from e
+            raise OutputTraceToModelException("Output format validation failed") from e
         except TypeError as e:
             self.logger.exception(
                 "Invalid data type in output trace", e, self.log_context
             )
             raise OutputTraceToModelException(
-                f"Invalid data type in output trace"
+                "Invalid data type in output trace"
             ) from e
         except Exception as e:
             self.logger.exception(
@@ -172,7 +173,7 @@ class MappingEngine:
                 self.log_context,
             )
             raise OutputTraceToModelException(
-                f"Output trace does not match the specified output format"
+                "Output trace does not match the specified output format"
             ) from e
 
         self.logger.info("Mapping done", self.log_context)
@@ -222,16 +223,18 @@ class MappingEngine:
         :return: List of FinalMappingModel instances
         """
         if output_model.profile:
+            self.log_context = {**self.log_context, "profile": self.profile}
+            if self.profile is not None:
+                self.logger.warning("A profile already exists", self.log_context)
             self.profile = output_model.profile
-            self.logger.info(
-                "Profile found", {**self.log_context, "profile": self.profile}
-            )
+            self.logger.info("Profile found", self.log_context)
 
         if output_model.switch:
             return self._apply_switch_transformation(
                 switch_value=output_model.switch, arguments=arguments
             )
-        elif output_model.multiple:
+
+        if output_model.multiple:
             results = []
             for sub_output in output_model.multiple:
                 sub_results = self._handle_output(
@@ -239,7 +242,8 @@ class MappingEngine:
                 )
                 results.extend(sub_results)
             return results
-        elif output_model.value:
+
+        if output_model.value:
             value = output_model.value
         elif output_model.custom:
             value = self._apply_custom_transformation(
@@ -273,7 +277,7 @@ class MappingEngine:
                 self.logger.exception(
                     "Error in custom transformation", e, self.log_context
                 )
-                raise CodeEvaluationException(f"Error in custom transformation") from e
+                raise CodeEvaluationException("Error in custom transformation") from e
         return arguments
 
     @staticmethod
@@ -291,7 +295,7 @@ class MappingEngine:
 
     def _apply_switch_transformation(
         self,
-        switch_value: List[ConditionOutputMappingModel],
+        switch_value: list[ConditionOutputMappingModel],
         arguments: list[Any] | None = None,
     ) -> list[FinalMappingModel]:
         """
@@ -306,27 +310,26 @@ class MappingEngine:
         list_response = []
 
         for condition in switch_value:
-            if str(condition.condition).lower().strip() != DEFAULT_CONDITION:
-                try:
-                    lambda_condition = self._eval(condition.condition)
-                    if lambda_condition(*arguments):
-                        list_response.extend(
-                            self._handle_output(
-                                output_model=condition, arguments=arguments
-                            )
-                        )
-                        return list_response
-                except TypeError as e:
-                    self.logger.exception(
-                        "Error in lambda condition",
-                        e,
-                        {"condition": condition.condition},
-                    )
-                    raise CodeEvaluationException("Error in lambda condition") from e
-            else:
+            if str(condition.condition).lower().strip() == DEFAULT_CONDITION:
                 list_response.extend(
                     self._handle_output(output_model=condition, arguments=arguments)
                 )
                 return list_response
+
+            try:
+                lambda_condition = self._eval(condition.condition)
+                if callable(lambda_condition) and lambda_condition(*arguments):
+                    list_response.extend(
+                        self._handle_output(output_model=condition, arguments=arguments)
+                    )
+                    return list_response
+            except TypeError as e:
+                self.logger.exception(
+                    "Error in lambda condition",
+                    e,
+                    {**self.log_context, "condition": condition.condition},
+                )
+                raise CodeEvaluationException("Error in lambda condition") from e
+
         list_response.append(FinalMappingModel(output_field=None, value=None))
         return list_response

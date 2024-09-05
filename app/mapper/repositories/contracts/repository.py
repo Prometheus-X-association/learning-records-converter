@@ -26,4 +26,4 @@ class MappingRepository(ABC):
         :return: The loaded mapping schema
         """
 
-        ...
+        raise NotImplementedError

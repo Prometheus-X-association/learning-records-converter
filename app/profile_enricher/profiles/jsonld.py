@@ -13,7 +13,7 @@ import re
 from abc import ABC
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Dict, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
 from pydantic import (AnyUrl, BaseModel, Field, ValidationInfo, field_validator,
                       model_validator)
@@ -214,10 +214,10 @@ class Extension(ProfileElement):
         """
         Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types.
         """
-        if value is not None and info.data.get("type") not in [
+        if value is not None and info.data.get("type") not in {
             ExtensionTypeEnum.CONTEXT,
             ExtensionTypeEnum.RESULT,
-        ]:
+        }:
             raise ValueError(
                 "recommendedVerbs is only allowed on a ContextExtension or a ResultExtension"
             )
@@ -272,7 +272,7 @@ class ActivityDefinition(BaseModel):
     name: Optional[LanguageMap] = None
     description: Optional[LanguageMap] = None
     moreInfo: Optional[AnyUrl] = None
-    extensions: Optional[Dict[AnyUrl, Any]] = None
+    extensions: Optional[dict[AnyUrl, Any]] = None
 
 
 class Activity(BaseModel):

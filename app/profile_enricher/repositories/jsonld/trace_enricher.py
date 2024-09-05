@@ -68,7 +68,7 @@ class TraceEnricher:
         for rule in template.rules:
             if (
                 rule.presence
-                in [PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED]
+                in {PresenceTypeEnum.RECOMMENDED, PresenceTypeEnum.INCLUDED}
                 and rule.location
                 and not JSONPathUtils.path_exists(path=rule.location, data=trace.data)
             ):

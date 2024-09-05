@@ -19,7 +19,7 @@ class ProfileRepository(ABC):
         :param template_name: The template name within the profile
         :param trace: The original trace to enrich
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def validate_trace(
@@ -33,7 +33,7 @@ class ProfileRepository(ABC):
         :param trace: The trace to validate
         :return: A list of ValidationError objects. An empty list indicates a valid trace
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def get_recommendations(
@@ -47,4 +47,4 @@ class ProfileRepository(ABC):
         :param trace: The trace data to generate recommendations for
         :return: A list of ValidationRecommendation objects
         """
-        ...
+        raise NotImplementedError

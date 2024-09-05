@@ -1,15 +1,18 @@
-from typing import Any
-
 from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
 from app.common.models.trace import Trace
+from app.common.type.types import JsonType
 from app.profile_enricher.types import ValidationRecommendation
+
+DEFAULT_OUTPUT_FORMAT = CustomTraceFormatStrEnum.XAPI
 
 
 class InputTraceRequestModel(BaseModel):
-    input_trace: dict[str, Any]
-    input_format: CustomTraceFormatStrEnum = Field(
+    """Model for input trace request."""
+
+    input_trace: JsonType = Field(..., description="Input trace data")
+    input_format: CustomTraceFormatStrEnum | None = Field(
         default=None, description="Input trace format"
     )
 
@@ -31,12 +34,16 @@ class InputTraceRequestModel(BaseModel):
 
 # Transformation models
 class TransformInputTraceRequestModel(InputTraceRequestModel):
+    """Model for transform input trace request."""
+
     output_format: CustomTraceFormatStrEnum = Field(
-        default=CustomTraceFormatStrEnum.XAPI, description="Output trace format"
+        default=DEFAULT_OUTPUT_FORMAT, description="Output trace format"
     )
 
 
 class TransformInputTraceResponseMetaModel(BaseModel):
+    """Model for transform input trace response metadata."""
+
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
     recommendations: list[ValidationRecommendation] = Field(
         default_factory=list,
@@ -45,7 +52,9 @@ class TransformInputTraceResponseMetaModel(BaseModel):
 
 
 class TransformInputTraceResponseModel(BaseModel):
-    output_trace: dict[str, Any] = Field(
+    """Model for transform input trace response."""
+
+    output_trace: JsonType = Field(
         description="Transformed output trace in JSON format"
     )
     meta: TransformInputTraceResponseMetaModel
@@ -53,8 +62,10 @@ class TransformInputTraceResponseModel(BaseModel):
 
 # Validation models
 class ValidateInputTraceRequestModel(InputTraceRequestModel):
-    pass
+    """Model for validate input trace request."""
 
 
 class ValidateInputTraceResponseModel(BaseModel):
+    """Model for validate input trace response."""
+
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format.")

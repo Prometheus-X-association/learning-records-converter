@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, Union, overload
+from typing import Any, overload
 
 import yaml
 
@@ -7,45 +7,44 @@ from .utils_general import is_empty
 
 
 @overload
-def remove_empty_elements(dictionnary: list) -> list: ...
+def remove_empty_elements(dictionary: list) -> list: ...
 
 
 @overload
-def remove_empty_elements(dictionnary: dict) -> dict: ...
+def remove_empty_elements(dictionary: dict) -> dict: ...
 
 
-def remove_empty_elements(dictionnary: Union[list, dict]) -> Union[list, dict]:
+def remove_empty_elements(dictionary: list | dict) -> list | dict:
     """Remove empty fields
 
     Args:
-        dictionnary : dictionnary to remove empty fields
+        dictionary : dictionary to remove empty fields
 
     Returns:
         dictionnary with removed fields
     """
-    if not isinstance(dictionnary, (dict, list)):
-        return dictionnary
-    elif isinstance(dictionnary, list):
+    if not isinstance(dictionary, (dict, list)):
+        return dictionary
+    elif isinstance(dictionary, list):
         return [
             value
-            for value in (remove_empty_elements(value) for value in dictionnary)
+            for value in (remove_empty_elements(value) for value in dictionary)
             if not is_empty(value)
         ]
     else:
         return {
             key: value
             for key, value in (
-                (key, remove_empty_elements(value))
-                for key, value in dictionnary.items()
+                (key, remove_empty_elements(value)) for key, value in dictionary.items()
             )
             if not is_empty(value)
         }
 
 
 def get_value_from_flat_key(
-    dict_element: Union[dict, list], flat_key: str, default_value=None, return_copy=True
+    dict_element: dict | list, flat_key: str, default_value=None, return_copy=True
 ) -> Any:
-    """Get value from a dict element by using a flatten key (keys seperated with dotes)
+    """Get value from a dict element by using a flatten key (keys separated with dotes)
     If the value exists (even if it's empty), the method returns the value.
     Else, the 'default_value' is returned
 
@@ -98,11 +97,11 @@ def set_value_from_flat_key(
 
 
 def set_value_from_flat_key(
-    dict_list_element: Union[dict, list],
+    dict_list_element: dict | list,
     flat_key: str,
     value: Any,
     overwrite: bool = True,
-) -> Union[dict, list]:
+) -> dict | list:
     """
     Set recursively a value into a dict element by using a flatten key (keys separated with dotes).
     Integer (numeric) are considered as list indexes.
@@ -155,7 +154,7 @@ def set_value_from_flat_key(
             # If all indexes not there, create them
             if len(dict_list_element) - 1 < index:
                 dict_list_element.extend(
-                    [None for i in range(len(dict_list_element), index + 1)]
+                    [None for _ in range(len(dict_list_element), index + 1)]
                 )
 
             try:
@@ -202,13 +201,13 @@ def set_value_from_flat_key(
 
 
 def get_nested_from_flat(
-    flat_field: Dict[str, Any], nested_field: Union[dict, list, None] = None
-) -> Union[dict, list]:
+    flat_field: dict[str, Any], nested_field: dict | list | None = None
+) -> dict | list:
     """Generate nested json from a flatten json
 
     Args:
         flat_field (dict):
-            Flatten dict. int values (0, 1, 2) are concidered list indexes
+            Flatten dict. int values (0, 1, 2) are considered list indexes
             Example: {'url.main': '', 'url.secondary': ''}
         nested_field (dict, optional):
             If a nested dict already exists, you might want to update it directly.
@@ -251,7 +250,7 @@ def get_nested_from_flat(
 
 def convert_yaml_file_to_json(yaml_path: str) -> dict:
     """Convert a YAML file into a dict.
-    The path to the YAML file is passed to the function and is loaded afterwards
+    The path to the YAML file is passed to the function and is loaded afterward
 
     Args:
         yaml_path (str): File path to YAML file

@@ -16,7 +16,7 @@ class LoggerContract(ABC):
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def info(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
@@ -26,7 +26,7 @@ class LoggerContract(ABC):
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def warning(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
@@ -36,7 +36,7 @@ class LoggerContract(ABC):
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def error(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
@@ -46,7 +46,7 @@ class LoggerContract(ABC):
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def critical(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
@@ -56,7 +56,7 @@ class LoggerContract(ABC):
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     def exception(
@@ -69,4 +69,4 @@ class LoggerContract(ABC):
         :param exc: The exception object
         :param context: Additional contextual information to include with the log.
         """
-        ...
+        raise NotImplementedError

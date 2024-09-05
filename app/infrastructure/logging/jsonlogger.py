@@ -65,35 +65,29 @@ class JsonLogger(LoggerContract):
         self._logger.log(level=level, msg=message, extra=extra)
 
     def debug(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerPort.debug"""
+        """Inherited from LoggerContract.debug"""
         self._log(level=logging.DEBUG, message=message, context=context)
 
     def info(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerPort.info"""
+        """Inherited from LoggerContract.info"""
         self._log(level=logging.INFO, message=message, context=context)
 
     def warning(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerPort.warning"""
+        """Inherited from LoggerContract.warning"""
         self._log(level=logging.WARNING, message=message, context=context)
 
     def error(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerPort.error"""
+        """Inherited from LoggerContract.error"""
         self._log(level=logging.ERROR, message=message, context=context)
 
     def critical(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerPort.critical"""
+        """Inherited from LoggerContract.critical"""
         self._log(level=logging.CRITICAL, message=message, context=context)
 
     def exception(
         self, message: str, exc: Exception, context: Optional[dict[str, Any]] = None
     ) -> None:
-        """
-        Log an exception with its full traceback.
-
-        :param message: A descriptive message about the exception
-        :param exc: The exception object
-        :param context: Additional contextual information
-        """
+        """Inherited from LoggerContract.exception"""
         exc_context = {
             "exception_type": type(exc).__name__,
             "exception_message": str(exc),

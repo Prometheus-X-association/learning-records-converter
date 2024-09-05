@@ -3,13 +3,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.exceptions import (BadRequestError, ForbiddenError, InternalServerError,
-                                NotFoundElementError)
-from app.api.schemas import (TransformInputTraceRequestModel,
-                             TransformInputTraceResponseMetaModel,
-                             TransformInputTraceResponseModel,
-                             ValidateInputTraceRequestModel,
-                             ValidateInputTraceResponseModel)
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
@@ -20,15 +13,29 @@ from app.profile_enricher.profiler import Profiler
 from app.profile_enricher.repositories.jsonld.jsonld_repository import \
     JsonLdProfileRepository
 
+from .exceptions import (BadRequestError, ForbiddenError, InternalServerError,
+                         NotFoundElementError)
+from .schemas import (TransformInputTraceRequestModel,
+                      TransformInputTraceResponseMetaModel,
+                      TransformInputTraceResponseModel, ValidateInputTraceRequestModel,
+                      ValidateInputTraceResponseModel)
+
 
 class LRCAPIRouter:
     def __init__(self, config: ConfigContract, logger: LoggerContract):
+        """
+        Initialize the LRCAPIRouter.
+
+        :param config: Configuration contract implementation
+        :param logger: Logger contract implementation
+        """
         self.config = config
         self.logger = logger
         self.router = APIRouter()
         self.setup_routes()
 
     def setup_routes(self):
+        """Set up the LRC API routes."""
         self.router.add_api_route(
             "/validate",
             self.validate_input_trace,
@@ -56,6 +63,24 @@ class LRCAPIRouter:
         """
         Validate or identify a trace.
 
+        ---
+        post:
+          summary: Validate input trace
+          description: Validate an input trace and identify its format.
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema: ValidateInputTraceRequestModel
+          responses:
+            200:
+              description: Successfully validated trace
+              content:
+                application/json:
+                  schema: ValidateInputTraceResponseModel
+            400:
+              description: Bad request, input format does not match the trace
+
         :param query: The request query model
         :return: The response model indicating the validated input format
         :raises BadRequestError: If the input format does not match the trace
@@ -72,8 +97,29 @@ class LRCAPIRouter:
         """
         Transform and enrich a trace from one format to another.
 
+        ---
+        post:
+          summary: Transform input trace
+          description: Transform an input trace into a specific output format and enrich it with profile data if available.
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema: TransformInputTraceRequestModel
+          responses:
+            200:
+              description: Successfully transformed trace
+              content:
+                application/json:
+                  schema: TransformInputTraceResponseModel
+            400:
+              description: Bad request, invalid input trace or format
+            500:
+              description: Internal server error, transformation failed
+
         :param query: The request query model
         :return: The response model containing the transformed trace
+        :raises ValueError: If the trace does not match the profile
         """
         self.logger.info(
             "Convert endpoint called", {"input_format": query.input_format}
@@ -175,7 +221,7 @@ def create_app() -> FastAPI:
             exc_type, (500, "Internal Server Error")
         )
 
-        if status_code == 500 and exc_type not in (TypeError, InternalServerError):
+        if status_code == 500 and exc_type not in {TypeError, InternalServerError}:
             message = "Something went wrong, please contact our support."
         else:
             message = "; ".join(exc.args) if exc.args else str(exc)

@@ -3,9 +3,9 @@ from typing import Any, Callable
 
 
 class CaseInsensitiveStrEnum(Enum):
-    """Case insensitive when looking for value in enum"""
+    """Case-insensitive when looking for value in enum"""
 
-    # Case insensitive
+    # Case-insensitive
     @classmethod
     def _missing_(cls, value) -> "CaseInsensitiveStrEnum | None":
         for member in cls:
@@ -35,7 +35,7 @@ def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], 
 
 
 def str_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
-    """Transform a Enum into a StrEnum
+    """Transform an Enum into a StrEnum
     This decorator transforms the list of enums to get all ENUM_KEY = 'enum_key' in one StrEnum.
 
     Args:

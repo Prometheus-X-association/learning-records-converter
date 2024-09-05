@@ -37,7 +37,7 @@ class TraceValidator:
         validation_results = self._apply_rules(
             template=template,
             trace=trace,
-            rule_types=[PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED],
+            rule_types={PresenceTypeEnum.INCLUDED, PresenceTypeEnum.EXCLUDED},
         )
         if not validation_results:
             self.logger.debug("Trace validated successfully", log_context)
@@ -62,7 +62,7 @@ class TraceValidator:
         self.logger.debug("Start trace recommendations", log_context)
 
         validation_results = self._apply_rules(
-            template=template, trace=trace, rule_types=[PresenceTypeEnum.RECOMMENDED]
+            template=template, trace=trace, rule_types={PresenceTypeEnum.RECOMMENDED}
         )
 
         if not validation_results:
@@ -76,7 +76,7 @@ class TraceValidator:
         self,
         template: StatementTemplate,
         trace: Trace,
-        rule_types: list[PresenceTypeEnum],
+        rule_types: set[PresenceTypeEnum],
     ) -> list[ValidationResult]:
         """
         Apply validation rules to a trace based on a given template and rule types.
@@ -106,7 +106,7 @@ class TraceValidator:
         self,
         rule: StatementTemplateRule,
         values: list[Any],
-        rule_types: list[PresenceTypeEnum],
+        rule_types: set[PresenceTypeEnum],
     ) -> list[ValidationResult]:
         """
         Check if a trace follows a specific rule.
@@ -124,7 +124,7 @@ class TraceValidator:
 
         # Check the "included", "excluded" and "recommended" rules
         if (
-            rule.presence in [PresenceTypeEnum.INCLUDED, PresenceTypeEnum.RECOMMENDED]
+            rule.presence in {PresenceTypeEnum.INCLUDED, PresenceTypeEnum.RECOMMENDED}
             and not values
         ):
             self.logger.debug("Found rule presence validation", log_context)
