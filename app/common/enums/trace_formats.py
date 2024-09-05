@@ -26,7 +26,7 @@ class TraceFormatToXapiMappingEnum(TraceFormatEnum):
     """Enumeration for mapping files from various formats to xAPI."""
 
     SCORM_2004 = "data/mappers/mapping_scorm2004_to_xapi.yml"
-    XAPI = ""
+    XAPI = "data/mappers/mapping_xapi_to_xapi.yml"
     IMSCALIPER1_2 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
     IMSCALIPER1_1 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
 
