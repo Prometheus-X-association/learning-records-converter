@@ -1,6 +1,5 @@
-from enums import CustomTraceFormatModelEnum
+from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 
-from app.common.enums import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
 
 from .mapping_engine import MappingEngine

@@ -1,7 +1,6 @@
 from typing import Any, Optional
 
-from enums.custom_trace_format import (CustomTraceFormatModelEnum,
-                                       CustomTraceFormatStrEnum)
+from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import BaseModel, ValidationError
 from pydantic.v1 import ValidationError as V1ValidationError
 

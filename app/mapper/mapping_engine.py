@@ -1,15 +1,16 @@
 from typing import Any, Callable, List
 
+from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from utils.utils_dict import (get_value_from_flat_key, remove_empty_elements,
                               set_value_from_flat_key)
 
-from app.common.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
+
 # This import is used for the eval method :
-from app.mapper.available_functions.mapping_runnable_functions import *
-from app.mapper.mapping_models import FinalMappingModel
-from app.mapper.mapping_schema import (ConditionOutputMappingModel, MappingSchema,
-                                       OutputMappingModel)
+from .available_functions.mapping_runnable_functions import *
+from .models.mapping_models import FinalMappingModel
+from .models.mapping_schema import (ConditionOutputMappingModel, MappingSchema,
+                                    OutputMappingModel)
 
 
 class MappingException(Exception):

@@ -1,6 +1,6 @@
 from typing import Any
 
-from enums.custom_trace_format import CustomTraceFormatStrEnum
+from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
 from app.common.models.trace import Trace

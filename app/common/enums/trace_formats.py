@@ -1,9 +1,12 @@
+"""
+CAUTION : DO NOT MODIFY.
+Use app/common/custom_trace_format if you need to add additional mapping formats
+"""
+
 from enum import Enum
 
-from app.common.trace_formats.models import (BaseXapiStatement,
-                                             IMSCaliperSensorModel1_1,
-                                             IMSCaliperSensorModel1_2,
-                                             SCORM2004DataModel)
+from models.trace_formats import (BaseXapiStatement, IMSCaliperSensorModel1_1,
+                                         IMSCaliperSensorModel1_2, SCORM2004DataModel)
 
 
 class TraceFormatEnum(Enum):

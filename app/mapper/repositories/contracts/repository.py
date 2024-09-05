@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from app.common.enums.custom_trace_format import CustomTraceFormatStrEnum
-from app.mapper.mapping_schema import MappingSchema
+from extensions.enums import CustomTraceFormatStrEnum
+
+from app.mapper.models.mapping_schema import MappingSchema
 
 
 class MappingRepository(ABC):

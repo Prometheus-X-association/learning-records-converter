@@ -1,3 +1,2 @@
-from enums.custom_trace_format import (CustomTraceFormatModelEnum,
-                                       CustomTraceFormatOutputMappingEnum,
-                                       CustomTraceFormatStrEnum)
+from enums.trace_formats import (TraceFormatEnum, TraceFormatModelEnum,
+                                 TraceFormatOutputMappingEnum)

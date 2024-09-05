@@ -11,7 +11,7 @@ from uuid import UUID
 
 from pydantic.v1 import AnyUrl, StrictStr, constr, validator
 
-from trace_formats.models.xapi.config import BaseModelWithConfig
+from ...config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
 

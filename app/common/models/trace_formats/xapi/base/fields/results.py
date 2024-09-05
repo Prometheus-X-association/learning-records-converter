@@ -6,7 +6,7 @@ from typing import Dict, Optional, Union
 
 from pydantic.v1 import StrictBool, StrictStr, conint, root_validator
 
-from trace_formats.models.xapi.config import BaseModelWithConfig
+from ...config import BaseModelWithConfig
 from .common import IRI
 
 

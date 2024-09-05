@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from trace_formats.models.xapi.config import BaseModelWithConfig
+from ...config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
 
