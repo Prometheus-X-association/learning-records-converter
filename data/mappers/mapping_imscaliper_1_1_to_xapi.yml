@@ -110,10 +110,10 @@ mappings:
       - "data.0.edApp"
     output_fields:
       switch:
-        - condition: "lambda iri, ed_app: isinstance(ed_app, str)"
+        - condition: "lambda ed_app: isinstance(ed_app, str)"
           output_field: "context.platform"
           custom:
-            - "lambda iri, ed_app: ed_app"
+            - "lambda ed_app: ed_app"
 
 
   # Mapping generated and result

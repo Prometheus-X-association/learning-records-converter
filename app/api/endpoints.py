@@ -83,6 +83,7 @@ class LRCAPIRouter:
 
         mapper = Mapper(
             repository=YamlMappingRepository(logger=self.logger),
+            logger=self.logger,
         )
 
         # Convert

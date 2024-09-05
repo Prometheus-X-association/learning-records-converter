@@ -1,23 +1,20 @@
 from typing import Any, Callable, List
 
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
+from pydantic import ValidationError
 from utils.utils_dict import (get_value_from_flat_key, remove_empty_elements,
                               set_value_from_flat_key)
 
 from app.common.models.trace import Trace
+from app.infrastructure.logging.contract import LoggerContract
 
 # This import is used for the eval method :
 from .available_functions.mapping_runnable_functions import *
+from .exceptions import (CodeEvaluationException, InputTraceToModelException,
+                         MapperException, OutputTraceToModelException)
 from .models.mapping_models import FinalMappingModel
 from .models.mapping_schema import (ConditionOutputMappingModel, MappingSchema,
                                     OutputMappingModel)
-
-
-class MappingException(Exception):
-    """Base exception for mapping errors."""
-
-    pass
-
 
 DEFAULT_CONDITION = "default"
 
@@ -32,17 +29,24 @@ class MappingEngine:
         input_format: CustomTraceFormatModelEnum,
         mapping_to_apply: MappingSchema,
         output_format: CustomTraceFormatModelEnum,
+        logger: LoggerContract,
     ):
         """
-        Initialize the MappingInput.
+        Initialize the MappingEngine.
 
         :param input_format: The input format of the trace
         :param mapping_to_apply: The mapping configuration to apply
         :param output_format: The desired output format
+        :param logger: LoggerContract implementation for logging
         """
         self.input_format = input_format
         self.output_format = output_format
         self.mapping_to_apply = mapping_to_apply
+        self.logger = logger
+        self.log_context = {
+            "input_format": self.input_format.name,
+            "output_format": self.output_format.name,
+        }
         self.profile = None
 
     def run(self, input_trace: Trace) -> Trace:
@@ -62,20 +66,35 @@ class MappingEngine:
         Validate the input trace and configuration.
 
         :param input_trace: The input trace to map
-        :raises MappingException: If validation fails
+        :raises MapperException: If validation fails
         """
         if not all([self.input_format, self.output_format, self.mapping_to_apply]):
-            raise MappingException(
+            self.logger.error("Incomplete mapping informations", self.log_context)
+            raise MapperException(
                 "Input format, output format, and mapping configuration must be specified"
             )
 
         # Check if input_trace match input_format (model validation)
         try:
             self.input_format.value(**input_trace.data)
-        except Exception as e:
-            raise MappingException(
-                f"Input trace does not match the specified input format: {e}"
+        except ValidationError as e:
+            self.logger.exception("Input format validation failed", e, self.log_context)
+            raise InputTraceToModelException(f"Input format validation failed") from e
+        except TypeError as e:
+            self.logger.exception(
+                "Invalid data type in input trace", e, self.log_context
             )
+            raise InputTraceToModelException(f"Invalid data type in input trace") from e
+        except Exception as e:
+            self.logger.exception(
+                "Input trace does not match the specified input format",
+                e,
+                self.log_context,
+            )
+            raise InputTraceToModelException(
+                f"Input trace does not match the specified input format"
+            ) from e
+        self.logger.debug("Input trace is valid against his format", self.log_context)
 
     def _apply_mapping(self, input_data: dict[str, Any]) -> dict[str, Any]:
         """
@@ -116,6 +135,7 @@ class MappingEngine:
         :param output_trace: The output trace to apply default values to
         :return: The output trace with default values applied
         """
+        self.logger.debug("Apply mapping default values", self.log_context)
         for default_value in self.mapping_to_apply.default_values:
             output_trace = self._build_trace_with_output(
                 output_content=default_value, output_trace=output_trace, overwrite=False
@@ -128,14 +148,34 @@ class MappingEngine:
 
         :param output_data: The output data to create the trace from
         :return: The final output trace
-        :raises MappingException: If the output trace does not match the specified output format
+        :raises MapperException: If the output trace does not match the specified output format
         """
+        self.logger.debug("Create output trace", self.log_context)
         try:
             self.output_format.value(**output_data)
-        except Exception as e:
-            raise MappingException(
-                f"Output trace does not match the specified output format: {e}"
+        except ValidationError as e:
+            self.logger.exception(
+                "Output format validation failed", e, self.log_context
             )
+            raise OutputTraceToModelException(f"Output format validation failed") from e
+        except TypeError as e:
+            self.logger.exception(
+                "Invalid data type in output trace", e, self.log_context
+            )
+            raise OutputTraceToModelException(
+                f"Invalid data type in output trace"
+            ) from e
+        except Exception as e:
+            self.logger.exception(
+                "Output trace does not match the specified output format",
+                e,
+                self.log_context,
+            )
+            raise OutputTraceToModelException(
+                f"Output trace does not match the specified output format"
+            ) from e
+
+        self.logger.info("Mapping done", self.log_context)
         return Trace(
             data=output_data,
             format=CustomTraceFormatStrEnum(self.output_format.name),
@@ -183,6 +223,9 @@ class MappingEngine:
         """
         if output_model.profile:
             self.profile = output_model.profile
+            self.logger.info(
+                "Profile found", {**self.log_context, "profile": self.profile}
+            )
 
         if output_model.switch:
             return self._apply_switch_transformation(
@@ -216,7 +259,7 @@ class MappingEngine:
         :param custom_input: List of custom transformation strings
         :param arguments: Input arguments for the transformations
         :return: The result of applying all transformations
-        :raises MappingException: If there's an error in the custom transformation
+        :raises MapperException: If there's an error in the custom transformation
         """
         for custom_code in custom_input:
             try:
@@ -227,7 +270,10 @@ class MappingEngine:
                     else transformation
                 )
             except Exception as e:
-                raise MappingException(f"Error in custom transformation: {e}")
+                self.logger.exception(
+                    "Error in custom transformation", e, self.log_context
+                )
+                raise CodeEvaluationException(f"Error in custom transformation") from e
         return arguments
 
     @staticmethod
@@ -261,8 +307,8 @@ class MappingEngine:
 
         for condition in switch_value:
             if str(condition.condition).lower().strip() != DEFAULT_CONDITION:
-                lambda_condition = self._eval(condition.condition)
                 try:
+                    lambda_condition = self._eval(condition.condition)
                     if lambda_condition(*arguments):
                         list_response.extend(
                             self._handle_output(
@@ -271,7 +317,12 @@ class MappingEngine:
                         )
                         return list_response
                 except TypeError as e:
-                    print("Condition unvalid")
+                    self.logger.exception(
+                        "Error in lambda condition",
+                        e,
+                        {"condition": condition.condition},
+                    )
+                    raise CodeEvaluationException("Error in lambda condition") from e
             else:
                 list_response.extend(
                     self._handle_output(output_model=condition, arguments=arguments)

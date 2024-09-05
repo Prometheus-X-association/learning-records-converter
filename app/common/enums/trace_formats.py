@@ -6,7 +6,7 @@ Use app/common/custom_trace_format if you need to add additional mapping formats
 from enum import Enum
 
 from models.trace_formats import (BaseXapiStatement, IMSCaliperSensorModel1_1,
-                                         IMSCaliperSensorModel1_2, SCORM2004DataModel)
+                                  IMSCaliperSensorModel1_2, SCORM2004DataModel)
 
 
 class TraceFormatEnum(Enum):

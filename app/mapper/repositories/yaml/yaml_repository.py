@@ -93,8 +93,9 @@ class YamlMappingRepository(MappingRepository):
             self.logger.error("Mapping model not found", log_context)
             raise ValueError("Could not load mapping config into model")
 
-        log_context.update({"mapping_path": mapping_path})
-        self.logger.debug("Mapping path found", log_context)
+        self.logger.debug(
+            "Mapping path found", {**log_context, "mapping_path": mapping_path}
+        )
 
         return Path(mapping_path)
 

@@ -151,8 +151,10 @@ class TraceValidator:
         for check_type, check_method in self.rule_checks.items():
             rule_values = getattr(rule, check_type)
             if rule_values and not check_method(rule_values, values):
-                log_context.update({"type": check_type})
-                self.logger.debug("Found rule presence validation", log_context)
+                self.logger.debug(
+                    "Found rule presence validation",
+                    {**log_context, "type": check_type},
+                )
 
                 validation_results.append(
                     ValidationResult(
