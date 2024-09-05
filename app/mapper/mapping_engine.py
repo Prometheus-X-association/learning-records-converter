@@ -104,7 +104,12 @@ class MappingEngine:
         :param input_data: The prepared input data
         :return: The mapped output trace
         """
-        output_trace = {}
+        # We start from the input trace if the formats are the same
+        if self.input_format == self.output_format:
+            output_trace = input_data
+        else:
+            output_trace = {}
+
         for mapping in self.mapping_to_apply.mappings:
             input_values = []
             for input_field in mapping.input_fields:
