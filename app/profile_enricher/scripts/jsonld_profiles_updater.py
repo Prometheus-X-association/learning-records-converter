@@ -85,6 +85,7 @@ def main(destination_dir: str | None = None) -> None:
     env_config = EnvConfig()
 
     json_logger = JsonLogger(name=__name__, level=env_config.get_log_level())
+    json_logger.info("Script starting", {"destination_dir": destination_dir})
 
     if destination_dir is None:
         try:
