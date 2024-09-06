@@ -4,7 +4,7 @@
 
 Learning Records are available in many formats, either standardized (xAPI, SCORM, IMS Caliper, cmi5) or proprietary (Google Classroom, MS Teams, csv, etc). This wide variety of formats is a barrier to many use cases of learning records as it prevents the easy combination and sharing of learning records datasets from multiple sources or organizations.
 
-As a result, Inokufu was tasked, within the Prometheus-X ecosystem, to develop a **Learning Records Converter** which is a parser translating datasets of learning traces according to a common xAPI profile.
+As a result, Inokufu was tasked, within the Prometheus-X ecosystem, to develop a **Learning Records Converter** which is a parser translating datasets of learning traces according to common xAPI profiles.
 
 ## Approach
 
@@ -265,12 +265,10 @@ Please note this project is work in progress.
 * [x] Quantitative inventory of the main software learning outcomes standards and tools used in the field of education and training in France and in Europe from the list identified in the working groups of the Data space Education & Skills (i.e. SCORM, xAPI, cmi5, IMS Caliper)
 * [x] Definition of the architecture of the API endpoints in accordance with the technical recommendations of GAIA-X
 * [x] Development of the endpoints necessary for parsing the various priority standards identified above
-* [ ] Integration of anonymization/pseudonymization features expression of data in JSON-LD format to ensure interoperability with other data spaces
 * [ ] API testing with model datasets provided by Prometheus volunteer partners
-* [ ] De-anonymization tests of learning traces (in connection with the task Anonymization and Pseudonymization)
 * [ ] Deployment of the service in a managed version in one of the partner cloud providers
 * [ ] Development of automated service deployment scripts for multi-cloud use (infrastructure as code e.g. Terraform) at partner cloud providers
-* [ ] Drafting of the public documentation, hosting and putting it online
+* [ ] Drafting of the final public documentation
 
 
 ## Interoperability of Learning Records: State-of-the-Art in 2023
