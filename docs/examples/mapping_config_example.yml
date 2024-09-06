@@ -1,106 +1,77 @@
 version: 1.0
-input_format: "SCORM"
+input_format: "IMS Caliper"
 output_format: "xAPI"
 mappings:
-  # Single input + Mulitple output
-  - input_fields: 
-    - "scorm.actor.value"
-    output_fields:
-      description: "Can map multiple fields"
-      multiple:
-        # Direct mapping
-        - description: ""
-          output_field: "xapi.actor.type"
-        # Switch tranformation
-        - switch:
-            - description: "No output needed because already passed before."
-              condition: "lambda val: is_empty(val)"
-              # Value tranformation
-              output_field: "xapi.actor.empty_val"
-              value: "anything"
-            - condition: "lambda val: not is_empty(val) and val >= 0"
-              output_field: "xapi.actor.positive"
-            - condition: "lambda val: not is_empty(val) and val < 0"
-              output_field: "xapi.actor.negative"
-              custom:
-                - "lambda val: -1 * val"
-                - "lambda val: str(val) + ' is now an absolute number'"
-            - condition: "default"
-              multiple:
-                - output_field: "xapi.actor.default.str"
-                  value: "default"
-                - output_field: "xapi.actor.value.int"
-                  value: 0
-  # Single input + Single output
-  - input_fields: 
-    - "scorm.object.value"
-    output_fields:
-      output_field: "xapi.object.value"
-  # Multiple input + Single output
+  # Mapping object information
   - input_fields:
-    - "scorm.author.firstname"
-    - "scorm.author.lastname"
-    - "scorm.author.age"
+      - "data.0.object.id"
     output_fields:
-      output_field: "xapi.author.description"
+      output_field: "object.id"
+
+  # ID
+  - input_fields:
+      - "data.0.id"
+    output_fields:
+      output_field: "id"
       custom:
-        - "lambda fn, ln, age: f'My name is {fn if fn else None} {ln.upper() if ln else None}, I am {age if age else None} years old.' if fn or ln or age else None"
-  # Multiple input + Multiple output
+        - "lambda id: str(id).split(':')[-1] if id else None"
+
+  # Mapping actor information
   - input_fields:
-    - "scorm.context.where"
-    - "scorm.context.why"
+      - "data.0.actor.id"
     output_fields:
-      multiple: 
-        - output_field: "xapi.context.full_content" 
-        - output_field: "xapi.context.description"
+      multiple:
+        - output_field: "actor.account.homePage"
           custom:
-            - "lambda where, why: f'{where} {why}' if where and why else ''"
-            - "lambda description: (description.lower(), description.upper())"
-            - "lambda l, u: f'{l} {u}' if l and u else ''"
-            - "lambda description: description.split(' ')"
-            - "lambda list_split: f'{' '.join(list_split)} - length of {len(list_split)}' if remove_empty_elements(list_split) else None"
+            - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
+        - output_field: "actor.account.name"
+          custom:
+            - "lambda url: (match.group(1) if (match := search(r'/users/(\\d+)', url)) else url)"
+
+  # Mapping generated and result
+  - input_fields:
+      - "data.0.generated"
+    output_fields:
+      switch:
+        - condition: "lambda generated: generated.get('type', '') == 'Result' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('resultScore', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxResultScore', None)"
+        - condition: "lambda generated: generated.get('type', '') == 'Score' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('scoreGiven', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxScore', None)"
+
+  # DASES Profiles
+  - input_fields:
+      - "data.0.type"
+      - "data.0.action"
+      - "data.0.object.type"
+    output_fields:
+      switch:
+        # lms_accessed_page
+        - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
+          profile: "lms.accessed-page"
+
+        # lms_downloaded_audio
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
+          profile: "lms.downloaded-audio"
 
 default_values:
-  - description: ""
-    output_field: "xapi.default.dict"
-    # Value tranformation
-    value: {"a": "b", "empty": null, "list": ["a", "b", "c"]}
-  - description: ""
-    output_field: "xapi.default.list"
-    # Value tranformation
-    value: ["a", "b", "c"]
-  - description: ""
-    output_field: "xapi.default.int"
-    # Value tranformation
-    value: 0
-  - description: ""
-    output_field: "xapi.default.float"
-    # Value tranformation
-    value: 1.5
-  - description: ""
-    output_field: "xapi.default.str"
-    # Value tranformation
-    value: "string here"
-  - description: ""
-    output_field: "xapi.default.boolean"
-    # Value tranformation
-    value: false
-  - description: ""
-    output_field: "xapi.default.empty"
-    # Value tranformation
-    value: null
-  - description: ""
-    output_field: "xapi.context.full_content" 
-    # Value tranformation
-    value: "No full content in context provided"
-  - description: ""
-    output_field: "xapi.actor.type"
-    # Value tranformation
-    value: "No actor type provided"
+  - description: "Default xAPI version"
+    output_field: "version"
+    value: "1.0.0"
 
 metadata:
-  author: "Your Name"
-  # version: 1.0
+  author: "Inokufu"
   date:
-    publication: "2023-01-01"
-    update: "2023-02-01"
+    publication: "2024-04-24"
+    update: "2024-04-26"
