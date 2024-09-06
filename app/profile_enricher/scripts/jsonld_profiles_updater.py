@@ -85,7 +85,6 @@ def main(destination_dir: str | None = None) -> None:
     env_config = EnvConfig()
 
     json_logger = JsonLogger(name=__name__, level=env_config.get_log_level())
-    json_logger.info("Script starting", {"destination_dir": destination_dir})
 
     if destination_dir is None:
         try:
@@ -93,6 +92,8 @@ def main(destination_dir: str | None = None) -> None:
         except BasePathException as e:
             json_logger.exception("Failed to create or access profiles directory", e)
             raise
+
+    json_logger.info("Script starting", {"destination_dir": destination_dir})
 
     updater = JsonLdProfilesUpdater(
         destination_dir=destination_dir, logger=json_logger, config=env_config

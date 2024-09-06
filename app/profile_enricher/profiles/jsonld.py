@@ -13,7 +13,7 @@ import re
 from abc import ABC
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Dict, Literal, Optional
+from typing import Annotated, Any, Dict, Literal, Optional, Union, get_args, get_origin
 
 from pydantic import (AnyUrl, BaseModel, Field, ValidationInfo, field_validator,
                       model_validator)
@@ -23,6 +23,25 @@ PROFILE_CONTEXT_URL = "https://w3id.org/xapi/profiles/context"
 ACTIVITY_CONTEXT_URL = "https://w3id.org/xapi/profiles/activity-context"
 PROFILE_CONFORMS_TO_URL = "https://w3id.org/xapi/profiles#1.0"
 LOCATION_PATTERN = r"^[\$@]([.\[].*)?$"
+
+
+class CustomBaseModel(BaseModel):
+    @model_validator(mode="before")
+    def allow_empty_string_for_anyurl(cls, values):
+        for field_name, field_info in cls.model_fields.items():
+            field_type = field_info.annotation
+            field_alias = field_info.alias or field_name
+
+            # If the field is an Optional AnyUrl (= Union of AnyUrl and None)
+            if (
+                values.get(field_alias) == ""
+                and get_origin(field_type) is Union
+                and AnyUrl in get_args(field_type)
+                and type(None) in get_args(field_type)
+            ):
+                values[field_alias] = None
+
+        return values
 
 
 # Enums
@@ -108,7 +127,7 @@ class PatternTypeEnum(StrEnum):
 
 
 # Models
-class LanguageMap(BaseModel):
+class LanguageMap(CustomBaseModel):
     """
     A model representing a language map for multilingual labels and definitions.
     """
@@ -116,7 +135,7 @@ class LanguageMap(BaseModel):
     en: str
 
 
-class ProfileVersion(BaseModel):
+class ProfileVersion(CustomBaseModel):
     """
     A model representing a version of a profile.
     """
@@ -126,7 +145,7 @@ class ProfileVersion(BaseModel):
     generated_at_time: datetime = Field(..., alias="generatedAtTime")
 
 
-class Author(BaseModel):
+class Author(CustomBaseModel):
     """
     A model representing an author of a profile.
     """
@@ -190,7 +209,7 @@ class Extension(ProfileElement):
     recommended_verbs: Optional[list[AnyUrl]] = Field(None, alias="recommendedVerbs")
     context: Optional[AnyUrl] = None
     iri_schema: Optional[AnyUrl] = Field(None, alias="schema")
-    inline_schema: Optional[str] = Field(None, alias="inlineSchema")
+    inline_schema: Optional[str | dict] = Field(None, alias="inlineSchema")
 
     @field_validator("recommended_activity_types")
     @staticmethod
@@ -244,7 +263,7 @@ class DocumentResource(ProfileElement):
     content_type: str = Field(..., alias="contentType")
     context: Optional[AnyUrl] = None
     iri_schema: Optional[AnyUrl] = Field(None, alias="schema")
-    inline_schema: Optional[str] = Field(None, alias="inlineSchema")
+    inline_schema: Optional[str | dict] = Field(None, alias="inlineSchema")
 
     @model_validator(mode="after")
     def validate_schema_fields(self) -> "DocumentResource":
@@ -258,7 +277,7 @@ class DocumentResource(ProfileElement):
         return self
 
 
-class ActivityDefinition(BaseModel):
+class ActivityDefinition(CustomBaseModel):
     """
     A model defining the properties of an activity.
     """
@@ -273,7 +292,7 @@ class ActivityDefinition(BaseModel):
     extensions: Optional[Dict[AnyUrl, Any]] = None
 
 
-class Activity(BaseModel):
+class Activity(CustomBaseModel):
     """
     A model representing an activity in a profile.
     """
@@ -285,7 +304,7 @@ class Activity(BaseModel):
     deprecated: bool = Field(default=False)
 
 
-class StatementTemplateRule(BaseModel):
+class StatementTemplateRule(CustomBaseModel):
     """
     A model representing a rule for statement templates.
     """
@@ -468,7 +487,7 @@ class Pattern(ProfileElement):
         return self
 
 
-class Profile(BaseModel):
+class Profile(CustomBaseModel):
     """
     A model representing a profile in the system.
     """
