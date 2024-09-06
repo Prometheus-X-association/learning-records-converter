@@ -1,0 +1,21 @@
+{
+    "fake_xapi": {
+        "context": {
+            "full_content": "Additional Where",
+            "description": "additional where additional why ADDITIONAL WHERE ADDITIONAL WHY - length of 8"
+        },
+        "actor": {
+            "type": "No actor type provided",
+            "empty_val": "anything"
+        },
+        "default": {
+            "dict": {"a": "b", "empty": null, "list": ["a", "b", "c"]},
+            "list": ["a", "b", "c"],
+            "int": 0,
+            "float": 1.5,
+            "str": "string here",
+            "boolean": false,
+            "empty":  null
+        }
+    }
+}

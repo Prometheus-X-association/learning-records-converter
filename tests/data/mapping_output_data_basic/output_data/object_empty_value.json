@@ -1,0 +1,20 @@
+{
+    "fake_xapi": {
+        "context": {
+            "full_content": "No full content in context provided"
+        },
+        "actor": {
+            "type": "No actor type provided",
+            "empty_val": "anything"
+        },
+        "default": {
+            "dict": {"a": "b", "empty": null, "list": ["a", "b", "c"]},
+            "list": ["a", "b", "c"],
+            "int": 0,
+            "float": 1.5,
+            "str": "string here",
+            "boolean": false,
+            "empty":  null
+        }
+    }
+}

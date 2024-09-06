@@ -1,0 +1,502 @@
+version: 1.0
+input_format: "xAPI"
+output_format: "Profiled xAPI"
+mappings:
+  # LMS Profiles
+  - input_fields:
+      - "verb.id"
+      - "object.definition.type"
+    output_fields:
+      switch:
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/accessed",
+                "http://activitystrea.ms/schema/1.0/access",
+                "http://activitystrea.ms/access",
+                "http://id.tincanapi.com/verb/viewed",
+                "https://w3id.org/xapi/dod-isd/verbs/accessed"
+              ] and 
+              obj_type in [
+                "http://activitystrea.ms/schema/1.0/page",
+                "http://activitystrea.ms/page",
+                "http://adlnet.gov/expapi/activities/module",
+                "http://id.tincanapi.com/activitytype/blog",
+                "http://id.tincanapi.com/activitytype/community-site"
+                "https://w3id.org/xapi/acrossx/activities/page",
+                "https://w3id.org/xapi/acrossx/activities/webpage",
+                "https://xapi.org.au/sociallearningprofile/article",
+                "http://activitystrea.ms/article",
+                "http://xapi.org.au/contentprofile/activitytype/journal_article",
+                "http://xapi.org.au/contentprofile/activitytype/newspaper_article"
+              ]'
+          profile: "lms.accessed-page"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/accessed",
+                "http://activitystrea.ms/schema/1.0/access",
+                "http://activitystrea.ms/access",
+                "http://id.tincanapi.com/verb/viewed",
+                "https://w3id.org/xapi/dod-isd/verbs/accessed",
+                "https://w3id.org/xapi/netc/verbs/opened"
+              ] and 
+              obj_type in [
+                "http://activitystrea.ms/schema/1.0/file",
+                "http://activitystrea.ms/file",
+                "http://adlnet.gov/expapi/activities/file",
+                "http://adlnet.gov/expapi/activities/media"
+              ] 
+              '
+          profile: "lms.accessed-file"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id in [
+                "http://adlnet.gov/expapi/verbs/registered",
+                "https://w3id.org/xapi/tla/verbs/registered"
+              ] and 
+              obj_type in [
+                "http://adlnet.gov/expapi/activities/course",
+                "http://id.tincanapi.com/activitytype/lms/course"
+              ]
+              '
+          profile: "lms.registered-course"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id in [
+                "http://adlnet.gov/expapi/verbs/unregistered",
+                "http://id.tincanapi.com/verb/unregistered"
+              ] and 
+              obj_type in [
+                "http://adlnet.gov/expapi/activities/course",
+                "http://id.tincanapi.com/activitytype/lms/course"
+              ]
+              '
+          profile: "lms.unregistered-course"
+
+  - input_fields:
+      - "verb.id"
+      - "object.definition.type"
+      - "object.definition.mimeType"
+    output_fields:
+      switch:
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/uploaded",
+                "http://activitystrea.ms/schema/1.0/add",
+                "http://activitystrea.ms/add",
+                "http://activitystrea.ms/schema/1.0/submit",
+                "http://activitystrea.ms/submit",
+                "https://xapi.org.au/contentprofile/verb/added"
+              ] and 
+              (obj_type in [
+                "http://activitystrea.ms/schema/1.0/audio", 
+                "http://activitystrea.ms/audio", 
+                "https://w3id.org/xapi/audio/activity-type/audio",
+                "http://xapi.org.au/contentprofile/activitytype/audio_recording",
+                "http://id.tincanapi.com/activitytype/voicemail"
+              ] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and mime_type.startswith("audio/")
+               )
+              )'
+          profile: "lms.uploaded-audio"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/uploaded",
+                "http://activitystrea.ms/schema/1.0/add",
+                "http://activitystrea.ms/add",
+                "http://activitystrea.ms/schema/1.0/submit",
+                "http://activitystrea.ms/submit",
+                "https://xapi.org.au/contentprofile/verb/added"
+              ] and 
+              (obj_type in ["http://id.tincanapi.com/activitytype/document", "https://w3id.org/xapi/acrossx/activities/e-book"] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and 
+                (mime_type.startswith("application/") or mime_type.startswith("text/"))
+               )
+              )'
+          profile: "lms.uploaded-document"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/uploaded",
+                "http://activitystrea.ms/schema/1.0/add",
+                "http://activitystrea.ms/add",
+                "http://activitystrea.ms/schema/1.0/submit",
+                "http://activitystrea.ms/submit",
+                "https://xapi.org.au/contentprofile/verb/added"
+              ] and 
+              (obj_type in [
+                "http://activitystrea.ms/schema/1.0/video",
+                "http://activitystrea.ms/video",
+                "https://w3id.org/xapi/video/activity-type/video",
+                "https://w3id.org/xapi/acrossx/activities/video",
+               ] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and mime_type.startswith("video/")
+               )
+              )'
+          profile: "lms.uploaded-video"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id in [
+                "https://w3id.org/xapi/netc/verbs/uploaded",
+                "http://activitystrea.ms/schema/1.0/add",
+                "http://activitystrea.ms/add",
+                "http://activitystrea.ms/schema/1.0/submit",
+                "http://activitystrea.ms/submit",
+                "https://xapi.org.au/contentprofile/verb/added"
+              ] and 
+              obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file"] and 
+              (mime_type is None or 
+               (not mime_type.startswith("audio/") and 
+                not mime_type.startswith("video/") and 
+                not mime_type.startswith("application/") and 
+                not mime_type.startswith("text/")
+               )
+              )'
+          profile: "lms.uploaded-file"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
+              (obj_type in [
+                "http://activitystrea.ms/schema/1.0/audio",
+                "http://activitystrea.ms/audio",
+                "https://w3id.org/xapi/audio/activity-type/audio",
+                "http://xapi.org.au/contentprofile/activitytype/audio_recording",
+                "http://id.tincanapi.com/activitytype/voicemail"
+              ] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and mime_type.startswith("audio/")
+               )
+              )'
+          profile: "lms.downloaded-audio"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
+              (obj_type in ["http://id.tincanapi.com/activitytype/document", "https://w3id.org/xapi/acrossx/activities/e-book"] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and 
+                (mime_type.startswith("application/") or mime_type.startswith("text/"))
+               )
+              )'
+          profile: "lms.downloaded-document"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id in [
+                "http://id.tincanapi.com/verb/downloaded",
+                "https://w3id.org/xapi/acrossx/verbs/watched",
+                "http://activitystrea.ms/watch",
+                "https://w3id.org/xapi/adb/verbs/watched"
+              ] and 
+              (obj_type in [
+                "http://activitystrea.ms/schema/1.0/video",
+                "http://activitystrea.ms/video",
+                "https://w3id.org/xapi/video/activity-type/video",
+                "https://w3id.org/xapi/acrossx/activities/video"
+              ] or 
+               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+                mime_type is not None and mime_type.startswith("video/")
+               )
+              )'
+          profile: "lms.downloaded-video"
+
+        - condition: '
+            lambda verb_id, obj_type, mime_type:
+              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
+              obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              (mime_type is None or 
+               (not mime_type.startswith("audio/") and 
+                not mime_type.startswith("video/") and 
+                not mime_type.startswith("application/") and 
+                not mime_type.startswith("text/")
+               )
+              )'
+          profile: "lms.downloaded-file"
+
+  # Virtual Classroom Profiles
+  - input_fields:
+      - "verb.id"
+      - "object.definition.type"
+      - "context.extensions"
+    output_fields:
+      switch:
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id == "http://adlnet.gov/expapi/verbs/initialized" and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ]
+          '
+          profile: "virtual-classroom.initialized"
+
+        - condition: '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id in [
+                "http://adlnet.gov/expapi/verbs/terminated",
+                "http://activitystrea.ms/terminate"
+              ] and  
+              obj_type in [
+                "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "http://adlnet.gov/expapi/activities/meeting",
+                "http://id.tincanapi.com/activitytype/tutor-session"
+              ]
+          '
+          profile: "virtual-classroom.terminated"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/attended",
+              "http://activitystrea.ms/schema/1.0/join",
+              "http://activitystrea.ms/schema/1.0/attend",
+              "http://activitystrea.ms/schema/1.0/checkin",
+              "http://activitystrea.ms/join",
+              "http://activitystrea.ms/attend",
+              "http://activitystrea.ms/checkin",
+              "https://w3id.org/xapi/adb/verbs/attended",
+              "https://xapi.org.au/sociallearningprofile/joined"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ]
+          '
+          profile: "virtual-classroom.joined"
+
+        - condition: '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id in [
+                "http://activitystrea.ms/schema/1.0/leave",
+                "http://activitystrea.ms/leave",
+                "http://adlnet.gov/expapi/verbs/exited",
+                "https://xapi.org.au/sociallearningprofile/left"
+              ] and 
+              obj_type in [
+                "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+                "http://adlnet.gov/expapi/activities/meeting",
+                "http://id.tincanapi.com/activitytype/tutor-session"
+              ]
+          '
+          profile: "virtual-classroom.left"
+
+        - condition: '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id in [
+                "http://adlnet.gov/expapi/verbs/asked",
+                "http://activitystrea.ms/schema/1.0/start",
+                "http://activitystrea.ms/start"
+              ] and 
+              obj_type in [
+                "http://adlnet.gov/expapi/activities/cmi.interaction",
+                "http://activitystrea.ms/schema/1.0/question",
+                "http://activitystrea.ms/question",
+                "http://adlnet.gov/expapi/activities/question",
+                "http://id.tincanapi.com/activitytype/survey",
+                "https://xapi.org.au/contentprofile/activitytype/survey"
+              ]
+          '
+          profile: "virtual-classroom.started-poll"
+
+        - condition: '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id in [
+                "http://adlnet.gov/expapi/verbs/answered",
+                "http://adlnet.gov/expapi/verbs/responded",
+                "https://w3id.org/xapi/dod-isd/verbs/answered"
+              ] and 
+              obj_type in [
+                "http://adlnet.gov/expapi/activities/cmi.interaction",
+                "http://activitystrea.ms/schema/1.0/question",
+                "http://activitystrea.ms/question",
+                "http://adlnet.gov/expapi/activities/question",
+                "http://id.tincanapi.com/activitytype/survey",
+                "https://xapi.org.au/contentprofile/activitytype/survey"
+              ]
+          '
+          profile: "virtual-classroom.answered-poll"
+
+        - condition: '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id in [
+                "https://w3id.org/xapi/acrossx/verbs/posted",
+                "http://id.tincanapi.com/verb/replied"
+              ] and 
+              obj_type in [
+                "https://w3id.org/xapi/acrossx/activities/message",
+                "http://id.tincanapi.com/activitytype/chat-message"
+              ]
+          '
+          profile: "virtual-classroom.posted-public-message"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact",
+              "http://id.tincanapi.com/verb/requested-attention"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == True
+            )
+        '
+          profile: "virtual-classroom.raised-hand"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact",
+              "http://id.tincanapi.com/verb/requested-attention"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == False
+            )
+        '
+          profile: "virtual-classroom.lowered-hand"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == True
+            )
+        '
+          profile: "virtual-classroom.shared-screen"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == False
+            )
+        '
+          profile: "virtual-classroom.unshared-screen"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == False
+            )
+        '
+          profile: "virtual-classroom.muted"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == True
+            )
+        '
+          profile: "virtual-classroom.unmuted"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == True
+            )
+        '
+          profile: "virtual-classroom.started-camera"
+
+        - condition: '
+          lambda verb_id, obj_type, context_extensions:
+            verb_id in [
+              "http://adlnet.gov/expapi/verbs/interacted",
+              "http://activitystrea.ms/schema/1.0/interact",
+              "http://activitystrea.ms/interact"
+            ] and 
+            obj_type in [
+              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              "http://adlnet.gov/expapi/activities/meeting",
+              "http://id.tincanapi.com/activitytype/tutor-session"
+            ] and (
+              "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
+              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == False
+            )
+        '
+          profile: "virtual-classroom.stopped-camera"
+
+default_values:
+  - description: "Default xAPI version"
+    output_field: "version"
+    value: "1.0.0"
+
+metadata:
+  author: "Inokufu"
+  date:
+    publication: "2024-04-24"
+    update: "2024-04-26"

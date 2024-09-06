@@ -1,0 +1,106 @@
+version: 1.0
+input_format: "SCORM"
+output_format: "xAPI"
+mappings:
+  # Single input + Mulitple output
+  - input_fields: 
+    - "fake_scorm.actor.value"
+    output_fields:
+      description: "Can map multiple fields"
+      multiple:
+        # Direct mapping
+        - description: ""
+          output_field: "fake_xapi.actor.type"
+        # Switch tranformation
+        - switch:
+            - description: "No output needed because already passed before."
+              condition: "lambda val: is_empty(val)"
+              # Value tranformation
+              output_field: "fake_xapi.actor.empty_val"
+              value: "anything"
+            - condition: "lambda val: not is_empty(val) and val >= 0"
+              output_field: "fake_xapi.actor.positive"
+            - condition: "lambda val: not is_empty(val) and val < 0"
+              output_field: "fake_xapi.actor.negative"
+              custom:
+                - "lambda val: -1 * val"
+                - "lambda val: str(val) + ' is now an absolute number'"
+            - condition: "default"
+              multiple:
+                - output_field: "fake_xapi.actor.default.str"
+                  value: "default"
+                - output_field: "fake_xapi.actor.value.int"
+                  value: 0
+  # Single input + Single output
+  - input_fields: 
+    - "fake_scorm.object.value"
+    output_fields:
+      output_field: "fake_xapi.object.value"
+  # Multiple input + Single output
+  - input_fields:
+    - "fake_scorm.author.firstname"
+    - "fake_scorm.author.lastname"
+    - "fake_scorm.author.age"
+    output_fields:
+      output_field: "fake_xapi.author.description"
+      custom:
+        - "lambda fn, ln, age: f'My name is {fn if fn else None} {ln.upper() if ln else None}, I am {age if age else None} years old.' if fn or ln or age else None"
+  # Multiple input + Multiple output
+  - input_fields:
+    - "fake_scorm.context.where"
+    - "fake_scorm.context.why"
+    output_fields:
+      multiple: 
+        - output_field: "fake_xapi.context.full_content" 
+        - output_field: "fake_xapi.context.description"
+          custom:
+            - "lambda where, why: f'{where} {why}' if where and why else ''"
+            - "lambda description: (description.lower(), description.upper())"
+            - "lambda l, u: f'{l} {u}' if l and u else ''"
+            - "lambda description: description.split(' ')"
+            - "lambda list_split: f'{' '.join(list_split)} - length of {len(list_split)}' if remove_empty_elements(list_split) else None"
+
+default_values:
+  - description: ""
+    output_field: "fake_xapi.default.dict"
+    # Value tranformation
+    value: {"a": "b", "empty": null, "list": ["a", "b", "c"]}
+  - description: ""
+    output_field: "fake_xapi.default.list"
+    # Value tranformation
+    value: ["a", "b", "c"]
+  - description: ""
+    output_field: "fake_xapi.default.int"
+    # Value tranformation
+    value: 0
+  - description: ""
+    output_field: "fake_xapi.default.float"
+    # Value tranformation
+    value: 1.5
+  - description: ""
+    output_field: "fake_xapi.default.str"
+    # Value tranformation
+    value: "string here"
+  - description: ""
+    output_field: "fake_xapi.default.boolean"
+    # Value tranformation
+    value: false
+  - description: ""
+    output_field: "fake_xapi.default.empty"
+    # Value tranformation
+    value: null
+  - description: ""
+    output_field: "fake_xapi.context.full_content" 
+    # Value tranformation
+    value: "No full content in context provided"
+  - description: ""
+    output_field: "fake_xapi.actor.type"
+    # Value tranformation
+    value: "No actor type provided"
+
+metadata:
+  author: "Your Name"
+  # version: 1.0
+  date:
+    publication: "2023-01-01"
+    update: "2023-02-01"

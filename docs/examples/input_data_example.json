@@ -1,0 +1,37 @@
+{
+  "sensor": "https://example.com/sensors/1",
+  "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p2",
+  "data": [
+    {
+      "id": "urn:uuid:1234-5678-abcd-efgh",
+      "type": "NavigationEvent",
+      "action": "NavigatedTo",
+      "actor": {
+        "id": "https://example.com/users/123456",
+        "type": "Person"
+      },
+      "object": {
+        "id": "https://example.com/courses/biology101/pages/introduction",
+        "type": "WebPage",
+        "name": "Introduction to Biology",
+        "description": "An introductory page for the Biology 101 course"
+      },
+      "eventTime": "2024-04-26T14:30:00.000Z",
+      "edApp": {
+        "id": "https://example.com/lms",
+        "type": "SoftwareApplication"
+      },
+      "group": {
+        "id": "https://example.com/courses/biology101",
+        "type": "CourseOffering",
+        "name": "Biology 101"
+      },
+      "generated": {
+        "id": "https://example.com/results/12345",
+        "type": "Result",
+        "resultScore": 85,
+        "maxResultScore": 100
+      }
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+version: 1.0
+input_format: "SCORM_2004"
+output_format: "XAPI"
+mappings:
+  # Mapping completion status
+  # TODO: manque la gestion du completion_threshold ?
+  - input_fields:
+    - "completion_status"
+    output_fields:
+      description: "Maps SCORM completion status to xAPI verb id and name"
+      switch:
+        - condition: "lambda val: val == 'completed'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/completed", "display": {"en-us": "completed"}}
+
+  # Initializing or resuming an attempt
+  - input_fields:
+    - "entry"
+    output_fields:
+      description: "Maps SCORM entry to xAPI verb id and name"
+      switch:
+        - condition: "lambda val: val == 'ab-initio'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/initialized", "display": {"en-us": "initialized"}}
+        - condition: "lambda val: val == 'resume'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/resumed", "display": {"en-us": "resumed"}}
+
+  # Exiting or suspending an attempt
+  - input_fields:
+    - "exit"
+    output_fields:
+      description: "Maps SCORM exit to xAPI verb id and name"
+      switch:
+        - condition: "lambda val: val == 'normal'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/terminated", "display": {"en-us": "terminated"}}
+        - condition: "lambda val: val == 'suspend'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/suspended", "display": {"en-us": "suspended"}}
+
+  # Learner id and name 
+  - input_fields:
+    - "learner_id"
+    - "learner_name"
+    output_fields:
+      description: "Maps SCORM learner ID to xAPI actor"
+      multiple:
+        - output_field: "actor.account.name"
+          custom:
+            - "lambda id, name: name"
+        # - output_field: "actor.account.id"
+        #   custom:
+        #     - "lambda id, name: id"
+        - output_field: "actor.account.homePage"
+          value: "http://example.com"
+
+  # Progress Measure
+  - input_fields:
+    - "progress_measure"
+    output_fields:
+      description: "Maps SCORM progress measure to xAPI verb"
+      multiple:
+        - output_field: "result.score.scaled"
+        - output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/progressed", "display": {"en-us": "progressed"}}
+
+  # Score
+  - input_fields:
+    - "score.scaled"
+    output_fields:
+      output_field: "result.score.scaled"
+
+  # Session Time
+  - input_fields:
+    - "session_time"
+    output_fields:
+      output_field: "result.duration"
+      custom:
+        - "lambda time: f'PT{time}S'" # Assuming SCORM session time is provided in seconds
+
+  # Success Status
+  - input_fields:
+    - "success_status"
+    output_fields:
+      description: "Maps SCORM success status to xAPI verb id and name"
+      switch:
+        - condition: "lambda val: val == 'passed'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/passed", "display": {"en-us": "passed"}}
+        - condition: "lambda val: val == 'failed'"
+          output_field: "verb"
+          value: {"id": "http://adlnet.gov/expapi/verbs/failed", "display": {"en-us": "failed"}}
+
+# Default values
+default_values:
+  - description: "Default context for CMI5"
+    output_field: "context.contextActivities.category"
+    value: {"id": "http://purl.org/xapi/cmi5/context/categories/cmi5", "definition": {"type": "http://adlnet.gov/expapi/activities/profile"}}
+  - description: "Default object"
+    output_field: "object"
+    value: {
+      "id": "https://example.com/activity/test",
+      "objectType": "Activity",
+      "definition": {
+        "type": "http://adlnet.gov/expapi/activities/cmi5",
+        "name": {"en-us": "CMI5 Activity"}
+      }
+    }
+
+metadata:
+  author: "Inokufu"
+  date:
+    publication: "2024-02-01"
+    update: "2024-02-01"

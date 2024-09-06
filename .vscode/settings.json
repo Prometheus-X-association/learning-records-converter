@@ -1,0 +1,45 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    // "python.linting.enabled": true,
+    // "python.linting.mypyEnabled": true,
+    // "python.linting.flake8Enabled": true,
+    // "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    // "python.formatting.blackArgs": [
+    //     "--line-length=99"
+    // ],
+    "black-formatter.args": [
+        "--line-length=99"
+    ],
+    // "python.sortImports.args": [
+    //     "--profile",
+    //     "black"
+    // ],
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "editor.rulers": [
+        99
+    ],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "black-formatter.importStrategy": "useBundled",
+    "python.defaultInterpreterPath": "${env:PYTHON_INSTALL_LOC}",
+    // "python.linting.pylintEnabled": true,
+    // "python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
+    // "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
+    // "python.formatting.yapfPath": "/usr/local/py-utils/bin/yapf",
+    // "python.linting.banditPath": "/usr/local/py-utils/bin/bandit",
+    // "python.linting.flake8Path": "/usr/local/py-utils/bin/flake8",
+    // "python.linting.mypyPath": "/usr/local/py-utils/bin/mypy",
+    // "python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
+    // "python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
+    // "python.linting.pylintPath": "pylint",
+}
