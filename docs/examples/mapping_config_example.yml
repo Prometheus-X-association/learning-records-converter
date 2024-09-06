@@ -1,0 +1,77 @@
+version: 1.0
+input_format: "IMS Caliper"
+output_format: "xAPI"
+mappings:
+  # Mapping object information
+  - input_fields:
+      - "data.0.object.id"
+    output_fields:
+      output_field: "object.id"
+
+  # ID
+  - input_fields:
+      - "data.0.id"
+    output_fields:
+      output_field: "id"
+      custom:
+        - "lambda id: str(id).split(':')[-1] if id else None"
+
+  # Mapping actor information
+  - input_fields:
+      - "data.0.actor.id"
+    output_fields:
+      multiple:
+        - output_field: "actor.account.homePage"
+          custom:
+            - "lambda actor_id: '{uri.scheme}://{uri.netloc}/'.format(uri=urlparse(actor_id))"
+        - output_field: "actor.account.name"
+          custom:
+            - "lambda url: (match.group(1) if (match := search(r'/users/(\\d+)', url)) else url)"
+
+  # Mapping generated and result
+  - input_fields:
+      - "data.0.generated"
+    output_fields:
+      switch:
+        - condition: "lambda generated: generated.get('type', '') == 'Result' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('resultScore', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxResultScore', None)"
+        - condition: "lambda generated: generated.get('type', '') == 'Score' if isinstance(generated, dict) else False"
+          multiple:
+            - output_field: "result.score.raw"
+              custom:
+                - "lambda generated: generated.get('scoreGiven', None)"
+            - output_field: "result.score.max"
+              custom:
+                - "lambda generated: generated.get('maxScore', None)"
+
+  # DASES Profiles
+  - input_fields:
+      - "data.0.type"
+      - "data.0.action"
+      - "data.0.object.type"
+    output_fields:
+      switch:
+        # lms_accessed_page
+        - condition: "lambda type, action, objectType: type in ['NavigationEvent', 'ViewEvent'] and action in ['NavigatedTo', 'Viewed'] and objectType in ['WebPage', 'Page']"
+          profile: "lms.accessed-page"
+
+        # lms_downloaded_audio
+        - condition: "lambda type, action, objectType: action in ['Downloaded'] and objectType in ['AudioObject']"
+          profile: "lms.downloaded-audio"
+
+default_values:
+  - description: "Default xAPI version"
+    output_field: "version"
+    value: "1.0.0"
+
+metadata:
+  author: "Inokufu"
+  date:
+    publication: "2024-04-24"
+    update: "2024-04-26"
