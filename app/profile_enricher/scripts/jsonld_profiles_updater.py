@@ -94,6 +94,8 @@ def main(destination_dir: str | None = None) -> None:
             json_logger.exception("Failed to create or access profiles directory", e)
             raise
 
+    json_logger.info("Script starting", {"destination_dir": destination_dir})
+
     updater = JsonLdProfilesUpdater(
         destination_dir=destination_dir, logger=json_logger, config=env_config
     )
