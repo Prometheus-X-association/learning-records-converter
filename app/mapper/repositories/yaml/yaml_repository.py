@@ -43,9 +43,8 @@ class YamlMappingRepository(MappingRepository):
         :raises ValueError: If the mapping configuration is not found
         :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
         """
-
         mapping_path = self._get_mapping_by_input_and_output_format(
-            input_format=input_format, output_format=output_format
+            input_format=input_format, output_format=output_format,
         )
         return self._get_config_model_from_yaml_file(file_path=mapping_path)
 
@@ -62,7 +61,6 @@ class YamlMappingRepository(MappingRepository):
         :return: The path to the mapping configuration file
         :raises ValueError: If the mapping configuration is not found
         """
-
         # Get correct mapping enum
         log_context = {
             "output_format": output_format.value,
@@ -92,7 +90,7 @@ class YamlMappingRepository(MappingRepository):
             raise ValueError("Could not load mapping config into model")
 
         self.logger.debug(
-            "Mapping path found", {**log_context, "mapping_path": mapping_path}
+            "Mapping path found", {**log_context, "mapping_path": mapping_path},
         )
 
         return Path(mapping_path)
@@ -119,5 +117,5 @@ class YamlMappingRepository(MappingRepository):
         except Exception as e:
             self.logger.exception("Unexpected error during mapping file validation", e)
             raise MappingConfigToModelError(
-                "Unexpected error during mapping file validation"
+                "Unexpected error during mapping file validation",
             ) from e

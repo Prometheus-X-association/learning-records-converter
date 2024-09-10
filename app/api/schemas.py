@@ -13,7 +13,7 @@ class InputTraceRequestModel(BaseModel):
 
     input_trace: JsonType = Field(..., description="Input trace data")
     input_format: CustomTraceFormatStrEnum | None = Field(
-        default=None, description="Input trace format"
+        default=None, description="Input trace format",
     )
 
     def get_trace(self) -> Trace:
@@ -36,7 +36,7 @@ class TransformInputTraceRequestModel(InputTraceRequestModel):
     """Model for transform input trace request."""
 
     output_format: CustomTraceFormatStrEnum = Field(
-        default=DEFAULT_OUTPUT_FORMAT, description="Output trace format"
+        default=DEFAULT_OUTPUT_FORMAT, description="Output trace format",
     )
 
 
@@ -54,7 +54,7 @@ class TransformInputTraceResponseModel(BaseModel):
     """Model for transform input trace response."""
 
     output_trace: JsonType = Field(
-        description="Transformed output trace in JSON format"
+        description="Transformed output trace in JSON format",
     )
     meta: TransformInputTraceResponseMetaModel
 

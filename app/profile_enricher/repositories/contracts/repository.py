@@ -23,7 +23,7 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def validate_trace(
-        self, group_name: str, template_name: str, trace: Trace
+        self, group_name: str, template_name: str, trace: Trace,
     ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
@@ -37,7 +37,7 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def get_recommendations(
-        self, group_name: str, template_name: str, trace: Trace
+        self, group_name: str, template_name: str, trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specific template.

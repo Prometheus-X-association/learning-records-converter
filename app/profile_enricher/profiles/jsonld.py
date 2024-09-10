@@ -13,7 +13,7 @@ import re
 from abc import ABC
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Dict, Literal, Optional, Union, get_args, get_origin
+from typing import Annotated, Any, Literal, Union, get_args, get_origin
 
 from pydantic import (
     AnyUrl,
@@ -148,7 +148,7 @@ class ProfileVersion(CustomBaseModel):
     """
 
     id: AnyUrl
-    was_revision_of: Optional[list[AnyUrl]] = Field(None, alias="wasRevisionOf")
+    was_revision_of: list[AnyUrl] | None = Field(None, alias="wasRevisionOf")
     generated_at_time: datetime = Field(..., alias="generatedAtTime")
 
 
@@ -159,7 +159,7 @@ class Author(CustomBaseModel):
 
     type: AuthorTypeEnum
     name: str
-    url: Optional[AnyUrl] = None
+    url: AnyUrl | None = None
 
 
 class ProfileElement(BaseModel, ABC):
@@ -181,25 +181,25 @@ class Concept(ProfileElement):
     """
 
     type: ConceptTypeEnum
-    broader: Optional[list[AnyUrl]] = None
-    broad_match: Optional[list[AnyUrl]] = Field(None, alias="broadMatch")
-    narrower: Optional[list[AnyUrl]] = None
-    narrow_match: Optional[list[AnyUrl]] = Field(None, alias="narrowMatch")
-    related: Optional[list[AnyUrl]] = None
-    related_match: Optional[list[AnyUrl]] = Field(None, alias="relatedMatch")
-    exact_match: Optional[list[AnyUrl]] = Field(None, alias="exactMatch")
+    broader: list[AnyUrl] | None = None
+    broad_match: list[AnyUrl] | None = Field(None, alias="broadMatch")
+    narrower: list[AnyUrl] | None = None
+    narrow_match: list[AnyUrl] | None = Field(None, alias="narrowMatch")
+    related: list[AnyUrl] | None = None
+    related_match: list[AnyUrl] | None = Field(None, alias="relatedMatch")
+    exact_match: list[AnyUrl] | None = Field(None, alias="exactMatch")
 
     @field_validator("related")
     @staticmethod
     def related_only_for_deprecated(
-        value: Optional[list[AnyUrl]], info: ValidationInfo
-    ) -> Optional[list[AnyUrl]]:
+        value: list[AnyUrl] | None, info: ValidationInfo,
+    ) -> list[AnyUrl] | None:
         """
         Validator to ensure 'related' field is used only for deprecated concepts.
         """
         if value and not info.data.get("deprecated"):
             raise ValueError(
-                "'related' MUST only be used on Concepts that are deprecated"
+                "'related' MUST only be used on Concepts that are deprecated",
             )
         return value
 
@@ -210,33 +210,33 @@ class Extension(ProfileElement):
     """
 
     type: ExtensionTypeEnum
-    recommended_activity_types: Optional[list[AnyUrl]] = Field(
-        None, alias="recommendedActivityTypes"
+    recommended_activity_types: list[AnyUrl] | None = Field(
+        None, alias="recommendedActivityTypes",
     )
-    recommended_verbs: Optional[list[AnyUrl]] = Field(None, alias="recommendedVerbs")
-    context: Optional[AnyUrl] = None
-    iri_schema: Optional[AnyUrl] = Field(None, alias="schema")
-    inline_schema: Optional[str | dict] = Field(None, alias="inlineSchema")
+    recommended_verbs: list[AnyUrl] | None = Field(None, alias="recommendedVerbs")
+    context: AnyUrl | None = None
+    iri_schema: AnyUrl | None = Field(None, alias="schema")
+    inline_schema: str | dict | None = Field(None, alias="inlineSchema")
 
     @field_validator("recommended_activity_types")
     @staticmethod
     def validate_recommended_activity_types(
-        value: Optional[list[AnyUrl]], info: ValidationInfo
-    ) -> Optional[list[AnyUrl]]:
+        value: list[AnyUrl] | None, info: ValidationInfo,
+    ) -> list[AnyUrl] | None:
         """
         Validator to ensure 'recommendedActivityTypes' is only allowed on ActivityExtension types.
         """
         if value is not None and info.data.get("type") != ExtensionTypeEnum.ACTIVITY:
             raise ValueError(
-                "recommendedActivityTypes is only allowed on an ActivityExtension"
+                "recommendedActivityTypes is only allowed on an ActivityExtension",
             )
         return value
 
     @field_validator("recommended_verbs")
     @staticmethod
     def validate_recommended_verbs(
-        value: Optional[list[AnyUrl]], info: ValidationInfo
-    ) -> Optional[list[AnyUrl]]:
+        value: list[AnyUrl] | None, info: ValidationInfo,
+    ) -> list[AnyUrl] | None:
         """
         Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types.
         """
@@ -245,7 +245,7 @@ class Extension(ProfileElement):
             ExtensionTypeEnum.RESULT,
         ]:
             raise ValueError(
-                "recommendedVerbs is only allowed on a ContextExtension or a ResultExtension"
+                "recommendedVerbs is only allowed on a ContextExtension or a ResultExtension",
             )
         return value
 
@@ -256,7 +256,7 @@ class Extension(ProfileElement):
         """
         if self.iri_schema is not None and self.inline_schema is not None:
             raise ValueError(
-                "Profiles MUST use at most one of schema and inlineSchema for Extensions"
+                "Profiles MUST use at most one of schema and inlineSchema for Extensions",
             )
         return self
 
@@ -268,9 +268,9 @@ class DocumentResource(ProfileElement):
 
     type: DocumentResourceTypeEnum
     content_type: str = Field(..., alias="contentType")
-    context: Optional[AnyUrl] = None
-    iri_schema: Optional[AnyUrl] = Field(None, alias="schema")
-    inline_schema: Optional[str | dict] = Field(None, alias="inlineSchema")
+    context: AnyUrl | None = None
+    iri_schema: AnyUrl | None = Field(None, alias="schema")
+    inline_schema: str | dict | None = Field(None, alias="inlineSchema")
 
     @model_validator(mode="after")
     def validate_schema_fields(self) -> "DocumentResource":
@@ -279,7 +279,7 @@ class DocumentResource(ProfileElement):
         """
         if self.iri_schema is not None and self.inline_schema is not None:
             raise ValueError(
-                "Profiles MUST use at most one of schema and inlineSchema for Document Resources"
+                "Profiles MUST use at most one of schema and inlineSchema for Document Resources",
             )
         return self
 
@@ -290,13 +290,13 @@ class ActivityDefinition(CustomBaseModel):
     """
 
     context: Annotated[AnyUrl, Literal[ACTIVITY_CONTEXT_URL]] = Field(
-        default=ACTIVITY_CONTEXT_URL, alias="@context"
+        default=ACTIVITY_CONTEXT_URL, alias="@context",
     )
-    type: Optional[AnyUrl] = None
-    name: Optional[LanguageMap] = None
-    description: Optional[LanguageMap] = None
-    more_info: Optional[AnyUrl] = Field(None, alias="moreInfo")
-    extensions: Optional[Dict[AnyUrl, Any]] = None
+    type: AnyUrl | None = None
+    name: LanguageMap | None = None
+    description: LanguageMap | None = None
+    more_info: AnyUrl | None = Field(None, alias="moreInfo")
+    extensions: dict[AnyUrl, Any] | None = None
 
 
 class Activity(CustomBaseModel):
@@ -318,21 +318,21 @@ class StatementTemplateRule(CustomBaseModel):
 
     location: str = Field(pattern=LOCATION_PATTERN)
     selector: str = Field(pattern=LOCATION_PATTERN, default=None)
-    presence: Optional[PresenceTypeEnum] = None
-    any: Optional[list[str]] = None
-    all: Optional[list[str]] = None
-    none: Optional[list[str]] = None
-    scope_note: Optional[LanguageMap] = Field(None, alias="scopeNote")
+    presence: PresenceTypeEnum | None = None
+    any: list[str] | None = None
+    all: list[str] | None = None
+    none: list[str] | None = None
+    scope_note: LanguageMap | None = Field(None, alias="scopeNote")
 
     @field_validator("location", "selector")
     @staticmethod
-    def validate_jsonpath(value: Optional[str]) -> Optional[str]:
+    def validate_jsonpath(value: str | None) -> str | None:
         """
         Validator to ensure that filter and script expressions are not used in JSONPath.
         """
         if re.search(r"\(.*\)", value):
             raise ValueError(
-                "Filter and script expressions MUST NOT be used in JSONPath"
+                "Filter and script expressions MUST NOT be used in JSONPath",
             )
         return value
 
@@ -343,7 +343,7 @@ class StatementTemplateRule(CustomBaseModel):
         """
         if not any([self.presence, self.any, self.all, self.none]):
             raise ValueError(
-                "A Statement Template Rule MUST include one or more of presence, any, all, or none"
+                "A Statement Template Rule MUST include one or more of presence, any, all, or none",
             )
         return self
 
@@ -354,30 +354,30 @@ class StatementTemplate(ProfileElement):
     """
 
     type: StatementTemplateTypeEnum
-    verb: Optional[AnyUrl] = None
-    object_activity_type: Optional[AnyUrl] = Field(None, alias="objectActivityType")
-    context_grouping_activity_type: Optional[list[AnyUrl]] = Field(
-        None, alias="contextGroupingActivityType"
+    verb: AnyUrl | None = None
+    object_activity_type: AnyUrl | None = Field(None, alias="objectActivityType")
+    context_grouping_activity_type: list[AnyUrl] | None = Field(
+        None, alias="contextGroupingActivityType",
     )
-    context_parent_activity_type: Optional[list[AnyUrl]] = Field(
-        None, alias="contextParentActivityType"
+    context_parent_activity_type: list[AnyUrl] | None = Field(
+        None, alias="contextParentActivityType",
     )
-    context_other_activity_type: Optional[list[AnyUrl]] = Field(
-        None, alias="contextOtherActivityType"
+    context_other_activity_type: list[AnyUrl] | None = Field(
+        None, alias="contextOtherActivityType",
     )
-    context_category_activity_type: Optional[list[AnyUrl]] = Field(
-        None, alias="contextCategoryActivityType"
+    context_category_activity_type: list[AnyUrl] | None = Field(
+        None, alias="contextCategoryActivityType",
     )
-    attachment_usage_type: Optional[list[AnyUrl]] = Field(
-        None, alias="attachmentUsageType"
+    attachment_usage_type: list[AnyUrl] | None = Field(
+        None, alias="attachmentUsageType",
     )
-    object_statement_ref_template: Optional[list[AnyUrl]] = Field(
-        None, alias="objectStatementRefTemplate"
+    object_statement_ref_template: list[AnyUrl] | None = Field(
+        None, alias="objectStatementRefTemplate",
     )
-    context_statement_ref_template: Optional[list[AnyUrl]] = Field(
-        None, alias="contextStatementRefTemplate"
+    context_statement_ref_template: list[AnyUrl] | None = Field(
+        None, alias="contextStatementRefTemplate",
     )
-    rules: Optional[list[StatementTemplateRule]] = None
+    rules: list[StatementTemplateRule] | None = None
 
     @model_validator(mode="after")
     def not_both_object_ref_and_activity_type(self) -> "StatementTemplate":
@@ -389,7 +389,7 @@ class StatementTemplate(ProfileElement):
             and self.object_activity_type is not None
         ):
             raise ValueError(
-                "A Statement Template MUST NOT have both objectStatementRefTemplate and objectActivityType"
+                "A Statement Template MUST NOT have both objectStatementRefTemplate and objectActivityType",
             )
         return self
 
@@ -401,17 +401,17 @@ class Pattern(ProfileElement):
 
     type: PatternTypeEnum
     primary: bool = Field(default=False)
-    alternates: Optional[list[AnyUrl]] = None
-    optional: Optional[AnyUrl] = None
-    one_or_more: Optional[AnyUrl] = Field(None, alias="oneOrMore")
-    sequence: Optional[list[AnyUrl]] = None
-    zero_or_more: Optional[AnyUrl] = Field(None, alias="zeroOrMore")
+    alternates: list[AnyUrl] | None = None
+    optional: AnyUrl | None = None
+    one_or_more: AnyUrl | None = Field(None, alias="oneOrMore")
+    sequence: list[AnyUrl] | None = None
+    zero_or_more: AnyUrl | None = Field(None, alias="zeroOrMore")
 
     @field_validator("pref_label", "definition")
     @staticmethod
     def primary_must_have_label_and_definition(
-        value: Optional[LanguageMap], info: ValidationInfo
-    ) -> Optional[LanguageMap]:
+        value: LanguageMap | None, info: ValidationInfo,
+    ) -> LanguageMap | None:
         """
         Validator to ensure that primary patterns include both 'prefLabel' and 'definition'.
         """
@@ -421,21 +421,21 @@ class Pattern(ProfileElement):
 
     @field_validator("alternates")
     @staticmethod
-    def validate_alternates(value: Optional[list[AnyUrl]]) -> Optional[list[AnyUrl]]:
+    def validate_alternates(value: list[AnyUrl] | None) -> list[AnyUrl] | None:
         """
         Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'.
         """
         if value is not None and any(x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value):
             raise ValueError(
-                "MUST NOT put optional or zeroOrMore directly inside alternates"
+                "MUST NOT put optional or zeroOrMore directly inside alternates",
             )
         return value
 
     @field_validator("sequence")
     @staticmethod
     def validate_sequence(
-        value: Optional[list[AnyUrl]], info: ValidationInfo
-    ) -> Optional[list[AnyUrl]]:
+        value: list[AnyUrl] | None, info: ValidationInfo,
+    ) -> list[AnyUrl] | None:
         """
         Validator to ensure that sequences include at least two members, unless specific conditions apply.
         """
@@ -443,7 +443,7 @@ class Pattern(ProfileElement):
                 info.data.get("primary") and not info.data.get("inScheme")
             ):
             raise ValueError(
-                "MUST include at least two members in sequence, unless sequence is in a primary Pattern that is not used elsewhere and the member of sequence is a single Statement Template"
+                "MUST include at least two members in sequence, unless sequence is in a primary Pattern that is not used elsewhere and the member of sequence is a single Statement Template",
             )
         return value
 
@@ -461,7 +461,7 @@ class Pattern(ProfileElement):
         ]
         if sum(1 for pt in pattern_types if getattr(self, pt) is not None) != 1:
             raise ValueError(
-                "A Pattern MUST contain exactly one of alternates, optional, oneOrMore, sequence, and zeroOrMore"
+                "A Pattern MUST contain exactly one of alternates, optional, oneOrMore, sequence, and zeroOrMore",
             )
         return self
 
@@ -474,7 +474,7 @@ class Pattern(ProfileElement):
         def check_self_reference(pattern_id, pattern_list):
             if pattern_id in pattern_list:
                 raise ValueError(
-                    "MUST NOT include any Pattern within itself, or within any Pattern within itself, or at any depth"
+                    "MUST NOT include any Pattern within itself, or within any Pattern within itself, or at any depth",
                 )
 
         for field in [
@@ -487,7 +487,7 @@ class Pattern(ProfileElement):
             value = getattr(self, field)
             if value:
                 check_self_reference(
-                    self.id, value if isinstance(value, list) else [value]
+                    self.id, value if isinstance(value, list) else [value],
                 )
         return self
 
@@ -499,20 +499,20 @@ class Profile(CustomBaseModel):
 
     id: AnyUrl
     context: Annotated[AnyUrl, Literal[PROFILE_CONTEXT_URL]] = Field(
-        default=PROFILE_CONTEXT_URL, alias="@context"
+        default=PROFILE_CONTEXT_URL, alias="@context",
     )
     type: ProfileTypeEnum
     conforms_to: Annotated[AnyUrl, Literal[PROFILE_CONFORMS_TO_URL]] = Field(
-        default=PROFILE_CONFORMS_TO_URL, alias="conformsTo"
+        default=PROFILE_CONFORMS_TO_URL, alias="conformsTo",
     )
     pref_label: LanguageMap = Field(..., alias="prefLabel")
     definition: LanguageMap
-    see_also: Optional[AnyUrl] = Field(None, alias="seeAlso")
+    see_also: AnyUrl | None = Field(None, alias="seeAlso")
     versions: list[ProfileVersion]
     author: Author
-    concepts: Optional[list[Concept | Extension | DocumentResource | Activity]] = None
-    templates: Optional[list[StatementTemplate]] = None
-    patterns: Optional[list[Pattern]] = None
+    concepts: list[Concept | Extension | DocumentResource | Activity] | None = None
+    templates: list[StatementTemplate] | None = None
+    patterns: list[Pattern] | None = None
 
     @model_validator(mode="after")
     def unique_pattern_ids(self) -> "Profile":
@@ -523,7 +523,7 @@ class Profile(CustomBaseModel):
         for pattern in self.patterns or []:
             if pattern.id in pattern_ids or pattern.id == self.id:
                 raise ValueError(
-                    f"Pattern id {pattern.id} is not unique or is the same as the Profile id"
+                    f"Pattern id {pattern.id} is not unique or is the same as the Profile id",
                 )
             pattern_ids.add(pattern.id)
         return self
@@ -539,7 +539,7 @@ class Profile(CustomBaseModel):
                 for revision in version.was_revision_of:
                     if revision not in all_ids:
                         raise ValueError(
-                            f"wasRevisionOf {revision} does not refer to an existing version"
+                            f"wasRevisionOf {revision} does not refer to an existing version",
                         )
         return self
 
@@ -565,6 +565,6 @@ class Profile(CustomBaseModel):
                         for ref in refs:
                             if ref not in concept_ids:
                                 raise ValueError(
-                                    f"Concept {concept.id} references non-existent concept {ref} in {field}"
+                                    f"Concept {concept.id} references non-existent concept {ref} in {field}",
                                 )
         return self

@@ -42,7 +42,7 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
 
 
 def get_value_from_flat_key(
-    dict_element: dict | list, flat_key: str, default_value=None, return_copy=True
+    dict_element: dict | list, flat_key: str, default_value=None, return_copy=True,
 ) -> Any:
     """Get value from a dict element by using a flatten key (keys separated with dotes)
     If the value exists (even if it's empty), the method returns the value.
@@ -84,13 +84,13 @@ def get_value_from_flat_key(
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: dict, flat_key: str, value: Any, overwrite: bool = True
+    dict_list_element: dict, flat_key: str, value: Any, overwrite: bool = True,
 ) -> dict: ...
 
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: list, flat_key: str, value: Any, overwrite: bool = True
+    dict_list_element: list, flat_key: str, value: Any, overwrite: bool = True,
 ) -> list: ...
 
 
@@ -146,7 +146,7 @@ def set_value_from_flat_key(
             # If all indexes not there, create them
             if len(dict_list_element) - 1 < index:
                 dict_list_element.extend(
-                    [None for _ in range(len(dict_list_element), index + 1)]
+                    [None for _ in range(len(dict_list_element), index + 1)],
                 )
 
             try:
@@ -167,7 +167,7 @@ def set_value_from_flat_key(
             temp_dict_value = dict_list_element.get(first_key, {})
 
             dict_list_element[first_key] = set_value_from_flat_key(
-                temp_dict_value, ".".join(list_key), value, overwrite=overwrite
+                temp_dict_value, ".".join(list_key), value, overwrite=overwrite,
             )
 
     # If no keys left (stop condition)
@@ -181,7 +181,7 @@ def set_value_from_flat_key(
     # Error during split
     else:
         raise ValueError(
-            "> Empty split not possible, something went wrong while setting dot dict"
+            "> Empty split not possible, something went wrong while setting dot dict",
         )
 
     # Final return to get full dict or list
@@ -189,7 +189,7 @@ def set_value_from_flat_key(
 
 
 def get_nested_from_flat(
-    flat_field: dict[str, Any], nested_field: dict | list | None = None
+    flat_field: dict[str, Any], nested_field: dict | list | None = None,
 ) -> dict | list:
     """Generate nested json from a flatten json
 
@@ -226,7 +226,7 @@ def get_nested_from_flat(
             nested_field = []
         elif any(all_field_start_with_numeric):
             raise ValueError(
-                "Either all fields starts with a numerical value, or none of them do"
+                "Either all fields starts with a numerical value, or none of them do",
             )
         else:
             nested_field = {}

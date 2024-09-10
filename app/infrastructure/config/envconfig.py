@@ -39,7 +39,7 @@ class EnvConfig(ConfigContract):
             Path(path).mkdir(parents=True, exist_ok=True)
         except PermissionError as e:
             raise BasePathError(
-                f"Permission denied when creating directory: {path}"
+                f"Permission denied when creating directory: {path}",
             ) from e
         except OSError as e:
             raise BasePathError(f"Failed to create directory {path}: {e}") from e

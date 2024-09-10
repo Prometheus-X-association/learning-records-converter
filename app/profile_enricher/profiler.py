@@ -92,6 +92,6 @@ class Profiler:
                 raise ProfilerError("Group name and template name cannot be empty")
         except ValueError as e:
             raise ProfilerError(
-                f"Invalid profile format. Expected 'group_name.template_name', got: {profile}"
+                f"Invalid profile format. Expected 'group_name.template_name', got: {profile}",
             ) from e
         return group_name, template_name

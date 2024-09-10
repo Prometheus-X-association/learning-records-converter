@@ -1,4 +1,5 @@
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from app.common.models.trace import Trace
 from app.common.type.types import JsonType
@@ -28,7 +29,7 @@ class TraceValidator:
         }
 
     def validate_trace(
-        self, template: StatementTemplate, trace: Trace
+        self, template: StatementTemplate, trace: Trace,
     ) -> list[ValidationError]:
         """
         Validate a trace against a given template.
@@ -51,7 +52,7 @@ class TraceValidator:
         return [ValidationError(**result.__dict__) for result in validation_results]
 
     def get_recommendations(
-        self, template: StatementTemplate, trace: Trace
+        self, template: StatementTemplate, trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a given template.
@@ -68,7 +69,7 @@ class TraceValidator:
         self.logger.debug("Start trace recommendations", log_context)
 
         validation_results = self._apply_rules(
-            template=template, trace=trace, rule_types={PresenceTypeEnum.RECOMMENDED}
+            template=template, trace=trace, rule_types={PresenceTypeEnum.RECOMMENDED},
         )
 
         if not validation_results:
@@ -103,7 +104,7 @@ class TraceValidator:
 
             # Validate the rule
             validation_results.extend(
-                self._validate_rule(rule=rule, values=values, rule_types=rule_types)
+                self._validate_rule(rule=rule, values=values, rule_types=rule_types),
             )
 
         return validation_results
@@ -140,7 +141,7 @@ class TraceValidator:
                     path=rule.location,
                     expected="included",
                     actual="missing",
-                )
+                ),
             )
         elif rule.presence == PresenceTypeEnum.EXCLUDED and values:
             self.logger.debug("Found rule presence validation", log_context)
@@ -150,7 +151,7 @@ class TraceValidator:
                     path=rule.location,
                     expected="excluded",
                     actual="present",
-                )
+                ),
             )
 
         # Check the "any" / "all" / "none" rules
@@ -172,7 +173,7 @@ class TraceValidator:
                             else rule_values
                         ),
                         actual=values,
-                    )
+                    ),
                 )
 
         return validation_results
@@ -211,7 +212,7 @@ class TraceValidator:
         return not any(v in none_values for v in values)
 
     def _get_values_for_rule(
-        self, rule: StatementTemplateRule, trace: Trace
+        self, rule: StatementTemplateRule, trace: Trace,
     ) -> list[Any]:
         """
         Extract values from the trace that are relevant to a specific rule.

@@ -25,5 +25,4 @@ class MappingRepository(ABC):
         :param output_format: The desired output format
         :return: The loaded mapping schema
         """
-
         raise NotImplementedError

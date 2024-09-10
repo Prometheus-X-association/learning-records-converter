@@ -1,18 +1,18 @@
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 class FakeXapiActorDefaultModel(BaseModel):
-    type_str: Optional[str] = Field(default=None, alias="str")
+    type_str: str | None = Field(default=None, alias="str")
 
 
 class FakeXapiActorValueModel(BaseModel):
-    type_int: Optional[int] = Field(default=None, alias="int")
+    type_int: int | None = Field(default=None, alias="int")
 
 
 class FakeXapiActorModel(BaseModel):
-    type: Optional[Any] = Field(default=None)
+    type: Any | None = Field(default=None)
     empty_val: str = Field(default=None)
     positive: int = Field(default=None)
     negative: str = Field(default=None)
@@ -21,34 +21,34 @@ class FakeXapiActorModel(BaseModel):
 
 
 class FakeXapiObjectModel(BaseModel):
-    value: Optional[str] = Field(default=None)
+    value: str | None = Field(default=None)
 
 
 class FakeXapiAuthorModel(BaseModel):
-    description: Optional[str] = Field(default=None)
+    description: str | None = Field(default=None)
 
 
 class FakeXapiContextModel(BaseModel):
-    full_content: Optional[str] = Field(default=None)
-    description: Optional[str] = Field(default=None)
+    full_content: str | None = Field(default=None)
+    description: str | None = Field(default=None)
 
 
 class FakeXapiDefaultModel(BaseModel):
-    type_dict: Optional[dict] = Field(default=None, alias="dict")
-    type_list: Optional[list] = Field(default=None, alias="list")
-    type_int: Optional[int] = Field(default=None, alias="int")
-    type_float: Optional[float] = Field(default=None, alias="float")
-    type_str: Optional[str] = Field(default=None, alias="str")
-    type_boolean: Optional[bool] = Field(default=None, alias="boolean")
-    empty: Optional[str] = Field(default=None)
+    type_dict: dict | None = Field(default=None, alias="dict")
+    type_list: list | None = Field(default=None, alias="list")
+    type_int: int | None = Field(default=None, alias="int")
+    type_float: float | None = Field(default=None, alias="float")
+    type_str: str | None = Field(default=None, alias="str")
+    type_boolean: bool | None = Field(default=None, alias="boolean")
+    empty: str | None = Field(default=None)
 
 
 class FakeXapiRootModel(BaseModel):
-    actor: Optional[FakeXapiActorModel] = Field(default=None)
-    object: Optional[FakeXapiObjectModel] = Field(default=None)
-    author: Optional[FakeXapiAuthorModel] = Field(default=None)
-    context: Optional[FakeXapiContextModel] = Field(default=None)
-    default: Optional[FakeXapiDefaultModel] = Field(default=None)
+    actor: FakeXapiActorModel | None = Field(default=None)
+    object: FakeXapiObjectModel | None = Field(default=None)
+    author: FakeXapiAuthorModel | None = Field(default=None)
+    context: FakeXapiContextModel | None = Field(default=None)
+    default: FakeXapiDefaultModel | None = Field(default=None)
 
 
 class FakeXapiModel(BaseModel):

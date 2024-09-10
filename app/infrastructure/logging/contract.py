@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 
 class LoggerContract(ABC):
@@ -9,7 +9,7 @@ class LoggerContract(ABC):
     """
 
     @abstractmethod
-    def debug(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
+    def debug(self, message: str, context: dict[str, Any] | None = None) -> None:
         """
         Log a debug message.
 
@@ -19,7 +19,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def info(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
+    def info(self, message: str, context: dict[str, Any] | None = None) -> None:
         """
         Log an info message.
 
@@ -29,7 +29,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def warning(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
+    def warning(self, message: str, context: dict[str, Any] | None = None) -> None:
         """
         Log a warning message.
 
@@ -39,7 +39,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
+    def error(self, message: str, context: dict[str, Any] | None = None) -> None:
         """
         Log an error message.
 
@@ -49,7 +49,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def critical(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
+    def critical(self, message: str, context: dict[str, Any] | None = None) -> None:
         """
         Log a critical message.
 
@@ -60,7 +60,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def exception(
-        self, message: str, exc: Exception, context: Optional[dict[str, Any]] = None
+        self, message: str, exc: Exception, context: dict[str, Any] | None = None,
     ) -> None:
         """
         Log an exception

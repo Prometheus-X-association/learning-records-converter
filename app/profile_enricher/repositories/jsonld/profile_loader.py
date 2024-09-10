@@ -1,7 +1,6 @@
 import json
 from functools import cache
 from pathlib import Path
-from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -79,7 +78,7 @@ class ProfileLoader:
         if template is None:
             self.logger.warning("Template not found", log_context)
             raise TemplateNotFoundError(
-                f"Template '{template_name}' not found in profile '{group_name}'"
+                f"Template '{template_name}' not found in profile '{group_name}'",
             )
 
         self.logger.info("Template found", log_context)
@@ -102,12 +101,12 @@ class ProfileLoader:
         except FileNotFoundError as e:
             self.logger.exception("Profile file not found", e, log_context)
             raise ProfileNotFoundError(
-                f"Profile file not found: {file_path}"
+                f"Profile file not found: {file_path}",
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in profile file", e, log_context)
             raise InvalidJsonError(
-                f"Invalid JSON in profile file: {file_path}"
+                f"Invalid JSON in profile file: {file_path}",
             ) from e
 
     def download_profile(self, group_name: str) -> JsonType:
@@ -133,27 +132,27 @@ class ProfileLoader:
                 if response.status != 200:
                     self.logger.error("Failed to download profile", log_context)
                     raise ProfileNotFoundError(
-                        f"Failed to download profile for {group_name}: HTTP status {response.status}"
+                        f"Failed to download profile for {group_name}: HTTP status {response.status}",
                     )
 
                 content = response.read().decode("utf-8")
             return json.loads(content)
         except HTTPError as e:
             self.logger.exception(
-                "HTTP error occurred while downloading profile", e, log_context
+                "HTTP error occurred while downloading profile", e, log_context,
             )
             raise ProfileNotFoundError(
-                f"Failed to download profile for {group_name}: HTTP error {e.code}"
+                f"Failed to download profile for {group_name}: HTTP error {e.code}",
             ) from e
         except URLError as e:
             self.logger.exception("Failed to download profile", e, log_context)
             raise ProfileNotFoundError(
-                f"Failed to download profile for {group_name}"
+                f"Failed to download profile for {group_name}",
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in downloaded profile", e, log_context)
             raise InvalidJsonError(
-                f"Invalid JSON in downloaded profile for {group_name}"
+                f"Invalid JSON in downloaded profile for {group_name}",
             ) from e
 
     def save_profile_file(self, file_path: Path, profile_json: JsonType):
@@ -169,7 +168,7 @@ class ProfileLoader:
             json_string = json.dumps(profile_json, ensure_ascii=False, indent=2)
             file_path.write_text(json_string, encoding="utf-8")
             self.logger.info("Profile saved", log_context)
-        except IOError as e:
+        except OSError as e:
             self.logger.exception("Failed to save profile", e, log_context)
             raise
 
@@ -192,13 +191,13 @@ class ProfileLoader:
         except Exception as e:
             self.logger.exception("Unexpected error during profile validation", e)
             raise ProfileValidationError(
-                "Unexpected error during profile validation"
+                "Unexpected error during profile validation",
             ) from e
 
     @staticmethod
     def _get_template_in_profile(
-        profile: Profile, template_name: str
-    ) -> Optional[StatementTemplate]:
+        profile: Profile, template_name: str,
+    ) -> StatementTemplate | None:
         """
         Get a specific template from a profile.
 

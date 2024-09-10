@@ -62,7 +62,7 @@ class JsonLdProfileRepository(ProfileRepository):
         self.logger.info("Trace enriched successfully", {"template": template_name})
 
     def validate_trace(
-        self, group_name: str, template_name: str, trace: Trace
+        self, group_name: str, template_name: str, trace: Trace,
     ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
@@ -89,7 +89,7 @@ class JsonLdProfileRepository(ProfileRepository):
         return self.trace_validator.validate_trace(template=template, trace=trace)
 
     def get_recommendations(
-        self, group_name: str, template_name: str, trace: Trace
+        self, group_name: str, template_name: str, trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specific template

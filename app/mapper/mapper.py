@@ -25,7 +25,7 @@ class Mapper:
         self.logger = logger
 
     def convert(
-        self, input_trace: Trace, output_format: CustomTraceFormatStrEnum
+        self, input_trace: Trace, output_format: CustomTraceFormatStrEnum,
     ) -> Trace:
         """
         Convert an input trace to the specified output format.
@@ -35,7 +35,7 @@ class Mapper:
         :return: The converted trace
         """
         schema = self.repository.load_schema(
-            input_format=input_trace.format, output_format=output_format
+            input_format=input_trace.format, output_format=output_format,
         )
 
         engine = MappingEngine(

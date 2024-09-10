@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Any, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -86,7 +86,7 @@ class CMIScore(BaseModel):
         le=1,
     )
     raw: float = Field(
-        ..., title="Raw Score", description="Reflects the performance of the learner."
+        ..., title="Raw Score", description="Reflects the performance of the learner.",
     )
     max: float = Field(
         ...,
@@ -102,13 +102,13 @@ class CMIScore(BaseModel):
 
 class CMIObjectiveIDOnly(BaseModel):
     id: str = Field(
-        ..., title="Objective ID", description="Unique label for the objective."
+        ..., title="Objective ID", description="Unique label for the objective.",
     )
 
 
 class CMIObjective(CMIObjectiveIDOnly):
     score: CMIScore = Field(
-        ..., title="Objective Score", description="Score related to the objective."
+        ..., title="Objective Score", description="Score related to the objective.",
     )
     success_status: SuccessStatus = Field(
         ...,
@@ -147,22 +147,22 @@ class CMIInteraction(BaseModel):
         description="Unique label for the interaction.",
     )
     type: InteractionType = Field(
-        ..., title="Interaction Type", description="Type of interaction."
+        ..., title="Interaction Type", description="Type of interaction.",
     )
-    objectives: List[CMIObjectiveIDOnly] = Field(
-        ..., title="Objectives", description="List of objectives."
+    objectives: list[CMIObjectiveIDOnly] = Field(
+        ..., title="Objectives", description="List of objectives.",
     )
     timestamp: int = Field(
-        ..., title="Interaction Time", description="Time of interaction."
+        ..., title="Interaction Time", description="Time of interaction.",
     )
-    correct_responses: List[CMICorrectResponses] = Field(
-        ..., title="Correct Responses", description="List of correct responses."
+    correct_responses: list[CMICorrectResponses] = Field(
+        ..., title="Correct Responses", description="List of correct responses.",
     )
     weighting: float = Field(
-        ..., title="Weighting", description="Weight of the interaction."
+        ..., title="Weighting", description="Weight of the interaction.",
     )
     learner_response: Any = Field(
-        ..., title="Learner Response", description="Response given by the learner."
+        ..., title="Learner Response", description="Response given by the learner.",
     )
     result: InteractionResult = Field(
         ...,
@@ -185,10 +185,10 @@ class CMIInteraction(BaseModel):
 class CMIComments(BaseModel):
     comment: str = Field(..., max_length=4000, title="Comment", description="Comment.")
     location: str = Field(
-        ..., max_length=250, title="Location", description="Location of the comment."
+        ..., max_length=250, title="Location", description="Location of the comment.",
     )
     timestamp: int = Field(
-        ..., title="Timestamp", description="Time of the comment (time(second,10,0))."
+        ..., title="Timestamp", description="Time of the comment (time(second,10,0)).",
     )
 
 
@@ -200,117 +200,117 @@ class CMICommentsFromLMS(CMIComments): ...
 
 class LearnerPreference(BaseModel):
     audio_level: float = Field(
-        ..., title="Audio Level", description="Audio level preference.", ge=0
+        ..., title="Audio Level", description="Audio level preference.", ge=0,
     )
     language: str = Field(
-        ..., max_length=250, title="Language", description="Language preference."
+        ..., max_length=250, title="Language", description="Language preference.",
     )
     delivery_speed: float = Field(
-        ..., title="Delivery Speed", description="Delivery speed preference.", ge=0
+        ..., title="Delivery Speed", description="Delivery speed preference.", ge=0,
     )
     audio_captioning: LearnerAudioCaptioning = Field(
-        ..., title="Audio Captioning", description="Audio captioning preference."
+        ..., title="Audio Captioning", description="Audio captioning preference.",
     )
 
 
 # SCORM 2004 Main Data Model
 class SCORM2004DataModel(BaseModel):
-    comments_from_learner: Optional[CMICommentsFromLearner] = Field(
-        None, title="Comments from Learner", description="Comments from the learner."
+    comments_from_learner: CMICommentsFromLearner | None = Field(
+        None, title="Comments from Learner", description="Comments from the learner.",
     )
-    comments_from_lms: Optional[CMICommentsFromLMS] = Field(
-        None, title="Comments from LMS", description="Comments from the LMS."
+    comments_from_lms: CMICommentsFromLMS | None = Field(
+        None, title="Comments from LMS", description="Comments from the LMS.",
     )
-    completion_status: Optional[CompletionStatus] = Field(
-        None, title="Completion Status", description="Completion status of the SCO."
+    completion_status: CompletionStatus | None = Field(
+        None, title="Completion Status", description="Completion status of the SCO.",
     )
-    completion_threshold: Optional[float] = Field(
+    completion_threshold: float | None = Field(
         None,
         title="Completion Threshold",
         description="Minimum scaled score required for completion.",
         ge=0,
         le=1,
     )
-    credit: Optional[Credit] = Field(
-        None, title="Credit", description="Indicates if credit is given for SCO."
+    credit: Credit | None = Field(
+        None, title="Credit", description="Indicates if credit is given for SCO.",
     )
-    entry: Optional[Entry] = Field(
-        None, title="Entry", description="Entry status of the learner."
+    entry: Entry | None = Field(
+        None, title="Entry", description="Entry status of the learner.",
     )
-    exit: Optional[ExitMode] = Field(
-        None, title="Exit Mode", description="How or why the learner exited the SCO."
+    exit: ExitMode | None = Field(
+        None, title="Exit Mode", description="How or why the learner exited the SCO.",
     )
-    interactions: Optional[List[CMIInteraction]] = Field(
-        None, title="Interactions", description="List of interactions."
+    interactions: list[CMIInteraction] | None = Field(
+        None, title="Interactions", description="List of interactions.",
     )
-    launch_data: Optional[str] = Field(
+    launch_data: str | None = Field(
         None,
         max_length=4000,
         title="Launch Data",
         description="Data provided upon launch.",
     )
-    learner_id: Optional[str] = Field(
-        None, max_length=4000, title="Learner ID", description="Identifies the learner."
+    learner_id: str | None = Field(
+        None, max_length=4000, title="Learner ID", description="Identifies the learner.",
     )
-    learner_name: Optional[str] = Field(
-        None, max_length=250, title="Learner Name", description="Name of the learner."
+    learner_name: str | None = Field(
+        None, max_length=250, title="Learner Name", description="Name of the learner.",
     )
-    learner_preference: Optional[LearnerPreference] = Field(
-        None, title="Learner Preference", description="Preferences of the learner."
+    learner_preference: LearnerPreference | None = Field(
+        None, title="Learner Preference", description="Preferences of the learner.",
     )
-    location: Optional[str] = Field(
+    location: str | None = Field(
         None,
         max_length=1000,
         title="Location",
         description="Learner's current location in the SCO.",
     )
-    max_time_allowed: Optional[float] = Field(
+    max_time_allowed: float | None = Field(
         None,
         title="Max Time Allowed",
         description="Maximum time allowed for the SCO (timeinterval(second, 10, 2)).",
     )
     mode: Mode = Field(None, title="Mode", description="Mode.")
-    objectives: Optional[List[CMIObjective]] = Field(
-        None, title="Objectives", description="List of objectives."
+    objectives: list[CMIObjective] | None = Field(
+        None, title="Objectives", description="List of objectives.",
     )
-    progress_measure: Optional[float] = Field(
+    progress_measure: float | None = Field(
         None,
         title="Progress Measure",
         description="Measure of the learner's progress.",
         ge=0,
         le=1,
     )
-    scaled_passing_score: Optional[float] = Field(
+    scaled_passing_score: float | None = Field(
         None,
         title="Scaled Passing Score",
         description="Scaled score required for passing.",
         ge=-1,
         le=1,
     )
-    score: Optional[CMIScore] = Field(
-        None, title="Score", description="Score of the learner."
+    score: CMIScore | None = Field(
+        None, title="Score", description="Score of the learner.",
     )
-    session_time: Optional[float] = Field(
+    session_time: float | None = Field(
         None,
         title="Session Time",
         description="Time spent in the current session (timeinterval(second,10,2)).",
     )
-    success_status: Optional[SuccessStatus] = Field(
-        None, title="Success Status", description="Completion status of the SCO."
+    success_status: SuccessStatus | None = Field(
+        None, title="Success Status", description="Completion status of the SCO.",
     )
-    suspend_data: Optional[str] = Field(
+    suspend_data: str | None = Field(
         None,
         max_length=64000,
         title="Suspend Data",
         description="Data stored between sessions.",
     )
-    time_limit_action: Optional[TimeLimitAction] = Field(
+    time_limit_action: TimeLimitAction | None = Field(
         None,
         max_length=250,
         title="Time Limit Action",
         description="Action to take when time limit is reached.",
     )
-    total_time: Optional[float] = Field(
+    total_time: float | None = Field(
         None,
         title="Total Time",
         description="Total time spent by the learner (timeinterval(second,10,2)).",

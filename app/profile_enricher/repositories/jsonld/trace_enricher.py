@@ -19,7 +19,7 @@ class TraceEnricher:
         self.logger = logger
 
     def get_enriched_data(
-        self, group_name: str, template: StatementTemplate, trace: Trace
+        self, group_name: str, template: StatementTemplate, trace: Trace,
     ) -> JsonType:
         """
         Get enriched data based on the given template.
@@ -51,7 +51,7 @@ class TraceEnricher:
         # Enriched more for rules with only one value
         if template.rules:
             enriched_data.update(
-                self._enrich_with_rules(template=template, trace=trace)
+                self._enrich_with_rules(template=template, trace=trace),
             )
 
         return get_nested_from_flat(flat_field=enriched_data)

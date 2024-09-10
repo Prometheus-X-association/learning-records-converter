@@ -20,7 +20,7 @@ class JsonLdProfilesUpdater:
     """
 
     def __init__(
-        self, destination_dir: str, logger: LoggerContract, config: ConfigContract
+        self, destination_dir: str, logger: LoggerContract, config: ConfigContract,
     ):
         """
         Initialize the JsonLdProfilesUpdater.
@@ -47,7 +47,7 @@ class JsonLdProfilesUpdater:
                 self.update_profile(profile_name=profile_name)
             except Exception as e:
                 self.logger.exception(
-                    "Failed to update profile file", e, {"profile": profile_name}
+                    "Failed to update profile file", e, {"profile": profile_name},
                 )
 
     def update_profile(self, profile_name: str) -> None:
@@ -65,7 +65,7 @@ class JsonLdProfilesUpdater:
             profile_json = self.profile_loader.download_profile(group_name=profile_name)
             self.profile_loader.build_profile_model(profile_json)
             self.profile_loader.save_profile_file(
-                file_path=file_path, profile_json=profile_json
+                file_path=file_path, profile_json=profile_json,
             )
             self.logger.info("Successfully updated profile", log_context)
         except ProfileNotFoundError:
@@ -99,7 +99,7 @@ def main(destination_dir: str | None = None) -> None:
     json_logger.info("Script starting", {"destination_dir": destination_dir})
 
     updater = JsonLdProfilesUpdater(
-        destination_dir=destination_dir, logger=json_logger, config=env_config
+        destination_dir=destination_dir, logger=json_logger, config=env_config,
     )
     updater.update_all_profiles()
 

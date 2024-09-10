@@ -1,4 +1,5 @@
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import ValidationError
@@ -82,7 +83,7 @@ class MappingEngine:
         if not all([self.input_format, self.output_format, self.mapping_to_apply]):
             self.logger.error("Incomplete mapping informations", self.log_context)
             raise MapperError(
-                "Input format, output format, and mapping configuration must be specified"
+                "Input format, output format, and mapping configuration must be specified",
             )
 
         # Check if input_trace match input_format (model validation)
@@ -93,7 +94,7 @@ class MappingEngine:
             raise InputTraceToModelError("Input format validation failed") from e
         except TypeError as e:
             self.logger.exception(
-                "Invalid data type in input trace", e, self.log_context
+                "Invalid data type in input trace", e, self.log_context,
             )
             raise InputTraceToModelError("Invalid data type in input trace") from e
         except Exception as e:
@@ -103,7 +104,7 @@ class MappingEngine:
                 self.log_context,
             )
             raise InputTraceToModelError(
-                "Input trace does not match the specified input format"
+                "Input trace does not match the specified input format",
             ) from e
         self.logger.debug("Input trace is valid against his format", self.log_context)
 
@@ -150,7 +151,7 @@ class MappingEngine:
         self.logger.debug("Apply mapping default values", self.log_context)
         for default_value in self.mapping_to_apply.default_values:
             output_trace = self._build_trace_with_output(
-                output_content=default_value, output_trace=output_trace, overwrite=False
+                output_content=default_value, output_trace=output_trace, overwrite=False,
             )
         return output_trace
 
@@ -167,15 +168,15 @@ class MappingEngine:
             self.output_format.value(**output_data)
         except ValidationError as e:
             self.logger.exception(
-                "Output format validation failed", e, self.log_context
+                "Output format validation failed", e, self.log_context,
             )
             raise OutputTraceToModelError("Output format validation failed") from e
         except TypeError as e:
             self.logger.exception(
-                "Invalid data type in output trace", e, self.log_context
+                "Invalid data type in output trace", e, self.log_context,
             )
             raise OutputTraceToModelError(
-                "Invalid data type in output trace"
+                "Invalid data type in output trace",
             ) from e
         except Exception as e:
             self.logger.exception(
@@ -184,7 +185,7 @@ class MappingEngine:
                 self.log_context,
             )
             raise OutputTraceToModelError(
-                "Output trace does not match the specified output format"
+                "Output trace does not match the specified output format",
             ) from e
 
         self.logger.info("Mapping done", self.log_context)
@@ -199,7 +200,7 @@ class MappingEngine:
         output_content: OutputMappingModel,
         output_trace: dict[str, Any],
         overwrite: bool,
-        arguments: list[Any] | None,
+        arguments: list[Any] = None,
     ) -> dict[str, Any]:
         """
         Build the output trace based on the output content.
@@ -224,7 +225,7 @@ class MappingEngine:
         return output_trace
 
     def _handle_output(
-        self, output_model: OutputMappingModel, arguments: list[Any]
+        self, output_model: OutputMappingModel, arguments: list[Any],
     ) -> list[FinalMappingModel]:
         """
         Handle the output based on the OutputMappingModel.
@@ -242,14 +243,14 @@ class MappingEngine:
 
         if output_model.switch:
             return self._apply_switch_transformation(
-                switch_value=output_model.switch, arguments=arguments
+                switch_value=output_model.switch, arguments=arguments,
             )
 
         if output_model.multiple:
             results = []
             for sub_output in output_model.multiple:
                 sub_results = self._handle_output(
-                    output_model=sub_output, arguments=arguments
+                    output_model=sub_output, arguments=arguments,
                 )
                 results.extend(sub_results)
             return results
@@ -258,7 +259,7 @@ class MappingEngine:
             value = output_model.value
         elif output_model.custom:
             value = self._apply_custom_transformation(
-                custom_input=output_model.custom, arguments=arguments
+                custom_input=output_model.custom, arguments=arguments,
             )
         else:
             value = arguments[0] if arguments else None
@@ -266,7 +267,7 @@ class MappingEngine:
         return [FinalMappingModel(output_field=output_model.output_field, value=value)]
 
     def _apply_custom_transformation(
-        self, custom_input: list[str], arguments: list[Any]
+        self, custom_input: list[str], arguments: list[Any],
     ) -> Any:
         """
         Apply a series of custom transformations to the input arguments.
@@ -286,7 +287,7 @@ class MappingEngine:
                 )
             except Exception as e:
                 self.logger.exception(
-                    "Error in custom transformation", e, self.log_context
+                    "Error in custom transformation", e, self.log_context,
                 )
                 raise CodeEvaluationError("Error in custom transformation") from e
         return arguments
@@ -301,7 +302,6 @@ class MappingEngine:
         :param expr: The expression to evaluate
         :return: The evaluated expression
         """
-
         return eval(expr)
 
     def _apply_switch_transformation(
@@ -323,7 +323,7 @@ class MappingEngine:
         for condition in switch_value:
             if str(condition.condition).lower().strip() == DEFAULT_CONDITION:
                 list_response.extend(
-                    self._handle_output(output_model=condition, arguments=arguments)
+                    self._handle_output(output_model=condition, arguments=arguments),
                 )
                 return list_response
 
@@ -331,7 +331,7 @@ class MappingEngine:
                 lambda_condition = self._eval(condition.condition)
                 if callable(lambda_condition) and lambda_condition(*arguments):
                     list_response.extend(
-                        self._handle_output(output_model=condition, arguments=arguments)
+                        self._handle_output(output_model=condition, arguments=arguments),
                     )
                     return list_response
             except TypeError as e:
