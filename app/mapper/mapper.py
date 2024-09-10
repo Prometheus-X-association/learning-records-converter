@@ -14,7 +14,7 @@ class Mapper:
     This class uses a MappingRepository to load schemas and a MappingEngine to perform the actual conversion.
     """
 
-    def __init__(self, repository: MappingRepository, logger: LoggerContract):
+    def __init__(self, repository: MappingRepository, logger: LoggerContract) -> None:
         """
         Initialize the Mapper with a MappingRepository.
 

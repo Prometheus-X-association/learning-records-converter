@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ConfigContract(ABC):
-    """
-    Abstract base class defining the contract for configuration management.
-    """
+    """Abstract base class defining the contract for configuration management."""
 
     @abstractmethod
     def get_log_level(self) -> str:

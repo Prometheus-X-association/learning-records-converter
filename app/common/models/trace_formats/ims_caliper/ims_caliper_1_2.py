@@ -1800,8 +1800,8 @@ class ResourceManagementEventModel(EventModel):
 
     @field_validator("generated")
     @staticmethod
-    def generated_required_condition(generated, values):
-        """Required when the action value is Copied, otherwise optional"""
+    def generated_required_condition(generated, values) -> None:
+        """Required when the action value is Copied, otherwise optional."""
         if values.data.get("action", "") == ActionTermEnum.COPIED and not generated:
             raise ValueError(
                 f"generated cannot be empty if action is {ActionTermEnum.COPIED}",
@@ -1964,7 +1964,7 @@ class ToolLaunchEventModel(EventModel):
     @field_validator("federated_session")
     @staticmethod
     def federated_session_required_condition(federated_session, values):
-        """Required when the action value is Launched, otherwise optional"""
+        """Required when the action value is Launched, otherwise optional."""
         if (
             values.data.get("action", "") == ActionTermEnum.LAUNCHED
             and not federated_session

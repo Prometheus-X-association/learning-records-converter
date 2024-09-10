@@ -15,13 +15,11 @@ from app.profile_enricher.repositories.jsonld.profile_loader import ProfileLoade
 
 
 class JsonLdProfilesUpdater:
-    """
-    A class to update JSON-LD profiles based on environment variables.
-    """
+    """A class to update JSON-LD profiles based on environment variables."""
 
     def __init__(
         self, destination_dir: str, logger: LoggerContract, config: ConfigContract,
-    ):
+    ) -> None:
         """
         Initialize the JsonLdProfilesUpdater.
 
@@ -35,9 +33,7 @@ class JsonLdProfilesUpdater:
         self.profile_loader: ProfileLoader = ProfileLoader(logger=logger, config=config)
 
     def update_all_profiles(self) -> None:
-        """
-        Update all profiles based on environment variables starting with 'PROFILE'.
-        """
+        """Update all profiles based on environment variables starting with 'PROFILE'."""
         self.logger.debug("Create path if not exists", {"path": self.destination_path})
         self.destination_path.mkdir(parents=True, exist_ok=True)
 

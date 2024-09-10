@@ -21,7 +21,7 @@ class YamlMappingRepository(MappingRepository):
     This class handles the loading of mapping schemas from YAML files based on input and output formats.
     """
 
-    def __init__(self, logger: LoggerContract):
+    def __init__(self, logger: LoggerContract) -> None:
         """
         Initialize the YamlMappingRepository.
 

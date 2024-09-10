@@ -22,7 +22,7 @@ from app.profile_enricher.profiles.jsonld import Profile, StatementTemplate
 class ProfileLoader:
     """Class responsible for loading profile's file."""
 
-    def __init__(self, logger: LoggerContract, config: ConfigContract):
+    def __init__(self, logger: LoggerContract, config: ConfigContract) -> None:
         self.logger = logger
         self.config = config
 
@@ -155,7 +155,7 @@ class ProfileLoader:
                 f"Invalid JSON in downloaded profile for {group_name}",
             ) from e
 
-    def save_profile_file(self, file_path: Path, profile_json: JsonType):
+    def save_profile_file(self, file_path: Path, profile_json: JsonType) -> None:
         """
         Save a profile file to the file system.
 

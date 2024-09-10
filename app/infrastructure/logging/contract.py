@@ -63,7 +63,7 @@ class LoggerContract(ABC):
         self, message: str, exc: Exception, context: dict[str, Any] | None = None,
     ) -> None:
         """
-        Log an exception
+        Log an exception.
 
         :param message: A descriptive message about the exception
         :param exc: The exception object

@@ -54,7 +54,7 @@ class ExtendedTypeBaseModel(BaseModel):
 
     @classmethod
     def _get_correct_value(cls, value: Any, annotations: list) -> Any:
-        """Get the correct model instance depending on value
+        """Get the correct model instance depending on value.
 
         Args:
             value (Any): Data for the model

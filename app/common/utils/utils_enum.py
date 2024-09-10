@@ -4,7 +4,7 @@ from typing import Any
 
 
 class CaseInsensitiveStrEnum(Enum):
-    """Case-insensitive when looking for value in enum"""
+    """Case-insensitive when looking for value in enum."""
 
     # Case-insensitive
     @classmethod

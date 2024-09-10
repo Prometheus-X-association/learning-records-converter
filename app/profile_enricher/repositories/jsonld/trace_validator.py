@@ -1,5 +1,4 @@
-from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.common.models.trace import Trace
 from app.common.type.types import JsonType
@@ -16,11 +15,14 @@ from app.profile_enricher.types import (
 )
 from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 class TraceValidator:
     """Class responsible for validating traces against templates."""
 
-    def __init__(self, logger: LoggerContract):
+    def __init__(self, logger: LoggerContract) -> None:
         self.logger = logger
         self.rule_checks: dict[str, Callable[[list[Any], list[Any]], bool]] = {
             "any": self._check_any,
@@ -117,7 +119,7 @@ class TraceValidator:
     ) -> list[ValidationResult]:
         """
         Check if a trace follows a specific rule.
-        See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid
+        See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid.
 
         :param rule: The rule to check against
         :param values: The extracted values relevant to the rule

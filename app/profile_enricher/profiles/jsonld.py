@@ -53,18 +53,14 @@ class CustomBaseModel(BaseModel):
 
 # Enums
 class AuthorTypeEnum(StrEnum):
-    """
-    Enumeration of types of authors for profiles.
-    """
+    """Enumeration of types of authors for profiles."""
 
     ORGANIZATION = "Organization"
     PERSON = "Person"
 
 
 class ConceptTypeEnum(StrEnum):
-    """
-    Enumeration of types of concepts in a profile.
-    """
+    """Enumeration of types of concepts in a profile."""
 
     VERB = "Verb"
     ACTIVITY_TYPE = "ActivityType"
@@ -72,9 +68,7 @@ class ConceptTypeEnum(StrEnum):
 
 
 class ExtensionTypeEnum(StrEnum):
-    """
-    Enumeration of types of extensions in a profile.
-    """
+    """Enumeration of types of extensions in a profile."""
 
     CONTEXT = "ContextExtension"
     RESULT = "ResultExtension"
@@ -82,9 +76,7 @@ class ExtensionTypeEnum(StrEnum):
 
 
 class DocumentResourceTypeEnum(StrEnum):
-    """
-    Enumeration of types of document resources in a profile.
-    """
+    """Enumeration of types of document resources in a profile."""
 
     STATE = "StateResource"
     AGENT_PROFILE = "AgentProfileResource"
@@ -92,9 +84,7 @@ class DocumentResourceTypeEnum(StrEnum):
 
 
 class PresenceTypeEnum(StrEnum):
-    """
-    Enumeration of presence types for rules in statement templates.
-    """
+    """Enumeration of presence types for rules in statement templates."""
 
     INCLUDED = "included"
     EXCLUDED = "excluded"
@@ -102,50 +92,38 @@ class PresenceTypeEnum(StrEnum):
 
 
 class ActivityTypeEnum(StrEnum):
-    """
-    Enumeration of types of activities.
-    """
+    """Enumeration of types of activities."""
 
     ACTIVITY = "Activity"
 
 
 class ProfileTypeEnum(StrEnum):
-    """
-    Enumeration of profile types.
-    """
+    """Enumeration of profile types."""
 
     PROFILE = "Profile"
 
 
 class StatementTemplateTypeEnum(StrEnum):
-    """
-    Enumeration of types of statement templates.
-    """
+    """Enumeration of types of statement templates."""
 
     STATEMENTTEMPLATE = "StatementTemplate"
 
 
 class PatternTypeEnum(StrEnum):
-    """
-    Enumeration of pattern types in a profile.
-    """
+    """Enumeration of pattern types in a profile."""
 
     PATTERN = "Pattern"
 
 
 # Models
 class LanguageMap(CustomBaseModel):
-    """
-    A model representing a language map for multilingual labels and definitions.
-    """
+    """A model representing a language map for multilingual labels and definitions."""
 
     en: str
 
 
 class ProfileVersion(CustomBaseModel):
-    """
-    A model representing a version of a profile.
-    """
+    """A model representing a version of a profile."""
 
     id: AnyUrl
     was_revision_of: list[AnyUrl] | None = Field(None, alias="wasRevisionOf")
@@ -153,9 +131,7 @@ class ProfileVersion(CustomBaseModel):
 
 
 class Author(CustomBaseModel):
-    """
-    A model representing an author of a profile.
-    """
+    """A model representing an author of a profile."""
 
     type: AuthorTypeEnum
     name: str
@@ -163,9 +139,7 @@ class Author(CustomBaseModel):
 
 
 class ProfileElement(BaseModel, ABC):
-    """
-    Abstract base model for elements of a profile, including concepts, extensions, and document resources.
-    """
+    """Abstract base model for elements of a profile, including concepts, extensions, and document resources."""
 
     id: AnyUrl
     type: str
@@ -176,9 +150,7 @@ class ProfileElement(BaseModel, ABC):
 
 
 class Concept(ProfileElement):
-    """
-    A model representing a concept in a profile.
-    """
+    """A model representing a concept in a profile."""
 
     type: ConceptTypeEnum
     broader: list[AnyUrl] | None = None
@@ -194,9 +166,7 @@ class Concept(ProfileElement):
     def related_only_for_deprecated(
         value: list[AnyUrl] | None, info: ValidationInfo,
     ) -> list[AnyUrl] | None:
-        """
-        Validator to ensure 'related' field is used only for deprecated concepts.
-        """
+        """Validator to ensure 'related' field is used only for deprecated concepts."""
         if value and not info.data.get("deprecated"):
             raise ValueError(
                 "'related' MUST only be used on Concepts that are deprecated",
@@ -205,9 +175,7 @@ class Concept(ProfileElement):
 
 
 class Extension(ProfileElement):
-    """
-    A model representing an extension in a profile.
-    """
+    """A model representing an extension in a profile."""
 
     type: ExtensionTypeEnum
     recommended_activity_types: list[AnyUrl] | None = Field(
@@ -223,9 +191,7 @@ class Extension(ProfileElement):
     def validate_recommended_activity_types(
         value: list[AnyUrl] | None, info: ValidationInfo,
     ) -> list[AnyUrl] | None:
-        """
-        Validator to ensure 'recommendedActivityTypes' is only allowed on ActivityExtension types.
-        """
+        """Validator to ensure 'recommendedActivityTypes' is only allowed on ActivityExtension types."""
         if value is not None and info.data.get("type") != ExtensionTypeEnum.ACTIVITY:
             raise ValueError(
                 "recommendedActivityTypes is only allowed on an ActivityExtension",
@@ -237,9 +203,7 @@ class Extension(ProfileElement):
     def validate_recommended_verbs(
         value: list[AnyUrl] | None, info: ValidationInfo,
     ) -> list[AnyUrl] | None:
-        """
-        Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types.
-        """
+        """Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types."""
         if value is not None and info.data.get("type") not in [
             ExtensionTypeEnum.CONTEXT,
             ExtensionTypeEnum.RESULT,
@@ -251,9 +215,7 @@ class Extension(ProfileElement):
 
     @model_validator(mode="after")
     def validate_schema_fields(self) -> "Extension":
-        """
-        Validator to ensure that only one of 'iriSchema' or 'inlineSchema' is used.
-        """
+        """Validator to ensure that only one of 'iriSchema' or 'inlineSchema' is used."""
         if self.iri_schema is not None and self.inline_schema is not None:
             raise ValueError(
                 "Profiles MUST use at most one of schema and inlineSchema for Extensions",
@@ -262,9 +224,7 @@ class Extension(ProfileElement):
 
 
 class DocumentResource(ProfileElement):
-    """
-    A model representing a document resource in a profile.
-    """
+    """A model representing a document resource in a profile."""
 
     type: DocumentResourceTypeEnum
     content_type: str = Field(..., alias="contentType")
@@ -274,9 +234,7 @@ class DocumentResource(ProfileElement):
 
     @model_validator(mode="after")
     def validate_schema_fields(self) -> "DocumentResource":
-        """
-        Validator to ensure that only one of 'iriSchema' or 'inlineSchema' is used.
-        """
+        """Validator to ensure that only one of 'iriSchema' or 'inlineSchema' is used."""
         if self.iri_schema is not None and self.inline_schema is not None:
             raise ValueError(
                 "Profiles MUST use at most one of schema and inlineSchema for Document Resources",
@@ -285,9 +243,7 @@ class DocumentResource(ProfileElement):
 
 
 class ActivityDefinition(CustomBaseModel):
-    """
-    A model defining the properties of an activity.
-    """
+    """A model defining the properties of an activity."""
 
     context: Annotated[AnyUrl, Literal[ACTIVITY_CONTEXT_URL]] = Field(
         default=ACTIVITY_CONTEXT_URL, alias="@context",
@@ -300,9 +256,7 @@ class ActivityDefinition(CustomBaseModel):
 
 
 class Activity(CustomBaseModel):
-    """
-    A model representing an activity in a profile.
-    """
+    """A model representing an activity in a profile."""
 
     id: AnyUrl
     type: ActivityTypeEnum
@@ -312,9 +266,7 @@ class Activity(CustomBaseModel):
 
 
 class StatementTemplateRule(CustomBaseModel):
-    """
-    A model representing a rule for statement templates.
-    """
+    """A model representing a rule for statement templates."""
 
     location: str = Field(pattern=LOCATION_PATTERN)
     selector: str = Field(pattern=LOCATION_PATTERN, default=None)
@@ -327,9 +279,7 @@ class StatementTemplateRule(CustomBaseModel):
     @field_validator("location", "selector")
     @staticmethod
     def validate_jsonpath(value: str | None) -> str | None:
-        """
-        Validator to ensure that filter and script expressions are not used in JSONPath.
-        """
+        """Validator to ensure that filter and script expressions are not used in JSONPath."""
         if re.search(r"\(.*\)", value):
             raise ValueError(
                 "Filter and script expressions MUST NOT be used in JSONPath",
@@ -338,9 +288,7 @@ class StatementTemplateRule(CustomBaseModel):
 
     @model_validator(mode="after")
     def at_least_one_rule(self) -> "StatementTemplateRule":
-        """
-        Validator to ensure that at least one of 'presence', 'any', 'all', or 'none' is specified.
-        """
+        """Validator to ensure that at least one of 'presence', 'any', 'all', or 'none' is specified."""
         if not any([self.presence, self.any, self.all, self.none]):
             raise ValueError(
                 "A Statement Template Rule MUST include one or more of presence, any, all, or none",
@@ -349,9 +297,7 @@ class StatementTemplateRule(CustomBaseModel):
 
 
 class StatementTemplate(ProfileElement):
-    """
-    A model representing a statement template in a profile.
-    """
+    """A model representing a statement template in a profile."""
 
     type: StatementTemplateTypeEnum
     verb: AnyUrl | None = None
@@ -381,9 +327,7 @@ class StatementTemplate(ProfileElement):
 
     @model_validator(mode="after")
     def not_both_object_ref_and_activity_type(self) -> "StatementTemplate":
-        """
-        Validator to ensure that 'objectStatementRefTemplate' and 'objectActivityType' are not both present.
-        """
+        """Validator to ensure that 'objectStatementRefTemplate' and 'objectActivityType' are not both present."""
         if (
             self.object_statement_ref_template is not None
             and self.object_activity_type is not None
@@ -395,9 +339,7 @@ class StatementTemplate(ProfileElement):
 
 
 class Pattern(ProfileElement):
-    """
-    A model representing a pattern in a profile.
-    """
+    """A model representing a pattern in a profile."""
 
     type: PatternTypeEnum
     primary: bool = Field(default=False)
@@ -412,9 +354,7 @@ class Pattern(ProfileElement):
     def primary_must_have_label_and_definition(
         value: LanguageMap | None, info: ValidationInfo,
     ) -> LanguageMap | None:
-        """
-        Validator to ensure that primary patterns include both 'prefLabel' and 'definition'.
-        """
+        """Validator to ensure that primary patterns include both 'prefLabel' and 'definition'."""
         if info.data.get("primary") and value is None:
             raise ValueError("A primary Pattern MUST include prefLabel and definition")
         return value
@@ -422,9 +362,7 @@ class Pattern(ProfileElement):
     @field_validator("alternates")
     @staticmethod
     def validate_alternates(value: list[AnyUrl] | None) -> list[AnyUrl] | None:
-        """
-        Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'.
-        """
+        """Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'."""
         if value is not None and any(x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value):
             raise ValueError(
                 "MUST NOT put optional or zeroOrMore directly inside alternates",
@@ -436,9 +374,7 @@ class Pattern(ProfileElement):
     def validate_sequence(
         value: list[AnyUrl] | None, info: ValidationInfo,
     ) -> list[AnyUrl] | None:
-        """
-        Validator to ensure that sequences include at least two members, unless specific conditions apply.
-        """
+        """Validator to ensure that sequences include at least two members, unless specific conditions apply."""
         if value is not None and len(value) < 2 and not (
                 info.data.get("primary") and not info.data.get("inScheme")
             ):
@@ -449,9 +385,7 @@ class Pattern(ProfileElement):
 
     @model_validator(mode="after")
     def exactly_one_pattern_type(self) -> "Pattern":
-        """
-        Validator to ensure that exactly one pattern type is specified.
-        """
+        """Validator to ensure that exactly one pattern type is specified."""
         pattern_types = [
             "alternates",
             "optional",
@@ -467,11 +401,9 @@ class Pattern(ProfileElement):
 
     @model_validator(mode="after")
     def no_self_reference(self) -> "Pattern":
-        """
-        Validator to ensure that patterns do not reference themselves, either directly or indirectly.
-        """
+        """Validator to ensure that patterns do not reference themselves, either directly or indirectly."""
 
-        def check_self_reference(pattern_id, pattern_list):
+        def check_self_reference(pattern_id, pattern_list) -> None:
             if pattern_id in pattern_list:
                 raise ValueError(
                     "MUST NOT include any Pattern within itself, or within any Pattern within itself, or at any depth",
@@ -493,9 +425,7 @@ class Pattern(ProfileElement):
 
 
 class Profile(CustomBaseModel):
-    """
-    A model representing a profile in the system.
-    """
+    """A model representing a profile in the system."""
 
     id: AnyUrl
     context: Annotated[AnyUrl, Literal[PROFILE_CONTEXT_URL]] = Field(
@@ -516,9 +446,7 @@ class Profile(CustomBaseModel):
 
     @model_validator(mode="after")
     def unique_pattern_ids(self) -> "Profile":
-        """
-        Validator to ensure that all pattern IDs are unique and not the same as the profile ID.
-        """
+        """Validator to ensure that all pattern IDs are unique and not the same as the profile ID."""
         pattern_ids = set()
         for pattern in self.patterns or []:
             if pattern.id in pattern_ids or pattern.id == self.id:
@@ -530,9 +458,7 @@ class Profile(CustomBaseModel):
 
     @model_validator(mode="after")
     def check_version_consistency(self) -> "Profile":
-        """
-        Validator to ensure that 'wasRevisionOf' references existing versions.
-        """
+        """Validator to ensure that 'wasRevisionOf' references existing versions."""
         all_ids = {v.id for v in self.versions}
         for version in self.versions:
             if version.was_revision_of:
@@ -545,9 +471,7 @@ class Profile(CustomBaseModel):
 
     @model_validator(mode="after")
     def validate_concept_references(self) -> "Profile":
-        """
-        Validator to ensure that all concept references are valid within the profile.
-        """
+        """Validator to ensure that all concept references are valid within the profile."""
         concept_ids = {c.id for c in self.concepts or []}
         for concept in self.concepts or []:
             if isinstance(concept, Concept):

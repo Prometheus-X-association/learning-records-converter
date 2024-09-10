@@ -12,11 +12,9 @@ from .trace_validator import TraceValidator
 
 
 class JsonLdProfileRepository(ProfileRepository):
-    """
-    A repository for handling JSON-LD profiles.
-    """
+    """A repository for handling JSON-LD profiles."""
 
-    def __init__(self, logger: LoggerContract, config: ConfigContract):
+    def __init__(self, logger: LoggerContract, config: ConfigContract) -> None:
         """
         Initialize the JsonLdProfileRepository.
 
@@ -92,7 +90,7 @@ class JsonLdProfileRepository(ProfileRepository):
         self, group_name: str, template_name: str, trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
-        Generate recommendations for a trace based on a specific template
+        Generate recommendations for a trace based on a specific template.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile

@@ -15,7 +15,7 @@ CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = (
 class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
-    def __init__(self, logger: LoggerContract):
+    def __init__(self, logger: LoggerContract) -> None:
         self.logger = logger
 
     def get_enriched_data(
@@ -58,7 +58,7 @@ class TraceEnricher:
 
     def _enrich_with_rules(self, template: StatementTemplate, trace: Trace) -> JsonType:
         """
-        Get enriched data based on the template's rules than contain only one value
+        Get enriched data based on the template's rules than contain only one value.
 
         :param template: The template to use for enrichment.
         :param trace: The trace that needs to be enriched.

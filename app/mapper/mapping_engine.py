@@ -32,9 +32,7 @@ DEFAULT_CONDITION = "default"
 
 
 class MappingEngine:
-    """
-    Handles mapping from an input format to an output format using a config model.
-    """
+    """Handles mapping from an input format to an output format using a config model."""
 
     def __init__(
         self,
@@ -42,7 +40,7 @@ class MappingEngine:
         mapping_to_apply: MappingSchema,
         output_format: CustomTraceFormatModelEnum,
         logger: LoggerContract,
-    ):
+    ) -> None:
         """
         Initialize the MappingEngine.
 
@@ -73,7 +71,7 @@ class MappingEngine:
         output_data = self._post_process(mapped_data=mapped_data)
         return self._create_output_trace(output_data=output_data)
 
-    def _validate_inputs(self, input_trace: Trace):
+    def _validate_inputs(self, input_trace: Trace) -> None:
         """
         Validate the input trace and configuration.
 
@@ -200,7 +198,7 @@ class MappingEngine:
         output_content: OutputMappingModel,
         output_trace: dict[str, Any],
         overwrite: bool,
-        arguments: list[Any] = None,
+        arguments: list[Any] | None = None,
     ) -> dict[str, Any]:
         """
         Build the output trace based on the output content.

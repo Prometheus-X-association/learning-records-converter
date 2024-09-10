@@ -1,3 +1,4 @@
+import contextlib
 import re
 from pathlib import Path
 from typing import Any, overload
@@ -16,7 +17,7 @@ def remove_empty_elements(dictionary: dict) -> dict: ...
 
 
 def remove_empty_elements(dictionary: list | dict) -> list | dict:
-    """Remove empty fields
+    """Remove empty fields.
 
     Args:
         dictionary : dictionary to remove empty fields
@@ -24,7 +25,7 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
     Returns:
         dictionnary with removed fields
     """
-    if not isinstance(dictionary, (dict, list)):
+    if not isinstance(dictionary, dict | list):
         return dictionary
     if isinstance(dictionary, list):
         return [
@@ -46,7 +47,7 @@ def get_value_from_flat_key(
 ) -> Any:
     """Get value from a dict element by using a flatten key (keys separated with dotes)
     If the value exists (even if it's empty), the method returns the value.
-    Else, the 'default_value' is returned
+    Else, the 'default_value' is returned.
 
     TODO :
         - use default_value really when value does not exist
@@ -77,7 +78,7 @@ def get_value_from_flat_key(
             if index < total_list_key_len:
                 value = default_value
             break
-    if return_copy and isinstance(value, (list, dict)):
+    if return_copy and isinstance(value, list | dict):
         return value.copy()
     return value
 
@@ -131,7 +132,7 @@ def set_value_from_flat_key(
         # If not overwrite but found element is not list, dict or None, return
         if (
             not overwrite
-            and not isinstance(dict_list_element, (list, dict))
+            and not isinstance(dict_list_element, list | dict)
             and not is_empty(dict_list_element)  # before : None
         ):
             # Return current value
@@ -191,7 +192,7 @@ def set_value_from_flat_key(
 def get_nested_from_flat(
     flat_field: dict[str, Any], nested_field: dict | list | None = None,
 ) -> dict | list:
-    """Generate nested json from a flatten json
+    """Generate nested json from a flatten json.
 
     Args:
         flat_field (dict):
@@ -238,7 +239,7 @@ def get_nested_from_flat(
 
 def convert_yaml_file_to_json(yaml_path: Path) -> dict:
     """Convert a YAML file into a dict.
-    The path to the YAML file is passed to the function and is loaded afterward
+    The path to the YAML file is passed to the function and is loaded afterward.
 
     Args:
         yaml_path (Path): File path to YAML file
@@ -257,7 +258,7 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
     ``dct``.
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
-    :return: None
+    :return: None.
     """
     for k in merge_dct:
         if (

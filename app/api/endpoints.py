@@ -30,7 +30,7 @@ from .schemas import (
 
 
 class LRCAPIRouter:
-    def __init__(self, config: ConfigContract, logger: LoggerContract):
+    def __init__(self, config: ConfigContract, logger: LoggerContract) -> None:
         """
         Initialize the LRCAPIRouter.
 
@@ -42,7 +42,7 @@ class LRCAPIRouter:
         self.router = APIRouter()
         self.setup_routes()
 
-    def setup_routes(self):
+    def setup_routes(self) -> None:
         """Set up the LRC API routes."""
         self.router.add_api_route(
             "/validate",

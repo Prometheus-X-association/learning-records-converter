@@ -6,11 +6,9 @@ from .types import ValidationError, ValidationRecommendation
 
 
 class Profiler:
-    """
-    A class to manage profile-based operations on traces.
-    """
+    """A class to manage profile-based operations on traces."""
 
-    def __init__(self, repository: ProfileRepository):
+    def __init__(self, repository: ProfileRepository) -> None:
         """
         Initialize the Profiler with a ProfileRepository.
 
@@ -84,7 +82,7 @@ class Profiler:
         Parse a profile identifier in the format 'group_name.template_name'
         :param profile: The profile identifier
         :return: The group_name and the template_name
-        :raises ProfilerException: If the profile format is invalid
+        :raises ProfilerException: If the profile format is invalid.
         """
         try:
             group_name, template_name = profile.split(".", 1)
