@@ -2,7 +2,8 @@ from random import choice
 
 
 def random_case_in_string(text: str) -> str:
-    """Randomly change char case in string
+    """Randomly change char case in string.
+
     xapi > xApI or XAPI or xAPi.
 
     Args:

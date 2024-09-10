@@ -79,7 +79,8 @@ class Profiler:
     @staticmethod
     def _parse_profile(profile: str) -> tuple[str, str]:
         """
-        Parse a profile identifier in the format 'group_name.template_name'
+        Parse a profile identifier in the format 'group_name.template_name'.
+
         :param profile: The profile identifier
         :return: The group_name and the template_name
         :raises ProfilerException: If the profile format is invalid.

@@ -6,23 +6,33 @@ from enums import TraceFormatEnum, TraceFormatModelEnum, TraceFormatOutputMappin
 
 @extend_enum(TraceFormatModelEnum, enum_class=TraceFormatEnum)
 class CustomTraceFormatModelEnum(TraceFormatEnum):
-    """All Trace format models."""
+    """
+    All Trace format models.
 
-    # FAKE_SCORM = FakeScormModel
-    # FAKE_XAPI = FakeXapiModel
+    Example:
+        FAKE_SCORM = FakeScormModel
+        FAKE_XAPI = FakeXapiModel
+
+    """
 
 
 class TraceFormatToFakeXapiMappingEnum(TraceFormatEnum):
-    """All mappings to transform a trace format into `fake_xapi`."""
+    """
+    All mappings to transform a trace format into `fake_xapi`.
 
-    # FAKE_SCORM = "data/mappers/mapping_example_fake_scorm_to_fake_xapi.yml"
+    Example :
+        FAKE_SCORM = "data/mappers/mapping_example_fake_scorm_to_fake_xapi.yml"
+    """
 
 
 @extend_enum(TraceFormatOutputMappingEnum, enum_class=TraceFormatEnum)
 class CustomTraceFormatOutputMappingEnum(TraceFormatEnum):
-    """All Output Format Enums that regroups the mapping for each input."""
+    """
+    All Output Format Enums that regroups the mapping for each input.
 
-    # FAKE_XAPI = TraceFormatToFakeXapiMappingEnum
+    Example :
+        FAKE_XAPI = TraceFormatToFakeXapiMappingEnum
+    """
 
 
 class CaseInsensitiveStrTraceFormatEnum(TraceFormatEnum, CaseInsensitiveStrEnum):
@@ -32,6 +42,7 @@ class CaseInsensitiveStrTraceFormatEnum(TraceFormatEnum, CaseInsensitiveStrEnum)
 @str_enum(CustomTraceFormatModelEnum, enum_class=CaseInsensitiveStrTraceFormatEnum)
 class CustomTraceFormatStrEnum(TraceFormatEnum):
     """
-    All trace format stringed name
+    All trace format stringed name.
+
     CAUTION : DO NOT MODIFY IF NOT NEEDED. This Enum is automatically filled.
     """

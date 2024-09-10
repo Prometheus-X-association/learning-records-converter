@@ -7,6 +7,7 @@ from app.profile_enricher.types import ValidationError, ValidationRecommendation
 class ProfileRepository(ABC):
     """
     Abstract base class for profile repositories.
+
     Defines the interface for enriching and validating traces based on profiles.
     """
 

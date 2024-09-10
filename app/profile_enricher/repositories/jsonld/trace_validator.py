@@ -23,6 +23,11 @@ class TraceValidator:
     """Class responsible for validating traces against templates."""
 
     def __init__(self, logger: LoggerContract) -> None:
+        """
+        Initialize the TraceValidator.
+
+        :param logger: The logger instance for logging operations.
+        """
         self.logger = logger
         self.rule_checks: dict[str, Callable[[list[Any], list[Any]], bool]] = {
             "any": self._check_any,
@@ -125,6 +130,7 @@ class TraceValidator:
     ) -> list[ValidationResult]:
         """
         Check if a trace follows a specific rule.
+
         See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid.
 
         :param rule: The rule to check against

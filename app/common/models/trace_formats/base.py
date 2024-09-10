@@ -75,6 +75,7 @@ class ExtendedTypeBaseModel(BaseModel):
     @classmethod
     def validation(cls, value: Any, extra_info: ValidationInfo) -> Any:
         """Validator applied to all fields of a Model.
+
         The purpose is to auto detect child classes for a field that uses models for typing.
 
         Caution:

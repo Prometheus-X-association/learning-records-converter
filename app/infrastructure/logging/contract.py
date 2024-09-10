@@ -3,10 +3,7 @@ from typing import Any
 
 
 class LoggerContract(ABC):
-    """
-    Abstract base class for logger implementations at various severity levels,
-    with optional context information.
-    """
+    """Abstract base class for logger implementations at various severity levels, with optional context information."""
 
     @abstractmethod
     def debug(self, message: str, context: dict[str, Any] | None = None) -> None:

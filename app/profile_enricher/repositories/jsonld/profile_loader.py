@@ -23,6 +23,12 @@ class ProfileLoader:
     """Class responsible for loading profile's file."""
 
     def __init__(self, logger: LoggerContract, config: ConfigContract) -> None:
+        """
+        Initialize the ProfileLoader.
+
+        :param logger: The logger instance for logging operations.
+        :param config: The configuration instance for accessing app settings.
+        """
         self.logger = logger
         self.config = config
 
@@ -129,7 +135,8 @@ class ProfileLoader:
         try:
             request = Request(url=url)  # noqa: S310
             with urlopen(
-                request, timeout=self.download_timeout,
+                request,
+                timeout=self.download_timeout,
             ) as response:
                 if response.status != 200:
                     self.logger.error("Failed to download profile", log_context)

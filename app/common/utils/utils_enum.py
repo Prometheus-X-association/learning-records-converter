@@ -17,6 +17,7 @@ class CaseInsensitiveStrEnum(Enum):
 
 def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
     """Python does not allow Enum to inherit other Enum.
+
     This decorator "adds" the list of inherited enums into the decorated enum.
 
     Args:
@@ -37,7 +38,8 @@ def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], 
 
 
 def str_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
-    """Transform an Enum into a StrEnum
+    """Transform an Enum into a StrEnum.
+
     This decorator transforms the list of enums to get all ENUM_KEY = 'enum_key' in one StrEnum.
 
     Args:

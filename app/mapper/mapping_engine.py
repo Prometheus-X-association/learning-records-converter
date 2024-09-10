@@ -308,7 +308,7 @@ class MappingEngine:
         return arguments
 
     @staticmethod
-    def _eval(expr: str) -> Callable | Any:
+    def _eval(expr: str) -> Callable:
         """
         Evaluate a Python expression.
 
@@ -347,7 +347,8 @@ class MappingEngine:
                 if callable(lambda_condition) and lambda_condition(*arguments):
                     list_response.extend(
                         self._handle_output(
-                            output_model=condition, arguments=arguments,
+                            output_model=condition,
+                            arguments=arguments,
                         ),
                     )
                     return list_response

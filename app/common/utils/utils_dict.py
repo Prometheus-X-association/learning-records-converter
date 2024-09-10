@@ -1,4 +1,3 @@
-import contextlib
 import re
 from pathlib import Path
 from typing import Any, overload
@@ -48,7 +47,8 @@ def get_value_from_flat_key(
     default_value=None,
     return_copy=True,
 ) -> Any:
-    """Get value from a dict element by using a flatten key (keys separated with dotes)
+    """Get value from a dict element by using a flatten key (keys separated with dotes).
+
     If the value exists (even if it's empty), the method returns the value.
     Else, the 'default_value' is returned.
 
@@ -112,6 +112,7 @@ def set_value_from_flat_key(
 ) -> dict | list:
     """
     Set recursively a value into a dict element by using a flatten key (keys separated with dotes).
+
     Integer (numeric) are considered as list indexes.
 
     TODO :
@@ -252,6 +253,7 @@ def get_nested_from_flat(
 
 def convert_yaml_file_to_json(yaml_path: Path) -> dict:
     """Convert a YAML file into a dict.
+
     The path to the YAML file is passed to the function and is loaded afterward.
 
     Args:
@@ -265,10 +267,12 @@ def convert_yaml_file_to_json(yaml_path: Path) -> dict:
 
 
 def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
-    """Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
+    """Recursive dict merge.
+
+    Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
-    ``dct``.
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``dct``.
+
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
     :return: None.

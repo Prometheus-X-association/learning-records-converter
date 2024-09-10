@@ -16,6 +16,11 @@ class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
     def __init__(self, logger: LoggerContract) -> None:
+        """
+        Initialize the TraceEnricher.
+
+        :param logger: The logger instance for logging operations.
+        """
         self.logger = logger
 
     def get_enriched_data(
