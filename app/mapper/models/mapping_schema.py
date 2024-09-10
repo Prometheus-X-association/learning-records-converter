@@ -43,7 +43,7 @@ class OutputMappingModel(BasicModel):
         description="list of multiple output mapping.",
     )
 
-    profile: str = Field(
+    profile: str | None = Field(
         default=None,
         description="Dases profile to apply.",
     )

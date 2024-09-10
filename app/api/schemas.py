@@ -1,9 +1,9 @@
 from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
+from app.common.common_types import JsonType
 from app.common.models.trace import Trace
-from app.common.type.types import JsonType
-from app.profile_enricher.types import ValidationRecommendation
+from app.profile_enricher.profiler_types import ValidationRecommendation
 
 DEFAULT_OUTPUT_FORMAT = CustomTraceFormatStrEnum.XAPI
 

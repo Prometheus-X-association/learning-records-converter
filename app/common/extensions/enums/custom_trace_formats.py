@@ -1,7 +1,11 @@
 """Use this file to add additional mapping formats."""
 
+from app.common.enums import (
+    TraceFormatEnum,
+    TraceFormatModelEnum,
+    TraceFormatOutputMappingEnum,
+)
 from app.common.utils.utils_enum import CaseInsensitiveStrEnum, extend_enum, str_enum
-from enums import TraceFormatEnum, TraceFormatModelEnum, TraceFormatOutputMappingEnum
 
 
 @extend_enum(TraceFormatModelEnum, enum_class=TraceFormatEnum)

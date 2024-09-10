@@ -13,11 +13,11 @@ class FakeXapiActorValueModel(BaseModel):
 
 class FakeXapiActorModel(BaseModel):
     type: Any | None = Field(default=None)
-    empty_val: str = Field(default=None)
-    positive: int = Field(default=None)
-    negative: str = Field(default=None)
-    default: FakeXapiActorDefaultModel = Field(default=None)
-    value: FakeXapiActorValueModel = Field(default=None)
+    empty_val: str | None = Field(default=None)
+    positive: int | None = Field(default=None)
+    negative: str | None = Field(default=None)
+    default: FakeXapiActorDefaultModel | None = Field(default=None)
+    value: FakeXapiActorValueModel | None = Field(default=None)
 
 
 class FakeXapiObjectModel(BaseModel):

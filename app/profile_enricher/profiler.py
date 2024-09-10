@@ -1,8 +1,8 @@
 from app.common.models.trace import Trace
 
 from .exceptions import ProfilerError
+from .profiler_types import ValidationError, ValidationRecommendation
 from .repositories.contracts.repository import ProfileRepository
-from .types import ValidationError, ValidationRecommendation
 
 
 class Profiler:
@@ -28,7 +28,7 @@ class Profiler:
         group_name, template_name = self._parse_profile(profile=trace.profile)
 
         try:
-            return self.repository.enrich_trace(
+            self.repository.enrich_trace(
                 group_name=group_name,
                 template_name=template_name,
                 trace=trace,

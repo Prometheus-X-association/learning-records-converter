@@ -1,5 +1,5 @@
+from app.common.common_types import JsonType
 from app.common.models.trace import Trace
-from app.common.type.types import JsonType
 from app.common.utils.utils_dict import deep_merge, get_nested_from_flat
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemplate

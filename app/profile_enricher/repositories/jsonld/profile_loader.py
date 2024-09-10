@@ -6,7 +6,7 @@ from urllib.request import Request, urlopen
 
 from pydantic import ValidationError
 
-from app.common.type.types import JsonType
+from app.common.common_types import JsonType
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.exceptions import (

@@ -3,13 +3,13 @@ from typing import Any
 
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import ValidationError
-from type.types import JsonType
 from utils.utils_dict import (
     get_value_from_flat_key,
     remove_empty_elements,
     set_value_from_flat_key,
 )
 
+from app.common.common_types import JsonType
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
@@ -53,11 +53,11 @@ class MappingEngine:
         self.output_format = output_format
         self.mapping_to_apply = mapping_to_apply
         self.logger = logger
-        self.log_context = {
+        self.log_context: dict[str, str] = {
             "input_format": self.input_format.name,
             "output_format": self.output_format.name,
         }
-        self.profile = None
+        self.profile: str | None = None
 
     def run(self, input_trace: Trace) -> Trace:
         """
@@ -243,7 +243,7 @@ class MappingEngine:
         :return: List of FinalMappingModel instances
         """
         if output_model.profile:
-            self.log_context = {**self.log_context, "profile": self.profile}
+            self.log_context = {**self.log_context, "profile": output_model.profile}
             if self.profile is not None:
                 self.logger.warning("A profile already exists", self.log_context)
             self.profile = output_model.profile
@@ -308,7 +308,7 @@ class MappingEngine:
         return arguments
 
     @staticmethod
-    def _eval(expr: str) -> Callable:
+    def _eval(expr: str) -> Callable | Any:
         """
         Evaluate a Python expression.
 

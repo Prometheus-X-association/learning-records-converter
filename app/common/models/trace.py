@@ -2,7 +2,7 @@ from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnu
 from pydantic import BaseModel, ValidationError
 from pydantic.v1 import ValidationError as V1ValidationError
 
-from app.common.type.types import JsonType
+from app.common.common_types import JsonType
 
 
 class Trace(BaseModel):

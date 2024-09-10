@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 
 from app.common.models.trace import Trace
-from app.profile_enricher.types import ValidationError, ValidationRecommendation
+from app.profile_enricher.profiler_types import (
+    ValidationError,
+    ValidationRecommendation,
+)
 
 
 class ProfileRepository(ABC):
