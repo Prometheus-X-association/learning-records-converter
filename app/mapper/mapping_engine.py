@@ -3,19 +3,29 @@ from typing import Any, Callable
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import ValidationError
 from type.types import JsonType
-from utils.utils_dict import (get_value_from_flat_key, remove_empty_elements,
-                              set_value_from_flat_key)
+from utils.utils_dict import (
+    get_value_from_flat_key,
+    remove_empty_elements,
+    set_value_from_flat_key,
+)
 
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
 # This import is used for the eval method :
-from .available_functions.mapping_runnable_functions import *
-from .exceptions import (CodeEvaluationException, InputTraceToModelException,
-                         MapperException, OutputTraceToModelException)
+from .available_functions.mapping_runnable_functions import *  # noqa: F403
+from .exceptions import (
+    CodeEvaluationError,
+    InputTraceToModelError,
+    MapperError,
+    OutputTraceToModelError,
+)
 from .models.mapping_models import FinalMappingModel
-from .models.mapping_schema import (ConditionOutputMappingModel, MappingSchema,
-                                    OutputMappingModel)
+from .models.mapping_schema import (
+    ConditionOutputMappingModel,
+    MappingSchema,
+    OutputMappingModel,
+)
 
 DEFAULT_CONDITION = "default"
 
@@ -71,7 +81,7 @@ class MappingEngine:
         """
         if not all([self.input_format, self.output_format, self.mapping_to_apply]):
             self.logger.error("Incomplete mapping informations", self.log_context)
-            raise MapperException(
+            raise MapperError(
                 "Input format, output format, and mapping configuration must be specified"
             )
 
@@ -80,19 +90,19 @@ class MappingEngine:
             self.input_format.value(**input_trace.data)
         except ValidationError as e:
             self.logger.exception("Input format validation failed", e, self.log_context)
-            raise InputTraceToModelException("Input format validation failed") from e
+            raise InputTraceToModelError("Input format validation failed") from e
         except TypeError as e:
             self.logger.exception(
                 "Invalid data type in input trace", e, self.log_context
             )
-            raise InputTraceToModelException("Invalid data type in input trace") from e
+            raise InputTraceToModelError("Invalid data type in input trace") from e
         except Exception as e:
             self.logger.exception(
                 "Input trace does not match the specified input format",
                 e,
                 self.log_context,
             )
-            raise InputTraceToModelException(
+            raise InputTraceToModelError(
                 "Input trace does not match the specified input format"
             ) from e
         self.logger.debug("Input trace is valid against his format", self.log_context)
@@ -105,10 +115,7 @@ class MappingEngine:
         :return: The mapped output trace
         """
         # We start from the input trace if the formats are the same
-        if self.input_format == self.output_format:
-            output_trace = input_data
-        else:
-            output_trace = {}
+        output_trace = input_data if self.input_format == self.output_format else {}
 
         for mapping in self.mapping_to_apply.mappings:
             input_values = []
@@ -131,8 +138,7 @@ class MappingEngine:
         :return: The post-processed data
         """
         output_trace = remove_empty_elements(dictionary=mapped_data)
-        output_trace = self._apply_default_values(output_trace=output_trace)
-        return output_trace
+        return self._apply_default_values(output_trace=output_trace)
 
     def _apply_default_values(self, output_trace: JsonType) -> JsonType:
         """
@@ -163,12 +169,12 @@ class MappingEngine:
             self.logger.exception(
                 "Output format validation failed", e, self.log_context
             )
-            raise OutputTraceToModelException("Output format validation failed") from e
+            raise OutputTraceToModelError("Output format validation failed") from e
         except TypeError as e:
             self.logger.exception(
                 "Invalid data type in output trace", e, self.log_context
             )
-            raise OutputTraceToModelException(
+            raise OutputTraceToModelError(
                 "Invalid data type in output trace"
             ) from e
         except Exception as e:
@@ -177,7 +183,7 @@ class MappingEngine:
                 e,
                 self.log_context,
             )
-            raise OutputTraceToModelException(
+            raise OutputTraceToModelError(
                 "Output trace does not match the specified output format"
             ) from e
 
@@ -193,7 +199,7 @@ class MappingEngine:
         output_content: OutputMappingModel,
         output_trace: dict[str, Any],
         overwrite: bool,
-        arguments: list[Any] = None,
+        arguments: list[Any] | None,
     ) -> dict[str, Any]:
         """
         Build the output trace based on the output content.
@@ -282,7 +288,7 @@ class MappingEngine:
                 self.logger.exception(
                     "Error in custom transformation", e, self.log_context
                 )
-                raise CodeEvaluationException("Error in custom transformation") from e
+                raise CodeEvaluationError("Error in custom transformation") from e
         return arguments
 
     @staticmethod
@@ -334,7 +340,7 @@ class MappingEngine:
                     e,
                     {**self.log_context, "condition": condition.condition},
                 )
-                raise CodeEvaluationException("Error in lambda condition") from e
+                raise CodeEvaluationError("Error in lambda condition") from e
 
         list_response.append(FinalMappingModel(output_field=None, value=None))
         return list_response

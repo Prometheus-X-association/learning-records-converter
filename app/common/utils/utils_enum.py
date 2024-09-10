@@ -11,6 +11,7 @@ class CaseInsensitiveStrEnum(Enum):
         for member in cls:
             if member.value.lower().strip() == str(value).lower().strip():
                 return member
+        return None
 
 
 def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:

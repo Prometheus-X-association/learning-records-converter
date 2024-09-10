@@ -1,15 +1,14 @@
-from __future__ import annotations
-
 from enum import StrEnum
-from typing import List, Literal, Union
+from typing import List, Literal, Union, TYPE_CHECKING
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic.fields import FieldInfo
-from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
 
-from ..base import ExtendedTypeBaseModel
+from models.trace_formats.base import ExtendedTypeBaseModel
 
+if TYPE_CHECKING:
+    from pydantic_core.core_schema import ValidationInfo
 
 #############################################################
 ##################### ENUMS/TERMS/TYPES #####################
@@ -753,7 +752,7 @@ class AttemptModel(EntityModel):
     is_part_of: Union[AttemptModel, str] = Field(
         default=None,
         alias="isPartOf",
-        description="The parent Attempt, if one exists. The isPartOf value MUST be expressed either as an object or as a string corresponding to the associated attempt’s IRI.",
+        description="The parent Attempt, if one exists. The isPartOf value MUST be expressed either as an object or as a string corresponding to the associated attempt's IRI.",
     )
     count: int = Field(
         default=None,
@@ -1451,6 +1450,7 @@ class IMSCaliperModel(BaseModel):
     sensor: str = Field(alias="sensor", examples=["http://oxana.instructure.com/"])
 
     @field_validator("data", mode="before")
+    @classmethod
     def validation(
         cls, value: List[EventModel], extra_info: ValidationInfo
     ) -> List[EventModel]:
@@ -1491,13 +1491,14 @@ class IMSCaliperModel(BaseModel):
             if get_origin(field.annotation) is list and isinstance(value, list):
                 new_value = []
                 for each_value in value:
+                    model_value = each_value
                     if isinstance(each_value, dict) and (
                         event_model := dict_discriminator.get(
                             each_value.get("type", ""), None
                         )
                     ):
-                        each_value = event_model(**each_value)
-                    new_value.append(each_value)
+                        model_value = event_model(**each_value)
+                    new_value.append(model_value)
                 return new_value
 
         return value

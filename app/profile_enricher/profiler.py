@@ -1,6 +1,6 @@
 from app.common.models.trace import Trace
 
-from .exceptions import ProfilerException
+from .exceptions import ProfilerError
 from .repositories.contracts.repository import ProfileRepository
 from .types import ValidationError, ValidationRecommendation
 
@@ -26,18 +26,17 @@ class Profiler:
         :raises ProfilerException: If enrichment fails
         """
         if not trace.profile:
-            raise ProfilerException("No profile associated with the trace")
+            raise ProfilerError("No profile associated with the trace")
         group_name, template_name = self._parse_profile(profile=trace.profile)
 
         try:
-            enriched_trace = self.repository.enrich_trace(
+            return self.repository.enrich_trace(
                 group_name=group_name,
                 template_name=template_name,
                 trace=trace,
             )
-            return enriched_trace
         except Exception as e:
-            raise ProfilerException("Failed to enrich trace") from e
+            raise ProfilerError("Failed to enrich trace") from e
 
     def validate_trace(self, trace: Trace) -> list[ValidationError]:
         """
@@ -52,14 +51,13 @@ class Profiler:
         group_name, template_name = self._parse_profile(profile=trace.profile)
 
         try:
-            errors = self.repository.validate_trace(
+            return self.repository.validate_trace(
                 group_name=group_name,
                 template_name=template_name,
                 trace=trace,
             )
-            return errors
         except Exception as e:
-            raise ProfilerException("Failed to validate trace") from e
+            raise ProfilerError("Failed to validate trace") from e
 
     def get_recommendations(self, trace: Trace) -> list[ValidationRecommendation]:
         """
@@ -74,12 +72,11 @@ class Profiler:
 
         group_name, template_name = self._parse_profile(profile=trace.profile)
 
-        recommendations = self.repository.get_recommendations(
+        return self.repository.get_recommendations(
             group_name=group_name,
             template_name=template_name,
             trace=trace,
         )
-        return recommendations
 
     @staticmethod
     def _parse_profile(profile: str) -> tuple[str, str]:
@@ -92,9 +89,9 @@ class Profiler:
         try:
             group_name, template_name = profile.split(".", 1)
             if not group_name or not template_name:
-                raise ValueError("Group name and template name cannot be empty")
+                raise ProfilerError("Group name and template name cannot be empty")
         except ValueError as e:
-            raise ProfilerException(
+            raise ProfilerError(
                 f"Invalid profile format. Expected 'group_name.template_name', got: {profile}"
             ) from e
         return group_name, template_name

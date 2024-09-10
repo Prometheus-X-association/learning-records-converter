@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import List, Literal, Union
+from typing import List, Literal, Union, TYPE_CHECKING
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic.fields import FieldInfo
-from pydantic_core.core_schema import ValidationInfo
 from typing_extensions import get_args, get_origin
 
-from ..base import ExtendedTypeBaseModel
-from .ims_caliper_1_1 import RoleTermEnum, StatusTermEnum
+from models.trace_formats.base import ExtendedTypeBaseModel
 
+if TYPE_CHECKING:
+    from models.trace_formats.ims_caliper.ims_caliper_1_1 import RoleTermEnum, StatusTermEnum
+    from pydantic_core.core_schema import ValidationInfo
 
 #############################################################
 ##################### ENUMS/TERMS/TYPES #####################
@@ -472,7 +473,7 @@ class CommentModel(EntityModel):
     commenter: Union[PersonModel, str] = Field(
         default=None,
         alias="commenter",
-        description="The Person who provided the comment. The commenter value MUST be expressed either as an object or as a string corresponding to the commenter’s IRI.",
+        description="The Person who provided the comment. The commenter value MUST be expressed either as an object or as a string corresponding to the commenter's IRI.",
     )
     commented_on: Union[EntityModel, str] = Field(
         default=None,
@@ -534,7 +535,7 @@ class RatingModel(EntityModel):
     rater: Union[PersonModel, str] = Field(
         default=None,
         alias="rater",
-        description="The Person who provided the Rating. The rater value MUST be expressed either as an object or as a string corresponding to the rater’s IRI.",
+        description="The Person who provided the Rating. The rater value MUST be expressed either as an object or as a string corresponding to the rater's IRI.",
     )
     rated: Union[EntityModel, str] = Field(
         default=None,
@@ -554,7 +555,7 @@ class RatingModel(EntityModel):
     rating_comment: Union[CommentModel, str] = Field(
         default=None,
         alias="ratingComment",
-        description="The Comment left with the Rating. The ratingComment value MUST be expressed either as an object or as a string corresponding to the comment’s IRI.",
+        description="The Comment left with the Rating. The ratingComment value MUST be expressed either as an object or as a string corresponding to the comment's IRI.",
     )
 
 
@@ -774,7 +775,7 @@ class AggregateMeasureCollectionModel(CollectionModel):
     items: List[Union[AggregateMeasureModel, str]] = Field(
         default=None,
         alias="items",
-        description="An ordered collection of AggregateMeasure entities. Each array item MUST be expressed either as an object or as a string corresponding to the item’s IRI.",
+        description="An ordered collection of AggregateMeasure entities. Each array item MUST be expressed either as an object or as a string corresponding to the item's IRI.",
     )
 
 
@@ -1267,12 +1268,12 @@ class SurveyInvitationModel(DigitalResourceModel):
     rater: Union[PersonModel, str] = Field(
         default=None,
         alias="rater",
-        description="The Person which will rate the Survey. The rater value MUST be expressed either as an object or as a string corresponding to the rater resource’s IRI.",
+        description="The Person which will rate the Survey. The rater value MUST be expressed either as an object or as a string corresponding to the rater resource's IRI.",
     )
     survey: Union[SurveyModel, str] = Field(
         default=None,
         alias="survey",
-        description="The Survey that the invitation is for. The survey value MUST be expressed either as an object or as a string corresponding to the rater resource’s IRI.",
+        description="The Survey that the invitation is for. The survey value MUST be expressed either as an object or as a string corresponding to the rater resource's IRI.",
     )
     sent_count: int = Field(
         default=None,
@@ -1565,7 +1566,7 @@ class FeedbackEventModel(EventModel):
     target: Union[FrameModel, str] = Field(
         default=None,
         alias="target",
-        description="If the object of the feedback is a particular segment of a DigitalResource use a Frame to mark its location. The target value MUST be expressed either as an object or as a string corresponding to the target entity’s IRI.",
+        description="If the object of the feedback is a particular segment of a DigitalResource use a Frame to mark its location. The target value MUST be expressed either as an object or as a string corresponding to the target entity's IRI.",
     )
     generated: Union[CommentModel, RatingModel, str] = Field(
         default=None,
@@ -1797,7 +1798,8 @@ class ResourceManagementEventModel(EventModel):
     )
 
     @field_validator("generated")
-    def generated_required_condition(cls, generated, values):
+    @staticmethod
+    def generated_required_condition(generated, values):
         """Required when the action value is Copied, otherwise optional"""
         if values.data.get("action", "") == ActionTermEnum.COPIED and not generated:
             raise ValueError(
@@ -1824,7 +1826,7 @@ class SearchEventModel(EventModel):
     generated: Union[SearchResponseModel, str] = Field(
         default=None,
         alias="generated",
-        description="The SearchResponse generated by the search provider that describes the search criteria, count of search results returned (if any), and references to the search result items (if any) returned by the search. The SearchResponse value MUST be expressed either as an object or as a string corresponding to the query’s IRI.",
+        description="The SearchResponse generated by the search provider that describes the search criteria, count of search results returned (if any), and references to the search result items (if any) returned by the search. The SearchResponse value MUST be expressed either as an object or as a string corresponding to the query's IRI.",
     )
 
 
@@ -1955,11 +1957,12 @@ class ToolLaunchEventModel(EventModel):
     )
     federated_session: Union[LtiSessionModel, str] = Field(
         alias="federatedSession",
-        description='The Platform\'s session, constituting part of the tool launch context. The federatedSession value MUST be expressed either as an object or as a string corresponding to the federatedSession’s IRI. Required when the action value is Launched, otherwise optional. Workflows that include a specific "return message" component (e.g. LTI Deep Linking response messages) SHOULD provide the federatedSession property and SHOULD populate its messageParameters property with the message parameters in the response message.',
+        description='The Platform\'s session, constituting part of the tool launch context. The federatedSession value MUST be expressed either as an object or as a string corresponding to the federatedSession\'s IRI. Required when the action value is Launched, otherwise optional. Workflows that include a specific "return message" component (e.g. LTI Deep Linking response messages) SHOULD provide the federatedSession property and SHOULD populate its messageParameters property with the message parameters in the response message.',
     )
 
     @field_validator("federated_session")
-    def federated_session_required_condition(cls, federated_session, values):
+    @staticmethod
+    def federated_session_required_condition(federated_session, values):
         """Required when the action value is Launched, otherwise optional"""
         if (
             values.data.get("action", "") == ActionTermEnum.LAUNCHED
@@ -1977,7 +1980,7 @@ class ToolUseEventModel(EventModel):
     )
     actor: Union[PersonModel, str] = Field(
         alias="actor",
-        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor’s IRI.",
+        description="The Person who initiated the action. The actor value MUST be expressed either as an object or as a string corresponding to the actor's IRI.",
     )
     action: Literal[ActionTermEnum.USED,] = Field(
         alias="action",
@@ -1985,17 +1988,17 @@ class ToolUseEventModel(EventModel):
     )
     object: Union[SoftwareApplicationModel, str] = Field(
         alias="object",
-        description="The SoftwareApplication that constitutes the object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object’s IRI.",
+        description="The SoftwareApplication that constitutes the object of the interaction. The object value MUST be expressed either as an object or as a string corresponding to the object's IRI.",
     )
     target: Union[SoftwareApplicationModel, str] = Field(
         default=None,
         alias="target",
-        description="A SoftwareApplication that represents a particular capability or feature provided by the object. The target value MUST be expressed either as an object or as a string corresponding to the target entity’s IRI.",
+        description="A SoftwareApplication that represents a particular capability or feature provided by the object. The target value MUST be expressed either as an object or as a string corresponding to the target entity's IRI.",
     )
     generated: Union[AggregateMeasureCollectionModel, str] = Field(
         default=None,
         alias="generated",
-        description="An AggregateMeasureCollection created or generated as a result of the interaction. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity’s IRI. Note that if the sender of the event wants to send aggregate measure information as part of this ToolUseEvent it should, by best practice, send a single AggregateMeasureCollection as the generated value.",
+        description="An AggregateMeasureCollection created or generated as a result of the interaction. The generated value MUST be expressed either as an object or as a string corresponding to the generated entity's IRI. Note that if the sender of the event wants to send aggregate measure information as part of this ToolUseEvent it should, by best practice, send a single AggregateMeasureCollection as the generated value.",
     )
 
 
@@ -2029,6 +2032,7 @@ class IMSCaliperModel(BaseModel):
     sensor: str = Field(alias="sensor", examples=["http://oxana.instructure.com/"])
 
     @field_validator("data", mode="before")
+    @classmethod
     def validation(
         cls, value: List[EventModel], extra_info: ValidationInfo
     ) -> List[EventModel]:
@@ -2069,13 +2073,14 @@ class IMSCaliperModel(BaseModel):
             if get_origin(field.annotation) is list and isinstance(value, list):
                 new_value = []
                 for each_value in value:
+                    model_value = each_value
                     if isinstance(each_value, dict) and (
                         event_model := dict_discriminator.get(
                             each_value.get("type", ""), None
                         )
                     ):
-                        each_value = event_model(**each_value)
-                    new_value.append(each_value)
+                        model_value = event_model(**each_value)
+                    new_value.append(model_value)
                 return new_value
 
         return value

@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import Any, overload
 
 import yaml
@@ -25,20 +26,19 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
     """
     if not isinstance(dictionary, (dict, list)):
         return dictionary
-    elif isinstance(dictionary, list):
+    if isinstance(dictionary, list):
         return [
             value
             for value in (remove_empty_elements(value) for value in dictionary)
             if not is_empty(value)
         ]
-    else:
-        return {
-            key: value
-            for key, value in (
-                (key, remove_empty_elements(value)) for key, value in dictionary.items()
-            )
-            if not is_empty(value)
-        }
+    return {
+        key: value
+        for key, value in (
+            (key, remove_empty_elements(value)) for key, value in dictionary.items()
+        )
+        if not is_empty(value)
+    }
 
 
 def get_value_from_flat_key(
@@ -67,8 +67,7 @@ def get_value_from_flat_key(
         if key.isnumeric() and isinstance(value, list):
             try:
                 value = value[int(key)]
-            except IndexError as ie:
-                print("out of index in list:", ie)
+            except IndexError:
                 value = default_value
         elif not key.isnumeric() and isinstance(value, dict):
             value = value.get(key, default_value)
@@ -80,8 +79,7 @@ def get_value_from_flat_key(
             break
     if return_copy and isinstance(value, (list, dict)):
         return value.copy()
-    else:
-        return value
+    return value
 
 
 @overload
@@ -133,15 +131,9 @@ def set_value_from_flat_key(
         # If not overwrite but found element is not list, dict or None, return
         if (
             not overwrite
-            and not (
-                isinstance(dict_list_element, list)
-                or isinstance(dict_list_element, dict)
-            )
+            and not isinstance(dict_list_element, (list, dict))
             and not is_empty(dict_list_element)  # before : None
         ):
-            print(
-                "> Warning - an item already have value and behavior is : NOT overwriting"
-            )
             # Return current value
             return dict_list_element
 
@@ -164,8 +156,8 @@ def set_value_from_flat_key(
                     value,
                     overwrite=overwrite,
                 )
-            except IndexError as ie:
-                print("IndexError :", ie)
+            except IndexError:
+                pass
 
         # Other keys (dict)
         else:
@@ -181,14 +173,10 @@ def set_value_from_flat_key(
     # If no keys left (stop condition)
     elif is_empty(flat_key):
         if not overwrite and not is_empty(dict_list_element):
-            print(
-                "> Warning - dict_list_element already have value and behavior is : NOT overwriting"
-            )
             # Return current value
             return dict_list_element
-        else:
-            # Return new value
-            return value
+        # Return new value
+        return value
 
     # Error during split
     else:
@@ -232,7 +220,7 @@ def get_nested_from_flat(
     # Format validation
     if nested_field is None:
         all_field_start_with_numeric = [
-            re.split(r"(?<!\\)\.", key)[0].isnumeric() for key in flat_field.keys()
+            re.split(r"(?<!\\)\.", key)[0].isnumeric() for key in flat_field
         ]
         if all(all_field_start_with_numeric):
             nested_field = []
@@ -248,24 +236,18 @@ def get_nested_from_flat(
     return nested_field
 
 
-def convert_yaml_file_to_json(yaml_path: str) -> dict:
+def convert_yaml_file_to_json(yaml_path: Path) -> dict:
     """Convert a YAML file into a dict.
     The path to the YAML file is passed to the function and is loaded afterward
 
     Args:
-        yaml_path (str): File path to YAML file
-
-    Raises:
-        ValueError: empty path
+        yaml_path (Path): File path to YAML file
 
     Returns:
         dict: Converted YAML
     """
-    if yaml_path:
-        with open(yaml_path, "r") as file:
-            return yaml.safe_load(file)
-    else:
-        raise ValueError("'yaml_path' cannot be empty")
+    with yaml_path.open(mode="r") as file:
+        return yaml.safe_load(file)
 
 
 def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
@@ -277,12 +259,12 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
     :param merge_dct: dct merged into dct
     :return: None
     """
-    for k, v in merge_dct.items():
+    for k in merge_dct:
         if (
             k in target_dict
             and isinstance(target_dict[k], dict)
             and isinstance(merge_dct[k], dict)
-        ):  # noqa
+        ):
             deep_merge(target_dict[k], merge_dct[k])
         else:
             target_dict[k] = merge_dct[k]

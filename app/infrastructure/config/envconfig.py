@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from app.profile_enricher.exceptions import BasePathException
+from app.profile_enricher.exceptions import BasePathError
 
 from .contract import ConfigContract
 
@@ -30,22 +30,22 @@ class EnvConfig(ConfigContract):
 
     def get_profiles_base_path(self) -> str:
         """Inherited from ConfigContract.get_profiles_base_path"""
-        return self._get("PROFILES_BASE_PATH", os.path.join("data", "dases_profiles"))
+        return self._get("PROFILES_BASE_PATH", Path("data") / "dases_profiles")
 
     def get_and_create_profiles_base_path(self) -> str:
         """Inherited from ConfigContract.get_and_create_profiles_base_path"""
         path = self.get_profiles_base_path()
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
-        except PermissionError:
-            raise BasePathException(
+        except PermissionError as e:
+            raise BasePathError(
                 f"Permission denied when creating directory: {path}"
-            )
+            ) from e
         except OSError as e:
-            raise BasePathException(f"Failed to create directory {path}: {str(e)}")
+            raise BasePathError(f"Failed to create directory {path}: {e}") from e
 
         if not os.access(path, os.W_OK):
-            raise BasePathException(f"Created directory {path} is not writable")
+            raise BasePathError(f"Created directory {path} is not writable")
 
         return path
 

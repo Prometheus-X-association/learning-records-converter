@@ -10,10 +10,13 @@ from pydantic import ValidationError
 from app.common.type.types import JsonType
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
-from app.profile_enricher.exceptions import (BasePathException, InvalidJsonException,
-                                             ProfileNotFoundException,
-                                             ProfileValidationError,
-                                             TemplateNotFoundException)
+from app.profile_enricher.exceptions import (
+    BasePathError,
+    InvalidJsonError,
+    ProfileNotFoundError,
+    ProfileValidationError,
+    TemplateNotFoundError,
+)
 from app.profile_enricher.profiles.jsonld import Profile, StatementTemplate
 
 
@@ -26,7 +29,7 @@ class ProfileLoader:
 
         try:
             self.base_path: Path = Path(config.get_and_create_profiles_base_path())
-        except BasePathException as e:
+        except BasePathError as e:
             self.logger.exception("Failed to create or access profiles directory", e)
             raise
 
@@ -75,7 +78,7 @@ class ProfileLoader:
         )
         if template is None:
             self.logger.warning("Template not found", log_context)
-            raise TemplateNotFoundException(
+            raise TemplateNotFoundError(
                 f"Template '{template_name}' not found in profile '{group_name}'"
             )
 
@@ -98,12 +101,12 @@ class ProfileLoader:
             return json.loads(file_content)
         except FileNotFoundError as e:
             self.logger.exception("Profile file not found", e, log_context)
-            raise ProfileNotFoundException(
+            raise ProfileNotFoundError(
                 f"Profile file not found: {file_path}"
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in profile file", e, log_context)
-            raise InvalidJsonException(
+            raise InvalidJsonError(
                 f"Invalid JSON in profile file: {file_path}"
             ) from e
 
@@ -123,14 +126,13 @@ class ProfileLoader:
 
         if not url:
             self.logger.warning("URL not found for profile", log_context)
-            raise ProfileNotFoundException(f"URL not found for profile: {group_name}")
-
+            raise ProfileNotFoundError(f"URL not found for profile: {group_name}")
         try:
-            request = Request(url=url)
-            with urlopen(request, timeout=self.download_timeout) as response:
+            request = Request(url=url)  # noqa: S310
+            with urlopen(request, timeout=self.download_timeout) as response:  # noqa: S310
                 if response.status != 200:
                     self.logger.error("Failed to download profile", log_context)
-                    raise ProfileNotFoundException(
+                    raise ProfileNotFoundError(
                         f"Failed to download profile for {group_name}: HTTP status {response.status}"
                     )
 
@@ -140,17 +142,17 @@ class ProfileLoader:
             self.logger.exception(
                 "HTTP error occurred while downloading profile", e, log_context
             )
-            raise ProfileNotFoundException(
+            raise ProfileNotFoundError(
                 f"Failed to download profile for {group_name}: HTTP error {e.code}"
             ) from e
         except URLError as e:
             self.logger.exception("Failed to download profile", e, log_context)
-            raise ProfileNotFoundException(
+            raise ProfileNotFoundError(
                 f"Failed to download profile for {group_name}"
             ) from e
         except json.JSONDecodeError as e:
             self.logger.exception("Invalid JSON in downloaded profile", e, log_context)
-            raise InvalidJsonException(
+            raise InvalidJsonError(
                 f"Invalid JSON in downloaded profile for {group_name}"
             ) from e
 

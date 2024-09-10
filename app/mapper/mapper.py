@@ -44,5 +44,4 @@ class Mapper:
             output_format=CustomTraceFormatModelEnum[output_format.name],
             logger=self.logger,
         )
-        converted_trace = engine.run(input_trace=input_trace)
-        return converted_trace
+        return engine.run(input_trace=input_trace)

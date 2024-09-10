@@ -1,13 +1,15 @@
 from pathlib import Path
 
 from enums import TraceFormatEnum
-from extensions.enums import (CustomTraceFormatOutputMappingEnum,
-                              CustomTraceFormatStrEnum)
+from extensions.enums import (
+    CustomTraceFormatOutputMappingEnum,
+    CustomTraceFormatStrEnum,
+)
 from pydantic import ValidationError
 from utils.utils_dict import convert_yaml_file_to_json
 
 from app.infrastructure.logging.contract import LoggerContract
-from app.mapper.exceptions import MappingConfigToModelException
+from app.mapper.exceptions import MappingConfigToModelError
 from app.mapper.models.mapping_schema import MappingSchema
 from app.mapper.repositories.contracts.repository import MappingRepository
 
@@ -45,9 +47,7 @@ class YamlMappingRepository(MappingRepository):
         mapping_path = self._get_mapping_by_input_and_output_format(
             input_format=input_format, output_format=output_format
         )
-        mapping_config = self._get_config_model_from_yaml_file(file_path=mapping_path)
-
-        return mapping_config
+        return self._get_config_model_from_yaml_file(file_path=mapping_path)
 
     def _get_mapping_by_input_and_output_format(
         self,
@@ -85,7 +85,7 @@ class YamlMappingRepository(MappingRepository):
             raise ValueError("Mapping config not found") from e
 
         # Read config file
-        if isinstance(mapping_config, TraceFormatEnum):
+        if isinstance(mapping_config, TraceFormatEnum) or not mapping_config.value:
             mapping_path = mapping_config.value
         else:
             self.logger.error("Mapping model not found", log_context)
@@ -105,19 +105,19 @@ class YamlMappingRepository(MappingRepository):
         :return: A validated CompleteConfigModel instance
         :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
         """
-        json_config = convert_yaml_file_to_json(yaml_path=str(file_path))
+        json_config = convert_yaml_file_to_json(yaml_path=file_path)
         self.logger.info("Mapping config loaded", {"path": file_path})
         # Load mapping in Model
         try:
             return MappingSchema(**json_config)
         except ValidationError as e:
             self.logger.exception("Mapping validation failed", e)
-            raise MappingConfigToModelException("Mapping validation failed") from e
+            raise MappingConfigToModelError("Mapping validation failed") from e
         except TypeError as e:
             self.logger.exception("Invalid data type in mapping", e)
-            raise MappingConfigToModelException("Invalid data type in mapping") from e
+            raise MappingConfigToModelError("Invalid data type in mapping") from e
         except Exception as e:
             self.logger.exception("Unexpected error during mapping file validation", e)
-            raise MappingConfigToModelException(
+            raise MappingConfigToModelError(
                 "Unexpected error during mapping file validation"
             ) from e

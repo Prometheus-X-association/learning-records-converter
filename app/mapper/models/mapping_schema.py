@@ -49,7 +49,8 @@ class OutputMappingModel(BasicModel):
     )
 
     @model_validator(mode="before")
-    def validate_output_field_transformation_xor_multiple(cls, values):
+    @staticmethod
+    def validate_output_field_transformation_xor_multiple(values):
         output_field, value, custom, switch, multiple, profile = (
             values.get("output_field"),
             values.get("value"),
@@ -74,7 +75,8 @@ class ConditionOutputMappingModel(OutputMappingModel):
     )
 
     @model_validator(mode="before")
-    def validate_output_field_transformation(cls, values):
+    @staticmethod
+    def validate_output_field_transformation(values):
         output_field, value, custom, switch = (
             values.get("output_field"),
             values.get("value"),

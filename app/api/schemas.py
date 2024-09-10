@@ -28,8 +28,7 @@ class InputTraceRequestModel(BaseModel):
         """
         if self.input_format:
             return Trace(data=self.input_trace, format=self.input_format)
-        else:
-            return Trace.create_with_format_detection(data=self.input_trace)
+        return Trace.create_with_format_detection(data=self.input_trace)
 
 
 # Transformation models

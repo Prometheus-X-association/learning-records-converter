@@ -3,10 +3,16 @@ from typing import Any, Callable
 from app.common.models.trace import Trace
 from app.common.type.types import JsonType
 from app.infrastructure.logging.contract import LoggerContract
-from app.profile_enricher.profiles.jsonld import (PresenceTypeEnum, StatementTemplate,
-                                                  StatementTemplateRule)
-from app.profile_enricher.types import (ValidationError, ValidationRecommendation,
-                                        ValidationResult)
+from app.profile_enricher.profiles.jsonld import (
+    PresenceTypeEnum,
+    StatementTemplate,
+    StatementTemplateRule,
+)
+from app.profile_enricher.types import (
+    ValidationError,
+    ValidationRecommendation,
+    ValidationResult,
+)
 from app.profile_enricher.utils.jsonpath import JSONPathUtils
 
 

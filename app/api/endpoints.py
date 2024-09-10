@@ -10,15 +10,23 @@ from app.infrastructure.logging.jsonlogger import JsonLogger
 from app.mapper.mapper import Mapper
 from app.mapper.repositories.yaml.yaml_repository import YamlMappingRepository
 from app.profile_enricher.profiler import Profiler
-from app.profile_enricher.repositories.jsonld.jsonld_repository import \
-    JsonLdProfileRepository
+from app.profile_enricher.repositories.jsonld.jsonld_repository import (
+    JsonLdProfileRepository,
+)
 
-from .exceptions import (BadRequestError, ForbiddenError, InternalServerError,
-                         NotFoundElementError)
-from .schemas import (TransformInputTraceRequestModel,
-                      TransformInputTraceResponseMetaModel,
-                      TransformInputTraceResponseModel, ValidateInputTraceRequestModel,
-                      ValidateInputTraceResponseModel)
+from .exceptions import (
+    BadRequestError,
+    ForbiddenError,
+    InternalServerError,
+    NotFoundElementError,
+)
+from .schemas import (
+    TransformInputTraceRequestModel,
+    TransformInputTraceResponseMetaModel,
+    TransformInputTraceResponseModel,
+    ValidateInputTraceRequestModel,
+    ValidateInputTraceResponseModel,
+)
 
 
 class LRCAPIRouter:
@@ -89,7 +97,7 @@ class LRCAPIRouter:
             input_trace = query.get_trace()
             return ValidateInputTraceResponseModel(input_format=input_trace.format)
         except ValueError as e:
-            raise BadRequestError(str(e))
+            raise BadRequestError(str(e)) from e
 
     async def transform_input_trace(
         self, query: TransformInputTraceRequestModel

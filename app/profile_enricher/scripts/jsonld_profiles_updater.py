@@ -6,9 +6,11 @@ from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
 from app.infrastructure.logging.jsonlogger import JsonLogger
-from app.profile_enricher.exceptions import (BasePathException,
-                                             ProfileNotFoundException,
-                                             ProfileValidationError)
+from app.profile_enricher.exceptions import (
+    BasePathError,
+    ProfileNotFoundError,
+    ProfileValidationError,
+)
 from app.profile_enricher.repositories.jsonld.profile_loader import ProfileLoader
 
 
@@ -66,7 +68,7 @@ class JsonLdProfilesUpdater:
                 file_path=file_path, profile_json=profile_json
             )
             self.logger.info("Successfully updated profile", log_context)
-        except ProfileNotFoundException:
+        except ProfileNotFoundError:
             self.logger.error("Profile not found", log_context)
         except ProfileValidationError:
             self.logger.error("Profile validation failed", log_context)
@@ -90,7 +92,7 @@ def main(destination_dir: str | None = None) -> None:
     if destination_dir is None:
         try:
             destination_dir: Path = Path(env_config.get_and_create_profiles_base_path())
-        except BasePathException as e:
+        except BasePathError as e:
             json_logger.exception("Failed to create or access profiles directory", e)
             raise
 

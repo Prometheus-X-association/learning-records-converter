@@ -1,22 +1,22 @@
-class ProfilerException(Exception):
+class ProfilerError(Exception):
     """Base class for profiler exceptions."""
 
 
-class ProfileNotFoundException(ProfilerException):
+class ProfileNotFoundError(ProfilerError):
     """Exception when a profile is not found."""
 
 
-class TemplateNotFoundException(ProfilerException):
+class TemplateNotFoundError(ProfilerError):
     """Exception when a template is not found."""
 
 
-class InvalidJsonException(ProfilerException):
+class InvalidJsonError(ProfilerError):
     """Exception when a JSON profile is invalid."""
 
 
-class ProfileValidationError(ProfilerException):
+class ProfileValidationError(ProfilerError):
     """Exception when a profile is not validated by Pydantic."""
 
 
-class BasePathException(ProfilerException):
+class BasePathError(ProfilerError):
     """Exception for errors related to the base path for profiles."""

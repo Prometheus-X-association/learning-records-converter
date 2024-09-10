@@ -68,11 +68,12 @@ class ExtendedTypeBaseModel(BaseModel):
             if issubclass(each_type, BaseModel) and isinstance(value, dict):
                 try:
                     return each_type(**value)
-                except ValidationError as ve:
+                except ValidationError:
                     pass
         return value
 
     @field_validator("*", mode="before")
+    @classmethod
     def validation(cls, value: Any, extra_info: ValidationInfo) -> Any:
         """Validator applied to all fields of a Model.
         The purpose is to auto detect child classes for a field that uses models for typing.
@@ -107,10 +108,10 @@ class ExtendedTypeBaseModel(BaseModel):
 
             # Return correct instance
             if get_origin(field.annotation) is list and isinstance(value, list):
-                new_value = []
-                for each_value in value:
-                    new_value.append(cls._get_correct_value(each_value, new_annotation))
-                return new_value
-            else:
-                return cls._get_correct_value(value, new_annotation)
+                return [
+                    cls._get_correct_value(each_value, new_annotation)
+                    for each_value in value
+                ]
+
+            return cls._get_correct_value(value, new_annotation)
         return value

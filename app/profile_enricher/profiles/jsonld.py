@@ -15,8 +15,14 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, Any, Dict, Literal, Optional, Union, get_args, get_origin
 
-from pydantic import (AnyUrl, BaseModel, Field, ValidationInfo, field_validator,
-                      model_validator)
+from pydantic import (
+    AnyUrl,
+    BaseModel,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 # Constants
 PROFILE_CONTEXT_URL = "https://w3id.org/xapi/profiles/context"
@@ -27,6 +33,7 @@ LOCATION_PATTERN = r"^[\$@]([.\[].*)?$"
 
 class CustomBaseModel(BaseModel):
     @model_validator(mode="before")
+    @classmethod
     def allow_empty_string_for_anyurl(cls, values):
         for field_name, field_info in cls.model_fields.items():
             field_type = field_info.annotation
@@ -418,11 +425,10 @@ class Pattern(ProfileElement):
         """
         Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'.
         """
-        if value is not None:
-            if any(x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value):
-                raise ValueError(
-                    "MUST NOT put optional or zeroOrMore directly inside alternates"
-                )
+        if value is not None and any(x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value):
+            raise ValueError(
+                "MUST NOT put optional or zeroOrMore directly inside alternates"
+            )
         return value
 
     @field_validator("sequence")
@@ -433,13 +439,12 @@ class Pattern(ProfileElement):
         """
         Validator to ensure that sequences include at least two members, unless specific conditions apply.
         """
-        if value is not None:
-            if len(value) < 2 and not (
+        if value is not None and len(value) < 2 and not (
                 info.data.get("primary") and not info.data.get("inScheme")
             ):
-                raise ValueError(
-                    "MUST include at least two members in sequence, unless sequence is in a primary Pattern that is not used elsewhere and the member of sequence is a single Statement Template"
-                )
+            raise ValueError(
+                "MUST include at least two members in sequence, unless sequence is in a primary Pattern that is not used elsewhere and the member of sequence is a single Statement Template"
+            )
         return value
 
     @model_validator(mode="after")

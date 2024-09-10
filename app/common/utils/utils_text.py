@@ -13,5 +13,4 @@ def random_case_in_string(text: str) -> str:
     """
     if text:
         return "".join(choice((str.upper, str.lower))(char) for char in str(text))
-    else:
-        return text
+    return text
