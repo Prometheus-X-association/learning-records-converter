@@ -79,22 +79,17 @@ class MappingEngine:
         try:
             self.input_format.value(**input_trace.data)
         except ValidationError as e:
-            self.logger.exception("Input format validation failed", e, self.log_context)
-            raise InputTraceToModelException("Input format validation failed") from e
+            msg = "Input format validation failed"
+            self.logger.exception(msg, e, self.log_context)
+            raise InputTraceToModelException(msg) from e
         except TypeError as e:
-            self.logger.exception(
-                "Invalid data type in input trace", e, self.log_context
-            )
-            raise InputTraceToModelException("Invalid data type in input trace") from e
+            msg = "Invalid data type in input trace"
+            self.logger.exception(msg, e, self.log_context)
+            raise InputTraceToModelException(msg) from e
         except Exception as e:
-            self.logger.exception(
-                "Input trace does not match the specified input format",
-                e,
-                self.log_context,
-            )
-            raise InputTraceToModelException(
-                "Input trace does not match the specified input format"
-            ) from e
+            msg = "Input trace does not match the specified input format"
+            self.logger.exception(msg,e,self.log_context)
+            raise InputTraceToModelException(msg) from e
         self.logger.debug("Input trace is valid against his format", self.log_context)
 
     def _apply_mapping(self, input_data: JsonType) -> JsonType:
@@ -160,26 +155,17 @@ class MappingEngine:
         try:
             self.output_format.value(**output_data)
         except ValidationError as e:
-            self.logger.exception(
-                "Output format validation failed", e, self.log_context
-            )
-            raise OutputTraceToModelException("Output format validation failed") from e
+            msg = "Output format validation failed"
+            self.logger.exception(msg , e, self.log_context)
+            raise OutputTraceToModelException(msg) from e
         except TypeError as e:
-            self.logger.exception(
-                "Invalid data type in output trace", e, self.log_context
-            )
-            raise OutputTraceToModelException(
-                "Invalid data type in output trace"
-            ) from e
+            msg = "Invalid data type in output trace"
+            self.logger.exception(msg, e, self.log_context)
+            raise OutputTraceToModelException(msg) from e
         except Exception as e:
-            self.logger.exception(
-                "Output trace does not match the specified output format",
-                e,
-                self.log_context,
-            )
-            raise OutputTraceToModelException(
-                "Output trace does not match the specified output format"
-            ) from e
+            msg = "Output trace does not match the specified output format"
+            self.logger.exception(msg,e,self.log_context)
+            raise OutputTraceToModelException(msg) from e
 
         self.logger.info("Mapping done", self.log_context)
         return Trace(
@@ -193,7 +179,7 @@ class MappingEngine:
         output_content: OutputMappingModel,
         output_trace: dict[str, Any],
         overwrite: bool,
-        arguments: list[Any] = None,
+        arguments: list[Any] | None = None,
     ) -> dict[str, Any]:
         """
         Build the output trace based on the output content.
@@ -279,10 +265,9 @@ class MappingEngine:
                     else transformation
                 )
             except Exception as e:
-                self.logger.exception(
-                    "Error in custom transformation", e, self.log_context
-                )
-                raise CodeEvaluationException("Error in custom transformation") from e
+                msg = "Error in custom transformation"
+                self.logger.exception(msg, e, self.log_context)
+                raise CodeEvaluationException(msg) from e
         return arguments
 
     @staticmethod
@@ -329,12 +314,13 @@ class MappingEngine:
                     )
                     return list_response
             except TypeError as e:
+                msg = "Error in lambda condition"
                 self.logger.exception(
-                    "Error in lambda condition",
+                    msg,
                     e,
                     {**self.log_context, "condition": condition.condition},
                 )
-                raise CodeEvaluationException("Error in lambda condition") from e
+                raise CodeEvaluationException(msg) from e
 
         list_response.append(FinalMappingModel(output_field=None, value=None))
         return list_response
