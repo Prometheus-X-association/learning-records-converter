@@ -31,7 +31,9 @@ class TraceValidator:
         }
 
     def validate_trace(
-        self, template: StatementTemplate, trace: Trace,
+        self,
+        template: StatementTemplate,
+        trace: Trace,
     ) -> list[ValidationError]:
         """
         Validate a trace against a given template.
@@ -54,7 +56,9 @@ class TraceValidator:
         return [ValidationError(**result.__dict__) for result in validation_results]
 
     def get_recommendations(
-        self, template: StatementTemplate, trace: Trace,
+        self,
+        template: StatementTemplate,
+        trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a given template.
@@ -71,7 +75,9 @@ class TraceValidator:
         self.logger.debug("Start trace recommendations", log_context)
 
         validation_results = self._apply_rules(
-            template=template, trace=trace, rule_types={PresenceTypeEnum.RECOMMENDED},
+            template=template,
+            trace=trace,
+            rule_types={PresenceTypeEnum.RECOMMENDED},
         )
 
         if not validation_results:
@@ -214,7 +220,9 @@ class TraceValidator:
         return not any(v in none_values for v in values)
 
     def _get_values_for_rule(
-        self, rule: StatementTemplateRule, trace: Trace,
+        self,
+        rule: StatementTemplateRule,
+        trace: Trace,
     ) -> list[Any]:
         """
         Extract values from the trace that are relevant to a specific rule.

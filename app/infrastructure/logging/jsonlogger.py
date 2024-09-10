@@ -52,7 +52,10 @@ class JsonLogger(LoggerContract):
         self._logger.addHandler(handler)
 
     def _log(
-        self, level: int, message: str, context: dict[str, Any] | None = None,
+        self,
+        level: int,
+        message: str,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """
         Internal method to handle logging at different levels.
@@ -85,7 +88,10 @@ class JsonLogger(LoggerContract):
         self._log(level=logging.CRITICAL, message=message, context=context)
 
     def exception(
-        self, message: str, exc: Exception, context: dict[str, Any] | None = None,
+        self,
+        message: str,
+        exc: Exception,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """Inherited from LoggerContract.exception."""
         exc_context = {

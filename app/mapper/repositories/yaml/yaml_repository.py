@@ -44,7 +44,8 @@ class YamlMappingRepository(MappingRepository):
         :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
         """
         mapping_path = self._get_mapping_by_input_and_output_format(
-            input_format=input_format, output_format=output_format,
+            input_format=input_format,
+            output_format=output_format,
         )
         return self._get_config_model_from_yaml_file(file_path=mapping_path)
 
@@ -90,7 +91,8 @@ class YamlMappingRepository(MappingRepository):
             raise ValueError("Could not load mapping config into model")
 
         self.logger.debug(
-            "Mapping path found", {**log_context, "mapping_path": mapping_path},
+            "Mapping path found",
+            {**log_context, "mapping_path": mapping_path},
         )
 
         return Path(mapping_path)

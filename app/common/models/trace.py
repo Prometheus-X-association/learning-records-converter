@@ -1,4 +1,3 @@
-
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import BaseModel, ValidationError
 from pydantic.v1 import ValidationError as V1ValidationError
@@ -38,7 +37,8 @@ class Trace(BaseModel):
             try:
                 trace_format.value(**data)
                 return cls(
-                    data=data, format=CustomTraceFormatStrEnum[trace_format.name],
+                    data=data,
+                    format=CustomTraceFormatStrEnum[trace_format.name],
                 )
             except (ValidationError, V1ValidationError):
                 continue

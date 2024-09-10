@@ -43,7 +43,10 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
 
 
 def get_value_from_flat_key(
-    dict_element: dict | list, flat_key: str, default_value=None, return_copy=True,
+    dict_element: dict | list,
+    flat_key: str,
+    default_value=None,
+    return_copy=True,
 ) -> Any:
     """Get value from a dict element by using a flatten key (keys separated with dotes)
     If the value exists (even if it's empty), the method returns the value.
@@ -85,13 +88,19 @@ def get_value_from_flat_key(
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: dict, flat_key: str, value: Any, overwrite: bool = True,
+    dict_list_element: dict,
+    flat_key: str,
+    value: Any,
+    overwrite: bool = True,
 ) -> dict: ...
 
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: list, flat_key: str, value: Any, overwrite: bool = True,
+    dict_list_element: list,
+    flat_key: str,
+    value: Any,
+    overwrite: bool = True,
 ) -> list: ...
 
 
@@ -168,7 +177,10 @@ def set_value_from_flat_key(
             temp_dict_value = dict_list_element.get(first_key, {})
 
             dict_list_element[first_key] = set_value_from_flat_key(
-                temp_dict_value, ".".join(list_key), value, overwrite=overwrite,
+                temp_dict_value,
+                ".".join(list_key),
+                value,
+                overwrite=overwrite,
             )
 
     # If no keys left (stop condition)
@@ -190,7 +202,8 @@ def set_value_from_flat_key(
 
 
 def get_nested_from_flat(
-    flat_field: dict[str, Any], nested_field: dict | list | None = None,
+    flat_field: dict[str, Any],
+    nested_field: dict | list | None = None,
 ) -> dict | list:
     """Generate nested json from a flatten json.
 

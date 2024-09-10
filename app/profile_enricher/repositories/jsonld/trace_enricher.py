@@ -19,7 +19,10 @@ class TraceEnricher:
         self.logger = logger
 
     def get_enriched_data(
-        self, group_name: str, template: StatementTemplate, trace: Trace,
+        self,
+        group_name: str,
+        template: StatementTemplate,
+        trace: Trace,
     ) -> JsonType:
         """
         Get enriched data based on the given template.

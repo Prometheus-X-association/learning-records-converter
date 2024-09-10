@@ -128,7 +128,9 @@ class ProfileLoader:
             raise ProfileNotFoundError(f"URL not found for profile: {group_name}")
         try:
             request = Request(url=url)  # noqa: S310
-            with urlopen(request, timeout=self.download_timeout) as response:  # noqa: S310
+            with urlopen(
+                request, timeout=self.download_timeout,
+            ) as response:
                 if response.status != 200:
                     self.logger.error("Failed to download profile", log_context)
                     raise ProfileNotFoundError(
@@ -139,7 +141,9 @@ class ProfileLoader:
             return json.loads(content)
         except HTTPError as e:
             self.logger.exception(
-                "HTTP error occurred while downloading profile", e, log_context,
+                "HTTP error occurred while downloading profile",
+                e,
+                log_context,
             )
             raise ProfileNotFoundError(
                 f"Failed to download profile for {group_name}: HTTP error {e.code}",
@@ -196,7 +200,8 @@ class ProfileLoader:
 
     @staticmethod
     def _get_template_in_profile(
-        profile: Profile, template_name: str,
+        profile: Profile,
+        template_name: str,
     ) -> StatementTemplate | None:
         """
         Get a specific template from a profile.

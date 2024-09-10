@@ -50,7 +50,9 @@ class InteractionType(StrEnum):
 # SCORM 1.1 Data Model Elements
 class CMIScore(BaseModel):
     raw: float | None = Field(
-        None, title="Raw Score", description="Reflects the performance of the learner.",
+        None,
+        title="Raw Score",
+        description="Reflects the performance of the learner.",
     )
     max: float | None = Field(
         None,
@@ -66,32 +68,48 @@ class CMIScore(BaseModel):
 
 class CMIObjective(BaseModel):
     id: str = Field(
-        ..., title="Objective ID", description="Unique label for the objective.",
+        ...,
+        title="Objective ID",
+        description="Unique label for the objective.",
     )
     score: CMIScore = Field(
-        ..., title="Objective Score", description="Score related to the objective.",
+        ...,
+        title="Objective Score",
+        description="Score related to the objective.",
     )
     status: LessonStatus = Field(
-        ..., title="Objective Status", description="Completion status of the objective.",
+        ...,
+        title="Objective Status",
+        description="Completion status of the objective.",
     )
 
 
 class CMIInteraction(BaseModel):
     id: str = Field(
-        ..., title="Interaction ID", description="Unique label for the interaction.",
+        ...,
+        title="Interaction ID",
+        description="Unique label for the interaction.",
     )
     time: str = Field(..., title="Interaction Time", description="Time of interaction.")
     type: InteractionType = Field(
-        ..., title="Interaction Type", description="Type of interaction.",
+        ...,
+        title="Interaction Type",
+        description="Type of interaction.",
     )
     correct_responses: list[str] = Field(
-        ..., title="Correct Responses", description="List of correct responses.",
+        ...,
+        title="Correct Responses",
+        description="List of correct responses.",
     )
     weighting: float = Field(
-        ..., title="Weighting", description="Weight of the interaction.",
+        ...,
+        title="Weighting",
+        description="Weight of the interaction.",
     )
     student_response: str = Field(
-        ..., title="Student Response", description="Response given by the student.",
+        ...,
+        title="Student Response",
+        description="Response given by the student.",
     )
     result: str = Field(
         ...,
@@ -99,17 +117,25 @@ class CMIInteraction(BaseModel):
         description="Judgment of the correctness of the learner response.",
     )
     latency: str = Field(
-        ..., title="Latency", description="Time taken for the response.",
+        ...,
+        title="Latency",
+        description="Time taken for the response.",
     )
 
 
 # SCORM 1.1 Main Data Model
 class SCORMDataModel(BaseModel):
     student_id: str = Field(
-        ..., max_length=255, title="Student ID", description="Identifies the student.",
+        ...,
+        max_length=255,
+        title="Student ID",
+        description="Identifies the student.",
     )
     student_name: str = Field(
-        ..., max_length=255, title="Student Name", description="Name of the student.",
+        ...,
+        max_length=255,
+        title="Student Name",
+        description="Name of the student.",
     )
     lesson_location: str = Field(
         ...,
@@ -118,24 +144,36 @@ class SCORMDataModel(BaseModel):
         description="Current location in the SCO.",
     )
     credit: Credit = Field(
-        ..., title="Credit", description="Indicates if credit is given for SCO.",
+        ...,
+        title="Credit",
+        description="Indicates if credit is given for SCO.",
     )
     lesson_status: LessonStatus = Field(
-        ..., title="Lesson Status", description="Completion status of the SCO.",
+        ...,
+        title="Lesson Status",
+        description="Completion status of the SCO.",
     )
     entry: Entry = Field(..., title="Entry", description="Entry status of the learner.")
     score: CMIScore = Field(..., title="Score", description="Score of the learner.")
     total_time: str = Field(
-        ..., title="Total Time", description="Total time spent by the learner.",
+        ...,
+        title="Total Time",
+        description="Total time spent by the learner.",
     )
     lesson_mode: LessonMode = Field(
-        ..., title="Lesson Mode", description="Mode of the lesson.",
+        ...,
+        title="Lesson Mode",
+        description="Mode of the lesson.",
     )
     exit: ExitMode = Field(
-        ..., title="Exit Mode", description="How or why the learner exited the SCO.",
+        ...,
+        title="Exit Mode",
+        description="How or why the learner exited the SCO.",
     )
     session_time: str = Field(
-        ..., title="Session Time", description="Time spent in the current session.",
+        ...,
+        title="Session Time",
+        description="Time spent in the current session.",
     )
     suspend_data: str = Field(
         ...,
@@ -150,7 +188,10 @@ class SCORMDataModel(BaseModel):
         description="Data provided upon launch.",
     )
     comments: str = Field(
-        ..., max_length=4096, title="Comments", description="Comments from the learner.",
+        ...,
+        max_length=4096,
+        title="Comments",
+        description="Comments from the learner.",
     )
     comments_from_lms: str = Field(
         ...,
@@ -159,20 +200,32 @@ class SCORMDataModel(BaseModel):
         description="Comments from the LMS.",
     )
     objectives: list[CMIObjective] = Field(
-        ..., title="Objectives", description="List of objectives.",
+        ...,
+        title="Objectives",
+        description="List of objectives.",
     )
     objectives_count: int = Field(
-        ..., title="Objectives Count", description="Number of objectives.",
+        ...,
+        title="Objectives Count",
+        description="Number of objectives.",
     )
     student_data: dict = Field(
-        ..., title="Student Data", description="Data related to the student.",
+        ...,
+        title="Student Data",
+        description="Data related to the student.",
     )
     student_preference: dict = Field(
-        ..., title="Student Preference", description="Preferences of the student.",
+        ...,
+        title="Student Preference",
+        description="Preferences of the student.",
     )
     interactions: list[CMIInteraction] = Field(
-        ..., title="Interactions", description="List of interactions.",
+        ...,
+        title="Interactions",
+        description="List of interactions.",
     )
     interactions_count: int = Field(
-        ..., title="Interactions Count", description="Number of interactions.",
+        ...,
+        title="Interactions Count",
+        description="Number of interactions.",
     )

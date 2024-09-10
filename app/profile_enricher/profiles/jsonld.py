@@ -164,7 +164,8 @@ class Concept(ProfileElement):
     @field_validator("related")
     @staticmethod
     def related_only_for_deprecated(
-        value: list[AnyUrl] | None, info: ValidationInfo,
+        value: list[AnyUrl] | None,
+        info: ValidationInfo,
     ) -> list[AnyUrl] | None:
         """Validator to ensure 'related' field is used only for deprecated concepts."""
         if value and not info.data.get("deprecated"):
@@ -179,7 +180,8 @@ class Extension(ProfileElement):
 
     type: ExtensionTypeEnum
     recommended_activity_types: list[AnyUrl] | None = Field(
-        None, alias="recommendedActivityTypes",
+        None,
+        alias="recommendedActivityTypes",
     )
     recommended_verbs: list[AnyUrl] | None = Field(None, alias="recommendedVerbs")
     context: AnyUrl | None = None
@@ -189,7 +191,8 @@ class Extension(ProfileElement):
     @field_validator("recommended_activity_types")
     @staticmethod
     def validate_recommended_activity_types(
-        value: list[AnyUrl] | None, info: ValidationInfo,
+        value: list[AnyUrl] | None,
+        info: ValidationInfo,
     ) -> list[AnyUrl] | None:
         """Validator to ensure 'recommendedActivityTypes' is only allowed on ActivityExtension types."""
         if value is not None and info.data.get("type") != ExtensionTypeEnum.ACTIVITY:
@@ -201,7 +204,8 @@ class Extension(ProfileElement):
     @field_validator("recommended_verbs")
     @staticmethod
     def validate_recommended_verbs(
-        value: list[AnyUrl] | None, info: ValidationInfo,
+        value: list[AnyUrl] | None,
+        info: ValidationInfo,
     ) -> list[AnyUrl] | None:
         """Validator to ensure 'recommendedVerbs' is only allowed on ContextExtension or ResultExtension types."""
         if value is not None and info.data.get("type") not in [
@@ -246,7 +250,8 @@ class ActivityDefinition(CustomBaseModel):
     """A model defining the properties of an activity."""
 
     context: Annotated[AnyUrl, Literal[ACTIVITY_CONTEXT_URL]] = Field(
-        default=ACTIVITY_CONTEXT_URL, alias="@context",
+        default=ACTIVITY_CONTEXT_URL,
+        alias="@context",
     )
     type: AnyUrl | None = None
     name: LanguageMap | None = None
@@ -303,25 +308,32 @@ class StatementTemplate(ProfileElement):
     verb: AnyUrl | None = None
     object_activity_type: AnyUrl | None = Field(None, alias="objectActivityType")
     context_grouping_activity_type: list[AnyUrl] | None = Field(
-        None, alias="contextGroupingActivityType",
+        None,
+        alias="contextGroupingActivityType",
     )
     context_parent_activity_type: list[AnyUrl] | None = Field(
-        None, alias="contextParentActivityType",
+        None,
+        alias="contextParentActivityType",
     )
     context_other_activity_type: list[AnyUrl] | None = Field(
-        None, alias="contextOtherActivityType",
+        None,
+        alias="contextOtherActivityType",
     )
     context_category_activity_type: list[AnyUrl] | None = Field(
-        None, alias="contextCategoryActivityType",
+        None,
+        alias="contextCategoryActivityType",
     )
     attachment_usage_type: list[AnyUrl] | None = Field(
-        None, alias="attachmentUsageType",
+        None,
+        alias="attachmentUsageType",
     )
     object_statement_ref_template: list[AnyUrl] | None = Field(
-        None, alias="objectStatementRefTemplate",
+        None,
+        alias="objectStatementRefTemplate",
     )
     context_statement_ref_template: list[AnyUrl] | None = Field(
-        None, alias="contextStatementRefTemplate",
+        None,
+        alias="contextStatementRefTemplate",
     )
     rules: list[StatementTemplateRule] | None = None
 
@@ -352,7 +364,8 @@ class Pattern(ProfileElement):
     @field_validator("pref_label", "definition")
     @staticmethod
     def primary_must_have_label_and_definition(
-        value: LanguageMap | None, info: ValidationInfo,
+        value: LanguageMap | None,
+        info: ValidationInfo,
     ) -> LanguageMap | None:
         """Validator to ensure that primary patterns include both 'prefLabel' and 'definition'."""
         if info.data.get("primary") and value is None:
@@ -363,7 +376,9 @@ class Pattern(ProfileElement):
     @staticmethod
     def validate_alternates(value: list[AnyUrl] | None) -> list[AnyUrl] | None:
         """Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'."""
-        if value is not None and any(x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value):
+        if value is not None and any(
+            x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value
+        ):
             raise ValueError(
                 "MUST NOT put optional or zeroOrMore directly inside alternates",
             )
@@ -372,12 +387,15 @@ class Pattern(ProfileElement):
     @field_validator("sequence")
     @staticmethod
     def validate_sequence(
-        value: list[AnyUrl] | None, info: ValidationInfo,
+        value: list[AnyUrl] | None,
+        info: ValidationInfo,
     ) -> list[AnyUrl] | None:
         """Validator to ensure that sequences include at least two members, unless specific conditions apply."""
-        if value is not None and len(value) < 2 and not (
-                info.data.get("primary") and not info.data.get("inScheme")
-            ):
+        if (
+            value is not None
+            and len(value) < 2
+            and not (info.data.get("primary") and not info.data.get("inScheme"))
+        ):
             raise ValueError(
                 "MUST include at least two members in sequence, unless sequence is in a primary Pattern that is not used elsewhere and the member of sequence is a single Statement Template",
             )
@@ -419,7 +437,8 @@ class Pattern(ProfileElement):
             value = getattr(self, field)
             if value:
                 check_self_reference(
-                    self.id, value if isinstance(value, list) else [value],
+                    self.id,
+                    value if isinstance(value, list) else [value],
                 )
         return self
 
@@ -429,11 +448,13 @@ class Profile(CustomBaseModel):
 
     id: AnyUrl
     context: Annotated[AnyUrl, Literal[PROFILE_CONTEXT_URL]] = Field(
-        default=PROFILE_CONTEXT_URL, alias="@context",
+        default=PROFILE_CONTEXT_URL,
+        alias="@context",
     )
     type: ProfileTypeEnum
     conforms_to: Annotated[AnyUrl, Literal[PROFILE_CONFORMS_TO_URL]] = Field(
-        default=PROFILE_CONFORMS_TO_URL, alias="conformsTo",
+        default=PROFILE_CONFORMS_TO_URL,
+        alias="conformsTo",
     )
     pref_label: LanguageMap = Field(..., alias="prefLabel")
     definition: LanguageMap

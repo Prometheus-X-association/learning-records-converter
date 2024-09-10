@@ -100,7 +100,8 @@ class LRCAPIRouter:
             raise BadRequestError(str(e)) from e
 
     async def transform_input_trace(
-        self, query: TransformInputTraceRequestModel,
+        self,
+        query: TransformInputTraceRequestModel,
     ) -> TransformInputTraceResponseModel:
         """
         Transform and enrich a trace from one format to another.
@@ -130,7 +131,8 @@ class LRCAPIRouter:
         :raises ValueError: If the trace does not match the profile
         """
         self.logger.info(
-            "Convert endpoint called", {"input_format": query.input_format},
+            "Convert endpoint called",
+            {"input_format": query.input_format},
         )
 
         input_trace = query.get_trace()
@@ -150,7 +152,8 @@ class LRCAPIRouter:
         if output_trace.profile:
             profiler = Profiler(
                 repository=JsonLdProfileRepository(
-                    logger=self.logger, config=self.config,
+                    logger=self.logger,
+                    config=self.config,
                 ),
             )
             profiler.enrich_trace(trace=output_trace)
@@ -169,10 +172,12 @@ class LRCAPIRouter:
         )
 
         self.logger.info(
-            "Convert endpoint completed", {"input_format": input_trace.format},
+            "Convert endpoint completed",
+            {"input_format": input_trace.format},
         )
         return TransformInputTraceResponseModel(
-            output_trace=output_trace.data, meta=meta,
+            output_trace=output_trace.data,
+            meta=meta,
         )
 
 
@@ -226,7 +231,8 @@ def create_app() -> FastAPI:
 
         exc_type = type(exc)
         status_code, error_type = error_mapping.get(
-            exc_type, (500, "Internal Server Error"),
+            exc_type,
+            (500, "Internal Server Error"),
         )
 
         if status_code == 500 and exc_type not in {TypeError, InternalServerError}:
@@ -246,7 +252,8 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def global_exception_handler(
-        request: Request, exc: Exception,
+        request: Request,
+        exc: Exception,
     ) -> JSONResponse:
         """
         Global exception handler for unhandled exceptions.

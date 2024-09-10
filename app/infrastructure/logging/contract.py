@@ -60,7 +60,10 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def exception(
-        self, message: str, exc: Exception, context: dict[str, Any] | None = None,
+        self,
+        message: str,
+        exc: Exception,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """
         Log an exception.

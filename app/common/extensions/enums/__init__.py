@@ -4,4 +4,8 @@ from extensions.enums.custom_trace_formats import (
                                                    CustomTraceFormatStrEnum,
 )
 
-__all__ = ["CustomTraceFormatModelEnum", "CustomTraceFormatOutputMappingEnum", "CustomTraceFormatStrEnum"]
+__all__ = [
+    "CustomTraceFormatModelEnum",
+    "CustomTraceFormatOutputMappingEnum",
+    "CustomTraceFormatStrEnum",
+]

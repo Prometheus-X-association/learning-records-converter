@@ -10,6 +10,7 @@ from pydantic.fields import FieldInfo
 if TYPE_CHECKING:
     from pydantic_core.core_schema import ValidationInfo
 
+
 #############################################################
 ##################### ENUMS/TERMS/TYPES #####################
 #############################################################
@@ -351,7 +352,8 @@ class LearningObjectiveModel(EntityModel):
 
 class DigitalResourceModel(EntityModel):
     type: Literal[TypeTermEnum.DIGITALRESOURCE] = Field(
-        alias="type", examples=[TypeTermEnum.DIGITALRESOURCE.DIGITALRESOURCE],
+        alias="type",
+        examples=[TypeTermEnum.DIGITALRESOURCE.DIGITALRESOURCE],
     )
     creators: list[AgentModel | str] = Field(
         default=None,
@@ -684,7 +686,8 @@ class AnnotationModel(EntityModel):
 
 class BookmarkAnnotationModel(AnnotationModel):
     type: Literal[TypeTermEnum.BOOKMARKANNOTATION] = Field(
-        alias="type", examples=[TypeTermEnum.BOOKMARKANNOTATION.value],
+        alias="type",
+        examples=[TypeTermEnum.BOOKMARKANNOTATION.value],
     )
     bookmark_notes: str = Field(
         default=None,
@@ -1311,11 +1314,9 @@ class NavigationEventModel(EventModel):
     )
     actor: PersonModel | SoftwareApplicationModel | str = Field(alias="actor")
     action: Literal[ActionTermEnum.NAVIGATEDTO,] = Field(alias="action")
-    object: DigitalResourceModel | EntityModel | SoftwareApplicationModel | str = (
-        Field(
-            alias="object",
-            description="The DigitalResource or SoftwareApplication to which the actor navigated.",
-        )
+    object: DigitalResourceModel | EntityModel | SoftwareApplicationModel | str = Field(
+        alias="object",
+        description="The DigitalResource or SoftwareApplication to which the actor navigated.",
     )
     target: FrameModel | str = Field(
         default=None,
@@ -1444,7 +1445,8 @@ class ViewEventModel(EventPersonModel):
 class IMSCaliperModel(BaseModel):
     data: list[EntityModel | EventModel] = Field(alias="data")
     data_version: str = Field(
-        alias="dataVersion", examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
+        alias="dataVersion",
+        examples=["http://purl.imsglobal.org/ctx/caliper/v1p1"],
     )
     send_time: str = Field(alias="sendTime", examples=["2019-11-16T02:08:59.163Z"])
     sensor: str = Field(alias="sensor", examples=["http://oxana.instructure.com/"])
@@ -1452,7 +1454,9 @@ class IMSCaliperModel(BaseModel):
     @field_validator("data", mode="before")
     @classmethod
     def validation(
-        cls, value: list[EventModel], extra_info: ValidationInfo,
+        cls,
+        value: list[EventModel],
+        extra_info: ValidationInfo,
     ) -> list[EventModel]:
         """Pydantic does not allow a model to use a discriminator and a field_validator with mode=`before`.
 
@@ -1468,7 +1472,8 @@ class IMSCaliperModel(BaseModel):
         """
         # Get FieldInfo
         field = cls.model_fields.get(
-            extra_info.field_name if extra_info.field_name else "", None,
+            extra_info.field_name if extra_info.field_name else "",
+            None,
         )
 
         if isinstance(field, FieldInfo):
@@ -1494,7 +1499,8 @@ class IMSCaliperModel(BaseModel):
                     model_value = each_value
                     if isinstance(each_value, dict) and (
                         event_model := dict_discriminator.get(
-                            each_value.get("type", ""), None,
+                            each_value.get("type", ""),
+                            None,
                         )
                     ):
                         model_value = event_model(**each_value)

@@ -92,7 +92,8 @@ class ExtendedTypeBaseModel(BaseModel):
         """
         # Get FieldInfo
         field = cls.model_fields.get(
-            extra_info.field_name if extra_info.field_name else "", None,
+            extra_info.field_name if extra_info.field_name else "",
+            None,
         )
 
         # Check if condition gathered to treat
