@@ -156,9 +156,7 @@ def set_value_from_flat_key(
                 dict_list_element = []
             # If all indexes not there, create them
             if len(dict_list_element) - 1 < index:
-                dict_list_element.extend(
-                    [None for _ in range(len(dict_list_element), index + 1)],
-                )
+                dict_list_element.extend([None] * (index + 1 - len(dict_list_element)))
 
             try:
                 dict_list_element[index] = set_value_from_flat_key(
@@ -266,7 +264,7 @@ def convert_yaml_file_to_json(yaml_path: Path) -> dict:
         return yaml.safe_load(file)
 
 
-def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
+def deep_merge(target_dict: dict, merge_dct: dict) -> None:
     """Recursive dict merge.
 
     Inspired by :meth:``dict.update()``, instead of

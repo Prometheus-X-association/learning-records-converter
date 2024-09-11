@@ -1,7 +1,7 @@
 """
 CAUTION : DO NOT MODIFY.
 
-Use app/common/custom_trace_format if you need to add additional mapping formats.
+Use app/extension/enums/custom_trace_formats.py if you need to add additional mapping formats.
 """
 
 from enum import Enum

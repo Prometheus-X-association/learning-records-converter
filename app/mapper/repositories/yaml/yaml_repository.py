@@ -74,21 +74,24 @@ class YamlMappingRepository(MappingRepository):
                 output_format.name
             ].value
         except (ValueError, KeyError) as e:
-            self.logger.exception("Output mapping not found", e, log_context)
-            raise ValueError("Output mapping enum not found") from e
+            msg = "Output mapping not found"
+            self.logger.exception(msg, e, log_context)
+            raise ValueError(msg) from e
 
         try:
             mapping_config = output_format_mappings[input_format.name]
         except (ValueError, KeyError) as e:
-            self.logger.exception("Mapping config not found", e, log_context)
-            raise ValueError("Mapping config not found") from e
+            msg = "Mapping config not found"
+            self.logger.exception(msg, e, log_context)
+            raise ValueError(msg) from e
 
         # Read config file
         if isinstance(mapping_config, TraceFormatEnum) or not mapping_config.value:
             mapping_path = mapping_config.value
         else:
-            self.logger.error("Mapping model not found", log_context)
-            raise ValueError("Could not load mapping config into model")
+            msg = "Mapping model not found"
+            self.logger.error(msg, log_context)
+            raise ValueError(msg)
 
         self.logger.debug(
             "Mapping path found",
@@ -111,13 +114,14 @@ class YamlMappingRepository(MappingRepository):
         try:
             return MappingSchema(**json_config)
         except ValidationError as e:
-            self.logger.exception("Mapping validation failed", e)
-            raise MappingConfigToModelError("Mapping validation failed") from e
+            msg = "Mapping validation failed"
+            self.logger.exception(msg, e)
+            raise MappingConfigToModelError(msg) from e
         except TypeError as e:
-            self.logger.exception("Invalid data type in mapping", e)
-            raise MappingConfigToModelError("Invalid data type in mapping") from e
+            msg = "Invalid data type in mapping"
+            self.logger.exception(msg, e)
+            raise MappingConfigToModelError(msg) from e
         except Exception as e:
-            self.logger.exception("Unexpected error during mapping file validation", e)
-            raise MappingConfigToModelError(
-                "Unexpected error during mapping file validation",
-            ) from e
+            msg = "Unexpected error during mapping file validation"
+            self.logger.exception(msg, e)
+            raise MappingConfigToModelException(msg) from e

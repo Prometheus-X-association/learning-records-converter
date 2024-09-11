@@ -105,14 +105,14 @@ class ProfileLoader:
             file_content = file_path.read_text(encoding="utf8")
             return json.loads(file_content)
         except FileNotFoundError as e:
-            self.logger.exception("Profile file not found", e, log_context)
-            raise ProfileNotFoundError(
-                f"Profile file not found: {file_path}",
+            msg = "Profile file not found"
+            self.logger.exception(msg, e, log_context)
+            raise ProfileNotFoundError(f"{msg}: {file_path}",
             ) from e
         except json.JSONDecodeError as e:
-            self.logger.exception("Invalid JSON in profile file", e, log_context)
-            raise InvalidJsonError(
-                f"Invalid JSON in profile file: {file_path}",
+            msg = "Invalid JSON in profile file"
+            self.logger.exception(msg, e, log_context)
+            raise InvalidJsonError(f"{msg}: {file_path}",
             ) from e
 
     def download_profile(self, group_name: str) -> JsonType:
