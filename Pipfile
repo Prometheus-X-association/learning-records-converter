@@ -28,6 +28,7 @@ pytest = "*"
 pytest-cov = "*"
 httpx = "==0.26.0"
 ruff = "*"
+vulture = "*"
 
 [requires]
 python_version = "3.12"

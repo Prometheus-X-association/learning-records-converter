@@ -19,7 +19,6 @@ from .exceptions import (
     CodeEvaluationError,
     InputTraceToModelError,
     MapperError,
-    OutputTraceToModelError,
 )
 from .models.mapping_models import FinalMappingModel
 from .models.mapping_schema import (
