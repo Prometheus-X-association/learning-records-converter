@@ -1,10 +1,14 @@
 import csv
+from collections import OrderedDict
+from collections.abc import Iterator
 from decimal import Decimal, InvalidOperation
 from io import TextIOWrapper
-from typing import Any, Iterator, OrderedDict, BinaryIO
+from typing import Any, BinaryIO
 
 from app.parsers.contracts.parser import Parser
 from app.parsers.types import DelimiterEnum
+from extensions.enums import CustomTraceFormatStrEnum
+from models.trace import Trace
 
 
 class CSVParser(Parser):
@@ -12,7 +16,7 @@ class CSVParser(Parser):
     Parser for CSV files.
     """
 
-    def parse(self, file: BinaryIO) -> Iterator[dict[str, Any]]:
+    def parse(self, file: BinaryIO) -> Iterator[Trace]:
         """
         Parse the given CSV file and yield parsed rows.
 
@@ -24,17 +28,21 @@ class CSVParser(Parser):
             text_io = TextIOWrapper(file, encoding=self.config.encoding)
             dialect = self._detect_dialect(text_io)
             reader = csv.DictReader(
-                text_io, **self._get_csv_params(detected_dialect=dialect)
+                text_io,
+                **self._get_csv_params(detected_dialect=dialect),
             )
             for row in reader:
-                yield self.clean_row(row=row)
+                yield Trace(
+                    data=self._clean_row(row=row),
+                    format=CustomTraceFormatStrEnum.CUSTOM,
+                )
 
         except UnicodeDecodeError as e:
             raise ValueError(
-                f"Unable to decode CSV with encoding {self.config.encoding}"
+                f"Unable to decode CSV with encoding {self.config.encoding}",
             ) from e
         except csv.Error as e:
-            raise ValueError(f"CSV Parsing error: {str(e)}") from e
+            raise ValueError(f"CSV Parsing error: {e!s}") from e
 
     @staticmethod
     def _detect_dialect(file: TextIOWrapper) -> csv.Dialect:
@@ -51,14 +59,17 @@ class CSVParser(Parser):
         except csv.Error:
             return csv.excel
 
-    def clean_row(self, row: dict) -> OrderedDict:
+    @staticmethod
+    def _clean_row(row: dict) -> OrderedDict:
         """
         Clean and normalize the values in a row.
 
         :param row: The row to clean
         :return: The cleaned row with normalized values
         """
-        return OrderedDict((k, self._normalize_value(value=v)) for k, v in row.items())
+        return OrderedDict(
+            (k, CSVParser._normalize_value(value=v)) for k, v in row.items()
+        )
 
     @staticmethod
     def _normalize_value(value: Any) -> Any:
@@ -71,6 +82,8 @@ class CSVParser(Parser):
         if not isinstance(value, str):
             return value
         value = value.strip()
+        if not value:
+            return None
         try:
             return Decimal(value).normalize()
         except InvalidOperation:

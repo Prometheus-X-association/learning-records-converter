@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Any, Iterator, BinaryIO
+from collections.abc import Iterator
+from typing import BinaryIO
 
 from app.api.schemas import CustomConfigModel
+from models.trace import Trace
 
 
 class Parser(ABC):
@@ -19,7 +21,7 @@ class Parser(ABC):
         self.config = config or CustomConfigModel()
 
     @abstractmethod
-    def parse(self, file: BinaryIO) -> Iterator[dict[str, Any]]:
+    def parse(self, file: BinaryIO) -> Iterator[Trace]:
         """
         Parse the given file and yield parsed data.
 

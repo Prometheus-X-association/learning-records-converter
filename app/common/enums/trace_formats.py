@@ -11,6 +11,7 @@ from models.trace_formats import (
     IMSCaliperSensorModel1_1,
     IMSCaliperSensorModel1_2,
     SCORM2004DataModel,
+    CustomDataModel,
 )
 
 
@@ -25,6 +26,7 @@ class TraceFormatModelEnum(TraceFormatEnum):
     XAPI = BaseXapiStatement
     IMSCALIPER1_2 = IMSCaliperSensorModel1_2
     IMSCALIPER1_1 = IMSCaliperSensorModel1_1
+    CUSTOM = CustomDataModel
 
 
 class TraceFormatToXapiMappingEnum(TraceFormatEnum):

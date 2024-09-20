@@ -1,5 +1,7 @@
 from pathlib import Path
+from typing import BinaryIO
 
+import yaml
 from enums import TraceFormatEnum
 from extensions.enums import (
     CustomTraceFormatOutputMappingEnum,
@@ -29,7 +31,7 @@ class YamlMappingRepository(MappingRepository):
         """
         self.logger = logger
 
-    def load_schema(
+    def load_schema_by_formats(
         self,
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
@@ -47,7 +49,17 @@ class YamlMappingRepository(MappingRepository):
             input_format=input_format,
             output_format=output_format,
         )
-        return self._get_config_model_from_yaml_file(file_path=mapping_path)
+
+        json_config = convert_yaml_file_to_json(yaml_path=mapping_path)
+        self.logger.info("Mapping config loaded", {"path": mapping_path})
+
+        return self._get_config_model(config=json_config)
+
+    def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
+        contents = mapping_file.read()
+        json_config = yaml.safe_load(contents)
+
+        return self._get_config_model(config=json_config)
 
     def _get_mapping_by_input_and_output_format(
         self,
@@ -100,19 +112,17 @@ class YamlMappingRepository(MappingRepository):
 
         return Path(mapping_path)
 
-    def _get_config_model_from_yaml_file(self, file_path: Path) -> MappingSchema:
+    def _get_config_model(self, config: dict) -> MappingSchema:
         """
-        Load and validate a YAML configuration file into a CompleteConfigModel.
+        Load and validate a configuration dict into a MappingSchema.
 
-        :param file_path: The path to the YAML configuration file
+        :param config: The mapping configuration
         :return: A validated CompleteConfigModel instance
-        :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
+        :raises MappingConfigToModelError: If the configuration file is invalid or cannot be loaded
         """
-        json_config = convert_yaml_file_to_json(yaml_path=file_path)
-        self.logger.info("Mapping config loaded", {"path": file_path})
         # Load mapping in Model
         try:
-            return MappingSchema(**json_config)
+            return MappingSchema(**config)
         except ValidationError as e:
             msg = "Mapping validation failed"
             self.logger.exception(msg, e)
@@ -124,4 +134,4 @@ class YamlMappingRepository(MappingRepository):
         except Exception as e:
             msg = "Unexpected error during mapping file validation"
             self.logger.exception(msg, e)
-            raise MappingConfigToModelException(msg) from e
+            raise MappingConfigToModelError(msg) from e

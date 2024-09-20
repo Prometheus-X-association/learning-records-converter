@@ -5,6 +5,7 @@ class DelimiterEnum(StrEnum):
     """
     Enumeration of possible CSV delimiters.
     """
+
     COMMA = ","
     SEMICOLON = ";"
     TAB = "\t"

@@ -1,3 +1,5 @@
+from typing import BinaryIO
+
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 
 from app.common.models.trace import Trace
@@ -28,6 +30,7 @@ class Mapper:
         self,
         input_trace: Trace,
         output_format: CustomTraceFormatStrEnum,
+        custom_mapping: BinaryIO | None = None,
     ) -> Trace:
         """
         Convert an input trace to the specified output format.
@@ -36,10 +39,14 @@ class Mapper:
         :param output_format: The desired output format
         :return: The converted trace
         """
-        schema = self.repository.load_schema(
-            input_format=input_trace.format,
-            output_format=output_format,
-        )
+        if custom_mapping:
+            schema = self.repository.load_schema_by_file(custom_mapping)
+        else:
+            # Use predefined schema from repository
+            schema = self.repository.load_schema_by_formats(
+                input_format=input_trace.format,
+                output_format=output_format,
+            )
 
         engine = MappingEngine(
             input_format=CustomTraceFormatModelEnum[input_trace.format.name],

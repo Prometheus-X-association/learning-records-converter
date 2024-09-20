@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import BinaryIO
 
 from extensions.enums import CustomTraceFormatStrEnum
 
@@ -13,7 +14,7 @@ class MappingRepository(ABC):
     """
 
     @abstractmethod
-    def load_schema(
+    def load_schema_by_formats(
         self,
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
@@ -25,4 +26,8 @@ class MappingRepository(ABC):
         :param output_format: The desired output format
         :return: The loaded mapping schema
         """
+        raise NotImplementedError
+
+    @abstractmethod
+    def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
         raise NotImplementedError

@@ -3,6 +3,8 @@ from .ims_caliper.ims_caliper_1_2 import IMSCaliperModel as IMSCaliperSensorMode
 from .scorm.scorm_1_1 import SCORMDataModel
 from .scorm.scorm_2004 import SCORM2004DataModel
 from .xapi.base.statements import BaseXapiStatement
+from .custom.custom import CustomDataModel
+
 
 __all__ = [
     "IMSCaliperSensorModel1_1",
@@ -10,4 +12,5 @@ __all__ = [
     "SCORMDataModel",
     "SCORM2004DataModel",
     "BaseXapiStatement",
+    "CustomDataModel",
 ]
