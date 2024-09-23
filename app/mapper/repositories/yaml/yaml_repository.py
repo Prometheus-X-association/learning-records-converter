@@ -106,7 +106,7 @@ class YamlMappingRepository(MappingRepository):
 
         :param file_path: The path to the YAML configuration file
         :return: A validated CompleteConfigModel instance
-        :raises MappingConfigToModelException: If the configuration file is invalid or cannot be loaded
+        :raises MappingConfigToModelError: If the configuration file is invalid or cannot be loaded
         """
         json_config = convert_yaml_file_to_json(yaml_path=file_path)
         self.logger.info("Mapping config loaded", {"path": file_path})
@@ -124,4 +124,4 @@ class YamlMappingRepository(MappingRepository):
         except Exception as e:
             msg = "Unexpected error during mapping file validation"
             self.logger.exception(msg, e)
-            raise MappingConfigToModelException(msg) from e
+            raise MappingConfigToModelError(msg) from e

@@ -48,9 +48,9 @@ class ProfileLoader:
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
         :return: The loaded StatementTemplate
-        :raises TemplateNotFoundException: If the specified template is not found
-        :raises ProfileNotFoundException: If the profile is not found
-        :raises InvalidJsonException: If the profile JSON is invalid
+        :raises TemplateNotFoundError: If the specified template is not found
+        :raises ProfileNotFoundError: If the profile is not found
+        :raises InvalidJsonError: If the profile JSON is invalid
         :raises ProfileValidationError: If the profile fails validation
         """
         # First, download the profile file if not exists or read it
@@ -96,8 +96,8 @@ class ProfileLoader:
 
         :param file_path: The file path of the profile
         :return: The loaded profile data
-        :raises ProfileNotFoundException: If the profile file is not found
-        :raises InvalidJsonException: If the profile JSON is invalid
+        :raises ProfileNotFoundError: If the profile file is not found
+        :raises InvalidJsonError: If the profile JSON is invalid
         """
         log_context = {"path": file_path}
         self.logger.debug("Read profile file", log_context)
@@ -107,12 +107,14 @@ class ProfileLoader:
         except FileNotFoundError as e:
             msg = "Profile file not found"
             self.logger.exception(msg, e, log_context)
-            raise ProfileNotFoundError(f"{msg}: {file_path}",
+            raise ProfileNotFoundError(
+                f"{msg}: {file_path}",
             ) from e
         except json.JSONDecodeError as e:
             msg = "Invalid JSON in profile file"
             self.logger.exception(msg, e, log_context)
-            raise InvalidJsonError(f"{msg}: {file_path}",
+            raise InvalidJsonError(
+                f"{msg}: {file_path}",
             ) from e
 
     def download_profile(self, group_name: str) -> JsonType:
@@ -121,8 +123,8 @@ class ProfileLoader:
 
         :param group_name: The name of the group whose profile is to be downloaded
         :return: The contents of the downloaded profile as a dictionary
-        :raises ProfileNotFoundException: If the profile cannot be downloaded or the URL is not found
-        :raises InvalidJsonException: If the downloaded content is not valid JSON
+        :raises ProfileNotFoundError: If the profile cannot be downloaded or the URL is not found
+        :raises InvalidJsonError: If the downloaded content is not valid JSON
         """
         url = self.config.get_profile_url(profile_name=group_name)
 
