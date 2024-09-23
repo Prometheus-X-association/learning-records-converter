@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from ...config import BaseModelWithConfig
+from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
 
@@ -15,4 +15,4 @@ class BaseXapiVerb(BaseModelWithConfig):
     """
 
     id: IRI
-    display: Optional[LanguageMap]
+    display: Optional[LanguageMap] = None

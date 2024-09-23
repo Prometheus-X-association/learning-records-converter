@@ -1,19 +1,20 @@
 """Base xAPI `Statement` definitions."""
 
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 from uuid import UUID
 
-from pydantic.v1 import constr, root_validator
+from pydantic import StringConstraints, model_validator
+from typing_extensions import Annotated
 
-from .fields.agents import BaseXapiAgent
-from .fields.attachments import BaseXapiAttachment
-from .fields.contexts import BaseXapiContext
-from .fields.groups import BaseXapiGroup
-from .fields.objects import BaseXapiObject
-from .fields.results import BaseXapiResult
-from .fields.verbs import BaseXapiVerb
 from ..config import BaseModelWithConfig
+from .agents import BaseXapiAgent
+from .attachments import BaseXapiAttachment
+from .contexts import BaseXapiContext
+from .groups import BaseXapiGroup
+from .objects import BaseXapiObject
+from .results import BaseXapiResult
+from .verbs import BaseXapiVerb
 
 
 class BaseXapiStatement(BaseModelWithConfig):
@@ -33,21 +34,21 @@ class BaseXapiStatement(BaseModelWithConfig):
         attachments (list): Consists of a list of attachments.
     """
 
-    id: Optional[UUID]
+    id: Optional[UUID] = None
     actor: Union[BaseXapiAgent, BaseXapiGroup]
     verb: BaseXapiVerb
     object: BaseXapiObject
-    result: Optional[BaseXapiResult]
-    context: Optional[BaseXapiContext]
-    timestamp: Optional[datetime]
-    stored: Optional[datetime]
-    authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]]
-    version: constr(regex=r"^1\.0\.[0-9]+$") = "1.0.0"  # noqa:F722
-    attachments: Optional[List[BaseXapiAttachment]]
+    result: Optional[BaseXapiResult] = None
+    context: Optional[BaseXapiContext] = None
+    timestamp: Optional[datetime] = None
+    stored: Optional[datetime] = None
+    authority: Optional[Union[BaseXapiAgent, BaseXapiGroup]] = None
+    version: Annotated[str, StringConstraints(pattern=r"^1\.0\.[0-9]+$")] = "1.0.0"
+    attachments: Optional[List[BaseXapiAttachment]] = None
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
     @classmethod
-    def check_abscence_of_empty_and_invalid_values(cls, values):
+    def check_absence_of_empty_and_invalid_values(cls, values: Any) -> Any:
         """Check the model for empty and invalid values.
 
         Check that the `context` field contains `platform` and `revision` fields
@@ -57,13 +58,13 @@ class BaseXapiStatement(BaseModelWithConfig):
             if value in [None, "", {}]:
                 raise ValueError(f"{field}: invalid empty value")
             if isinstance(value, dict) and field != "extensions":
-                cls.check_abscence_of_empty_and_invalid_values(value)
+                cls.check_absence_of_empty_and_invalid_values(value)
 
         context = dict(values.get("context", {}))
         if context:
             platform = context.get("platform", {})
             revision = context.get("revision", {})
-            object_type = dict(values.get("object", {})).get("objectType", "Activity")
+            object_type = dict(values["object"]).get("objectType", "Activity")
             if (platform or revision) and object_type != "Activity":
                 raise ValueError(
                     "revision and platform properties can only be used if the "

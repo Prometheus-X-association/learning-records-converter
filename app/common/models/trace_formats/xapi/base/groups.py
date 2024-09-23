@@ -1,18 +1,24 @@
 """Base xAPI `Group` definitions."""
 
+import sys
 from abc import ABC
 from typing import List, Optional, Union
 
-try:
+from ..config import BaseModelWithConfig
+from .agents import BaseXapiAgent
+from .ifi import (
+    BaseXapiAccountIFI,
+    BaseXapiMboxIFI,
+    BaseXapiMboxSha1SumIFI,
+    BaseXapiOpenIdIFI,
+)
+
+if sys.version_info >= (3, 8):
     from typing import Literal
-except ImportError:
+else:
     from typing_extensions import Literal
 
-from pydantic.v1 import StrictStr
-
-from ...config import BaseModelWithConfig
-from .agents import BaseXapiAgent
-from .ifi import BaseXapiAccountIFI, BaseXapiMboxIFI, BaseXapiMboxSha1SumIFI, BaseXapiOpenIdIFI
+from ..config import NonEmptyStrictStr
 
 
 class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
@@ -26,7 +32,7 @@ class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """
 
     objectType: Literal["Group"]
-    name: Optional[StrictStr]
+    name: Optional[NonEmptyStrictStr] = None
 
 
 class BaseXapiAnonymousGroup(BaseXapiGroupCommonProperties):
@@ -60,7 +66,9 @@ class BaseXapiIdentifiedGroupWithMbox(BaseXapiIdentifiedGroup, BaseXapiMboxIFI):
     """
 
 
-class BaseXapiIdentifiedGroupWithMboxSha1Sum(BaseXapiIdentifiedGroup, BaseXapiMboxSha1SumIFI):
+class BaseXapiIdentifiedGroupWithMboxSha1Sum(
+    BaseXapiIdentifiedGroup, BaseXapiMboxSha1SumIFI
+):
     """Pydantic model for `Group` type property.
 
     It is defined for group type with a hash IFI.
