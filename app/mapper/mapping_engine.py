@@ -76,7 +76,7 @@ class MappingEngine:
         Validate the input trace and configuration.
 
         :param input_trace: The input trace to map
-        :raises MapperException: If validation fails
+        :raises MapperError: If validation fails
         """
         if not all([self.input_format, self.output_format, self.mapping_to_apply]):
             self.logger.error("Incomplete mapping informations", self.log_context)
@@ -94,11 +94,11 @@ class MappingEngine:
         except TypeError as e:
             msg = "Invalid data type in input trace"
             self.logger.exception(msg, e, self.log_context)
-            raise InputTraceToModelException(msg) from e
+            raise InputTraceToModelError(msg) from e
         except Exception as e:
             msg = "Input trace does not match the specified input format"
-            self.logger.exception(msg,e,self.log_context)
-            raise InputTraceToModelException(msg) from e
+            self.logger.exception(msg, e, self.log_context)
+            raise InputTraceToModelError(msg) from e
         self.logger.debug("Input trace is valid against his format", self.log_context)
 
     def _apply_mapping(self, input_data: JsonType) -> JsonType:
@@ -156,23 +156,23 @@ class MappingEngine:
 
         :param output_data: The output data to create the trace from
         :return: The final output trace
-        :raises MapperException: If the output trace does not match the specified output format
+        :raises MapperError: If the output trace does not match the specified output format
         """
         self.logger.debug("Create output trace", self.log_context)
         try:
             self.output_format.value(**output_data)
         except ValidationError as e:
             msg = "Output format validation failed"
-            self.logger.exception(msg , e, self.log_context)
-            raise OutputTraceToModelException(msg) from e
+            self.logger.exception(msg, e, self.log_context)
+            raise OutputTraceToModelError(msg) from e
         except TypeError as e:
             msg = "Invalid data type in output trace"
             self.logger.exception(msg, e, self.log_context)
-            raise OutputTraceToModelException(msg) from e
+            raise OutputTraceToModelError(msg) from e
         except Exception as e:
             msg = "Output trace does not match the specified output format"
-            self.logger.exception(msg,e,self.log_context)
-            raise OutputTraceToModelException(msg) from e
+            self.logger.exception(msg, e, self.log_context)
+            raise OutputTraceToModelError(msg) from e
 
         self.logger.info("Mapping done", self.log_context)
         return Trace(
@@ -268,7 +268,7 @@ class MappingEngine:
         :param custom_input: List of custom transformation strings
         :param arguments: Input arguments for the transformations
         :return: The result of applying all transformations
-        :raises MapperException: If there's an error in the custom transformation
+        :raises MapperError: If there's an error in the custom transformation
         """
         for custom_code in custom_input:
             try:
@@ -281,7 +281,7 @@ class MappingEngine:
             except Exception as e:
                 msg = "Error in custom transformation"
                 self.logger.exception(msg, e, self.log_context)
-                raise CodeEvaluationException(msg) from e
+                raise CodeEvaluationError(msg) from e
         return arguments
 
     @staticmethod
