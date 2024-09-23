@@ -1,18 +1,24 @@
 """Base xAPI `Agent` definitions."""
 
+import sys
 from abc import ABC
 from typing import Optional, Union
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
+from ..config import NonEmptyStrictStr
+from ..config import BaseModelWithConfig
 
-from pydantic.v1 import StrictStr
-
-from ...config import BaseModelWithConfig
 from .common import IRI
-from .ifi import BaseXapiAccountIFI, BaseXapiMboxIFI, BaseXapiMboxSha1SumIFI, BaseXapiOpenIdIFI
+from .ifi import (
+    BaseXapiAccountIFI,
+    BaseXapiMboxIFI,
+    BaseXapiMboxSha1SumIFI,
+    BaseXapiOpenIdIFI,
+)
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseXapiAgentAccount(BaseModelWithConfig):
@@ -24,7 +30,7 @@ class BaseXapiAgentAccount(BaseModelWithConfig):
     """
 
     homePage: IRI
-    name: StrictStr
+    name: NonEmptyStrictStr
 
 
 class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
@@ -37,8 +43,8 @@ class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
         name (str): Consists of the full name of the Agent.
     """
 
-    objectType: Optional[Literal["Agent"]]
-    name: Optional[StrictStr]
+    objectType: Literal["Agent"] = "Agent"
+    name: Optional[NonEmptyStrictStr] = None
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):
@@ -48,7 +54,9 @@ class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):
     """
 
 
-class BaseXapiAgentWithMboxSha1Sum(BaseXapiAgentCommonProperties, BaseXapiMboxSha1SumIFI):
+class BaseXapiAgentWithMboxSha1Sum(
+    BaseXapiAgentCommonProperties, BaseXapiMboxSha1SumIFI
+):
     """Pydantic model for `Agent` type property.
 
     It is defined for agent type with a hash IFI.

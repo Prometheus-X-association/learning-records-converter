@@ -1,17 +1,14 @@
 """Base xAPI `Object` definitions (1)."""
 
-from typing import Dict, List, Optional, Union
-
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
+from typing import Any, Dict, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic.v1 import AnyUrl, StrictStr, constr, validator
+from pydantic import AnyUrl, StringConstraints, field_validator
+from typing_extensions import Annotated
 
-from ...config import BaseModelWithConfig
+from ..config import NonEmptyStrictStr
+
+from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
 
@@ -26,11 +23,11 @@ class BaseXapiActivityDefinition(BaseModelWithConfig):
         extensions (dict): Consists of a dictionary of other properties as needed.
     """
 
-    name: Optional[LanguageMap]
-    description: Optional[LanguageMap]
-    type: Optional[IRI]
-    moreInfo: Optional[AnyUrl]
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]]
+    name: Optional[LanguageMap] = None
+    description: Optional[LanguageMap] = None
+    type: Optional[IRI] = None
+    moreInfo: Optional[AnyUrl] = None
+    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
 
 
 class BaseXapiInteractionComponent(BaseModelWithConfig):
@@ -41,8 +38,8 @@ class BaseXapiInteractionComponent(BaseModelWithConfig):
         description (LanguageMap): Consists of the description of the interaction.
     """
 
-    id: constr(regex=r"^[^\s]+$")  # noqa:F722
-    description: Optional[LanguageMap]
+    id: Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]
+    description: Optional[LanguageMap] = None
 
 
 class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
@@ -72,18 +69,18 @@ class BaseXapiActivityInteractionDefinition(BaseXapiActivityDefinition):
         "numeric",
         "other",
     ]
-    correctResponsesPattern: Optional[List[StrictStr]]
-    choices: Optional[List[BaseXapiInteractionComponent]]
-    scale: Optional[List[BaseXapiInteractionComponent]]
-    source: Optional[List[BaseXapiInteractionComponent]]
-    target: Optional[List[BaseXapiInteractionComponent]]
-    steps: Optional[List[BaseXapiInteractionComponent]]
+    correctResponsesPattern: Optional[List[NonEmptyStrictStr]] = None
+    choices: Optional[List[BaseXapiInteractionComponent]] = None
+    scale: Optional[List[BaseXapiInteractionComponent]] = None
+    source: Optional[List[BaseXapiInteractionComponent]] = None
+    target: Optional[List[BaseXapiInteractionComponent]] = None
+    steps: Optional[List[BaseXapiInteractionComponent]] = None
 
-    @validator("choices", "scale", "source", "target", "steps")
+    @field_validator("choices", "scale", "source", "target", "steps", mode="after")
     @classmethod
-    def check_unique_ids(cls, value):
+    def check_unique_ids(cls, value: Optional[List[Any]]) -> None:
         """Check the uniqueness of interaction components IDs."""
-        if len(value) != len({x.id for x in value}):
+        if value and (len(value) != len({x.id for x in value if x})):
             raise ValueError("Duplicate InteractionComponents are not valid")
 
 
@@ -98,13 +95,13 @@ class BaseXapiActivity(BaseModelWithConfig):
     """
 
     id: IRI
-    objectType: Optional[Literal["Activity"]]
+    objectType: Optional[Literal["Activity"]] = None
     definition: Optional[
         Union[
             BaseXapiActivityDefinition,
             BaseXapiActivityInteractionDefinition,
         ]
-    ]
+    ] = None
 
 
 class BaseXapiStatementRef(BaseModelWithConfig):

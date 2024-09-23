@@ -2,9 +2,9 @@
 
 from typing import Optional
 
-from pydantic.v1 import AnyUrl
+from pydantic import AnyUrl
 
-from ...config import BaseModelWithConfig
+from ..config import BaseModelWithConfig
 from .common import IRI, LanguageMap
 
 
@@ -23,8 +23,8 @@ class BaseXapiAttachment(BaseModelWithConfig):
 
     usageType: IRI
     display: LanguageMap
-    description: Optional[LanguageMap]
+    description: Optional[LanguageMap] = None
     contentType: str
     length: int
     sha2: str
-    fileUrl: Optional[AnyUrl]
+    fileUrl: Optional[AnyUrl] = None
