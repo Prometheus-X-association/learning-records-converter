@@ -67,7 +67,6 @@ class Profiler:
         """
         if not trace.profile:
             return []
-
         group_name, template_name = self._parse_profile(profile=trace.profile)
 
         return self.repository.get_recommendations(

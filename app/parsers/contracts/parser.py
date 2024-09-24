@@ -4,6 +4,7 @@ from typing import BinaryIO
 
 from app.api.schemas import CustomConfigModel
 from app.common.models.trace import Trace
+from app.infrastructure.logging.contract import LoggerContract
 
 
 class Parser(ABC):
@@ -11,14 +12,18 @@ class Parser(ABC):
     Abstract base class for all parsers.
     """
 
-    def __init__(self, config: CustomConfigModel | None = None):
+    def __init__(
+        self, logger: LoggerContract, parsing_config: CustomConfigModel | None = None,
+    ):
         """
         Initialize the parser with optional configuration.
 
-        :param config: Configuration for the parser
+        :param logger: LoggerContract implementation for logging
+        :param parsing_config: Configuration for the parser
         """
 
-        self.config = config or CustomConfigModel()
+        self.logger = logger
+        self.parsing_config = parsing_config or CustomConfigModel()
 
     @abstractmethod
     def parse(self, file: BinaryIO) -> Iterator[Trace]:

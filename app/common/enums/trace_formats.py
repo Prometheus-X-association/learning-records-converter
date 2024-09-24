@@ -22,20 +22,20 @@ class TraceFormatEnum(Enum):
 class TraceFormatModelEnum(TraceFormatEnum):
     """Enumeration mapping trace formats to their model classes."""
 
+    CUSTOM = CustomDataModel
+    IMSCALIPER1_1 = IMSCaliperSensorModel1_1
+    IMSCALIPER1_2 = IMSCaliperSensorModel1_2
     SCORM_2004 = SCORM2004DataModel
     XAPI = BaseXapiStatement
-    IMSCALIPER1_2 = IMSCaliperSensorModel1_2
-    IMSCALIPER1_1 = IMSCaliperSensorModel1_1
-    CUSTOM = CustomDataModel
 
 
 class TraceFormatToXapiMappingEnum(TraceFormatEnum):
     """Enumeration for mapping files from various formats to xAPI."""
 
+    IMSCALIPER1_1 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
+    IMSCALIPER1_2 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
     SCORM_2004 = "data/mappers/mapping_scorm2004_to_xapi.yml"
     XAPI = "data/mappers/mapping_xapi_to_xapi.yml"
-    IMSCALIPER1_2 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
-    IMSCALIPER1_1 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
 
 
 class TraceFormatOutputMappingEnum(TraceFormatEnum):

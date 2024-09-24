@@ -1,14 +1,22 @@
-from enum import StrEnum
+import csv
+from enum import Enum, StrEnum
 
 
 class DelimiterEnum(StrEnum):
     """
-    Enumeration of possible CSV delimiters.
+    Enumeration of possible delimiters.
     """
 
-    COMMA = ","
-    SEMICOLON = ";"
-    TAB = "\t"
-    PIPE = "|"
-    SPACE = " "
     COLON = ":"
+    COMMA = ","
+    PIPE = "|"
+    SEMICOLON = ";"
+    SPACE = " "
+    TAB = "\t"
+
+
+class QuotingEnum(Enum):
+    ALL = csv.QUOTE_ALL
+    MINIMAL = csv.QUOTE_MINIMAL
+    NONE = csv.QUOTE_NONE
+    NONNUMERIC = csv.QUOTE_NONNUMERIC

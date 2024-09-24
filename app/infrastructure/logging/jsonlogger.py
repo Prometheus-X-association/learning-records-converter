@@ -25,8 +25,10 @@ class JsonLoggingFormatter(logging.Formatter):
             "timestamp": self.formatTime(record=record, datefmt=self.datefmt),
             "level": record.levelname,
             "message": record.getMessage(),
-            "context": getattr(record, "context", {}),
         }
+        context = getattr(record, "context", {})
+        if context:
+            log_data["context"] = context
         return json.dumps(obj=log_data, default=str)
 
 

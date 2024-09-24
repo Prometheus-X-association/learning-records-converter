@@ -174,7 +174,7 @@ class MappingEngine:
             self.logger.exception(msg, e, self.log_context)
             raise OutputTraceToModelError(msg) from e
 
-        self.logger.info("Mapping done", self.log_context)
+        self.logger.debug("Mapping done", self.log_context)
         return Trace(
             data=output_data,
             format=CustomTraceFormatStrEnum(self.output_format.name),
