@@ -35,7 +35,6 @@ def parse_date(
                 "PREFER_DATES_FROM": "past",
             },
         )
-        return date.isoformat() if date is not None else None
-    except Exception as e:
-        print(e)
-        return None
+        return date.isoformat() if date is not None else date_string
+    except (ValueError, TypeError):
+        return date_string

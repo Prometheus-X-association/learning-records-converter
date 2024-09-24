@@ -30,4 +30,10 @@ class MappingRepository(ABC):
 
     @abstractmethod
     def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
+        """
+        Load a mapping schema from a file.
+
+        :param mapping_file: A file-like object containing the mapping schema
+        :return: The parsed mapping schema
+        """
         raise NotImplementedError

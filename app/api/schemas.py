@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.common.common_types import JsonType
 from app.common.models.trace import Trace
+from app.parsers.types import DelimiterEnum, QuotingEnum
 from app.profile_enricher.profiler_types import ValidationRecommendation
 
 DEFAULT_OUTPUT_FORMAT = CustomTraceFormatStrEnum.XAPI
@@ -70,3 +71,39 @@ class ValidateInputTraceResponseModel(BaseModel):
     """Model for validate input trace response."""
 
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format.")
+
+
+# Custom file transformation models
+class CustomConfigModel(BaseModel):
+    encoding: str | None = Field(
+        default="utf-8",
+        description="Encoding of the file",
+    )
+    delimiter: DelimiterEnum | None = Field(
+        default=None,
+        description="Separator used in the file, if applicable",
+    )
+    quotechar: str | None = Field(
+        default=None,
+        description="Character used to quote fields",
+    )
+    escapechar: str | None = Field(
+        default=None,
+        description="Character used to escape special characters",
+    )
+    doublequote: bool | None = Field(
+        default=None,
+        description="Whether to double quote characters within quoted fields",
+    )
+    skipinitialspace: bool | None = Field(
+        default=None,
+        description="Whether to skip initial spaces in fields",
+    )
+    lineterminator: str | None = Field(
+        default=None,
+        description="Character(s) used to terminate lines",
+    )
+    quoting: QuotingEnum | None = Field(
+        default=None,
+        description="Quoting style used in the CSV file",
+    )

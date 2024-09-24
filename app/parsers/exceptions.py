@@ -6,6 +6,5 @@ class ParserFactoryError(Exception):
     """Exception raised for errors in the ParserFactory."""
 
 
-
 class CSVParsingError(ParserError):
     """Exception raised for errors during CSV parsing."""

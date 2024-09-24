@@ -1,14 +1,21 @@
-from fastapi import APIRouter, FastAPI, Request
+import json
+
+from fastapi import APIRouter, FastAPI, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import Json
+from starlette.responses import StreamingResponse
 
+from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.contract import LoggerContract
 from app.infrastructure.logging.jsonlogger import JsonLogger
 from app.mapper.mapper import Mapper
 from app.mapper.repositories.yaml.yaml_repository import YamlMappingRepository
+from app.parsers.factory import ParserFactory
+from app.parsers.jsonencoder import CustomJSONEncoder
 from app.profile_enricher.profiler import Profiler
 from app.profile_enricher.repositories.jsonld.jsonld_repository import (
     JsonLdProfileRepository,
@@ -21,6 +28,8 @@ from .exceptions import (
     NotFoundElementError,
 )
 from .schemas import (
+    DEFAULT_OUTPUT_FORMAT,
+    CustomConfigModel,
     TransformInputTraceRequestModel,
     TransformInputTraceResponseMetaModel,
     TransformInputTraceResponseModel,
@@ -61,6 +70,14 @@ class LRCAPIRouter:
             response_model=TransformInputTraceResponseModel,
             tags=["Trace transformation"],
             description="Transform an input trace into a specific output trace.",
+            status_code=200,
+        )
+
+        self.router.add_api_route(
+            "/convert_custom",
+            self.transform_custom_file,
+            methods=["POST"],
+            response_model=None,
             status_code=200,
         )
 
@@ -141,6 +158,10 @@ class LRCAPIRouter:
             repository=YamlMappingRepository(logger=self.logger),
             logger=self.logger,
         )
+        mapper.load_schema_by_formats(
+            input_format=input_trace.format,
+            output_format=query.output_format,
+        )
 
         # Convert
         output_trace = mapper.convert(
@@ -178,6 +199,38 @@ class LRCAPIRouter:
         return TransformInputTraceResponseModel(
             output_trace=output_trace.data,
             meta=meta,
+        )
+
+    async def transform_custom_file(
+        self,
+        data_file: UploadFile,
+        mapping_file: UploadFile,
+        config: Json[CustomConfigModel] | None = Form(default=None),
+        output_format: CustomTraceFormatStrEnum = Form(default=DEFAULT_OUTPUT_FORMAT),
+    ) -> StreamingResponse:
+        parser = ParserFactory.get_parser(
+            mime_type=data_file.content_type,
+            logger=self.logger,
+            parsing_config=config,
+        )
+
+        mapper = Mapper(
+            repository=YamlMappingRepository(logger=self.logger),
+            logger=self.logger,
+        )
+        mapper.load_schema_by_file(file=mapping_file.file)
+
+        async def generate_xapi_statements():
+            for trace in parser.parse(file=data_file.file):
+                output_trace = mapper.convert(
+                    input_trace=trace,
+                    output_format=output_format,
+                )
+                yield json.dumps(obj=output_trace.data, cls=CustomJSONEncoder) + "\n"
+
+        return StreamingResponse(
+            content=generate_xapi_statements(),
+            media_type="application/x-ndjson",
         )
 
 

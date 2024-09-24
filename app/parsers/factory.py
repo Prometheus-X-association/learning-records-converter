@@ -16,7 +16,7 @@ class ParserFactory:
     """
 
     @staticmethod
-    def register_parser(mime_type: str, parser_class: type[Parser]):
+    def register_parser(mime_type: str, parser_class: type[Parser]) -> None:
         """
         Register a new parser class for a specific MIME type.
 

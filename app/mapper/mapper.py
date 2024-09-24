@@ -25,12 +25,36 @@ class Mapper:
         """
         self.repository = repository
         self.logger = logger
+        self.schema = None
+
+    def load_schema_by_file(self, file: BinaryIO):
+        """
+        Load a mapping schema from a file.
+
+        :param file: A file-like object containing the mapping schema
+        """
+        self.schema = self.repository.load_schema_by_file(mapping_file=file)
+
+    def load_schema_by_formats(
+        self,
+        input_format: CustomTraceFormatStrEnum,
+        output_format: CustomTraceFormatStrEnum,
+    ):
+        """
+        Load a mapping schema based on input and output formats.
+
+        :param input_format: The format of the input trace
+        :param output_format: The desired output format
+        """
+        self.schema = self.repository.load_schema_by_formats(
+            input_format=input_format,
+            output_format=output_format,
+        )
 
     def convert(
         self,
         input_trace: Trace,
         output_format: CustomTraceFormatStrEnum,
-        custom_mapping: BinaryIO | None = None,
     ) -> Trace:
         """
         Convert an input trace to the specified output format.
@@ -39,18 +63,9 @@ class Mapper:
         :param output_format: The desired output format
         :return: The converted trace
         """
-        if custom_mapping:
-            schema = self.repository.load_schema_by_file(custom_mapping)
-        else:
-            # Use predefined schema from repository
-            schema = self.repository.load_schema_by_formats(
-                input_format=input_trace.format,
-                output_format=output_format,
-            )
-
         engine = MappingEngine(
             input_format=CustomTraceFormatModelEnum[input_trace.format.name],
-            mapping_to_apply=schema,
+            mapping_to_apply=self.schema,
             output_format=CustomTraceFormatModelEnum[output_format.name],
             logger=self.logger,
         )

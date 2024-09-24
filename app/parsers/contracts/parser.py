@@ -13,7 +13,9 @@ class Parser(ABC):
     """
 
     def __init__(
-        self, logger: LoggerContract, parsing_config: CustomConfigModel | None = None,
+        self,
+        logger: LoggerContract,
+        parsing_config: CustomConfigModel | None = None,
     ):
         """
         Initialize the parser with optional configuration.

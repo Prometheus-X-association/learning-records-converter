@@ -56,8 +56,18 @@ class YamlMappingRepository(MappingRepository):
         return self._get_config_model(config=json_config)
 
     def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
+        """
+        Load a mapping schema from a YAML file.
+
+        This method reads a YAML file, parses its contents, and creates a MappingSchema object.
+
+        :param mapping_file: A file-like object containing the YAML mapping schema
+        :return: The parsed mapping schema
+        :raises MappingConfigToModelError: If the YAML fails to parse or the resulting schema is invalid
+        """
         contents = mapping_file.read()
-        json_config = yaml.safe_load(contents)
+        json_config = yaml.safe_load(stream=contents)
+        self.logger.info("Mapping config loaded")
 
         return self._get_config_model(config=json_config)
 
