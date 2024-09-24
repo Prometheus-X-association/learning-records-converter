@@ -3,7 +3,7 @@ from collections.abc import Iterator
 from typing import BinaryIO
 
 from app.api.schemas import CustomConfigModel
-from models.trace import Trace
+from app.common.models.trace import Trace
 
 
 class Parser(ABC):

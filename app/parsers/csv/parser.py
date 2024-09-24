@@ -5,10 +5,10 @@ from decimal import Decimal, InvalidOperation
 from io import TextIOWrapper
 from typing import Any, BinaryIO
 
+from app.common.extensions.enums import CustomTraceFormatStrEnum
+from app.common.models.trace import Trace
 from app.parsers.contracts.parser import Parser
 from app.parsers.types import DelimiterEnum
-from extensions.enums import CustomTraceFormatStrEnum
-from models.trace import Trace
 
 
 class CSVParser(Parser):
@@ -25,10 +25,10 @@ class CSVParser(Parser):
         :raises ValueError: If there's an error decoding the file or parsing the CSV
         """
         try:
-            text_io = TextIOWrapper(file, encoding=self.config.encoding)
-            dialect = self._detect_dialect(text_io)
+            text_io = TextIOWrapper(buffer=file, encoding=self.config.encoding)
+            dialect = self._detect_dialect(file=text_io)
             reader = csv.DictReader(
-                text_io,
+                f=text_io,
                 **self._get_csv_params(detected_dialect=dialect),
             )
             for row in reader:
@@ -55,7 +55,10 @@ class CSVParser(Parser):
         try:
             sample = file.read(4096)
             file.seek(0)
-            return csv.Sniffer().sniff(sample, [e.value for e in DelimiterEnum])
+            return csv.Sniffer().sniff(
+                sample=sample,
+                delimiters=[e.value for e in DelimiterEnum],
+            )
         except csv.Error:
             return csv.excel
 
