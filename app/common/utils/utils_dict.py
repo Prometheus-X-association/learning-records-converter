@@ -132,71 +132,26 @@ def set_value_from_flat_key(
     Returns:
         Union[dict, list]: The original dict or list, modified if not overwrite.
     """
-    list_key = re.split(r"(?<!\\)\.", flat_key)
+    current = dict_list_element
+    keys = re.findall(r"\[[^\]]*\]|\w+(?:-\w+)?", flat_key)
 
-    # If there is at least one key to navigate
-    if not is_empty(flat_key) and len(list_key) > 0:
-        first_key = list_key.pop(0)
-        first_key = first_key.replace(r"\.", ".")
+    if not keys:
+        return value if overwrite else dict_list_element
 
-        # If not overwrite but found element is not list, dict or None, return
-        if (
-            not overwrite
-            and not isinstance(dict_list_element, list | dict)
-            and not is_empty(dict_list_element)  # before : None
-        ):
-            # Return current value
-            return dict_list_element
+    for i, key in enumerate(keys):
+        key = key.replace(r"\.", ".")
 
-        # Numeric keys (list)
-        if first_key.isnumeric():
-            index = int(first_key)
-            # If not list, create one
-            if not isinstance(dict_list_element, list):
-                dict_list_element = []
-            # If all indexes not there, create them
-            if len(dict_list_element) - 1 < index:
-                dict_list_element.extend([None] * (index + 1 - len(dict_list_element)))
+        if key.startswith('[') and key.endswith(']'):
+            key = key[1:-1]  # Remove brackets
 
-            try:
-                dict_list_element[index] = set_value_from_flat_key(
-                    dict_list_element[index],
-                    ".".join(list_key),
-                    value,
-                    overwrite=overwrite,
-                )
-            except IndexError:
-                pass
-
-        # Other keys (dict)
+        if i == len(keys) - 1:
+            if overwrite or key not in current:
+                current[key] = value
         else:
-            # If not dict, create one
-            if not isinstance(dict_list_element, dict):
-                dict_list_element = {}
-            temp_dict_value = dict_list_element.get(first_key, {})
+            if key not in current or not isinstance(current[key], (dict, list)):
+                current[key] = {} if not key.isnumeric() else []
+            current = current[key]
 
-            dict_list_element[first_key] = set_value_from_flat_key(
-                temp_dict_value,
-                ".".join(list_key),
-                value,
-                overwrite=overwrite,
-            )
-
-    # If no keys left (stop condition)
-    elif is_empty(flat_key):
-        if not overwrite and not is_empty(dict_list_element):
-            # Return current value
-            return dict_list_element
-        # Return new value
-        return value
-
-    # Error during split
-    else:
-        raise ValueError(
-            "> Empty split not possible, something went wrong while setting dot dict",
-        )
-
-    # Final return to get full dict or list
     return dict_list_element
 
 
