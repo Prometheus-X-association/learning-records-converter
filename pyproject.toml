@@ -7,6 +7,8 @@ license = { file = "LICENSE" }
 [tool.ruff]
 output-format = "concise"
 target-version = "py312"
+line-length = 88
+indent-width = 4
 
 extend-exclude = [
   "app/common/models/trace_formats/xapi",
