@@ -132,26 +132,87 @@ def set_value_from_flat_key(
     Returns:
         Union[dict, list]: The original dict or list, modified if not overwrite.
     """
-    current = dict_list_element
-    keys = re.findall(r"\[[^\]]*\]|\w+(?:-\w+)?", flat_key)
+    # Split the flat_key, but keep keys with brackets intact
+    keys = re.split(r"\.(?![^\[]*\])", flat_key)
 
+    # Error during split
     if not keys:
+        raise ValueError(
+            "> Empty split not possible, something went wrong while setting dot dict",
+        )
+
+    # If flat_key is empty, return the value or the original dict_list_element based on overwrite
+    if is_empty(flat_key):
         return value if overwrite else dict_list_element
 
-    for i, key in enumerate(keys):
-        key = key.replace(r"\.", ".")
-
-        if key.startswith('[') and key.endswith(']'):
-            key = key[1:-1]  # Remove brackets
-
-        if i == len(keys) - 1:
-            if overwrite or key not in current:
-                current[key] = value
+    current = dict_list_element
+    for i, full_key in enumerate(keys):
+        # Handle keys with brackets (e.g., for extensions)
+        match = re.match(r"(.+?)\[(.+)\]", full_key)
+        if match:
+            key, subkey = match.group(1), match.group(2).strip("'\"")
         else:
-            if key not in current or not isinstance(current[key], (dict, list)):
-                current[key] = {} if not key.isnumeric() else []
-            current = current[key]
+            key, subkey = full_key.replace(r"\.", "."), None
 
+        try:
+            # Handle numeric keys for list indexing
+            if key.isnumeric():
+                key = int(key)
+                if not isinstance(current, list):
+                    current = []
+                    if i == 0:
+                        dict_list_element = current
+                # Extend the list if the index is out of range
+                while len(current) <= key:
+                    current.append(None)
+
+            if i == len(keys) - 1:
+                # We've reached the final key
+                if subkey:
+                    # Handle extension-like keys
+                    if not isinstance(current, dict):
+                        current = {}
+                        if i == 0:
+                            dict_list_element = current
+                    current.setdefault(key, {})
+                    if (
+                        overwrite
+                        or subkey not in current[key]
+                        or is_empty(current[key][subkey])
+                    ):
+                        current[key][subkey] = value
+                elif overwrite or key not in current or is_empty(current[key]):
+                    current[key] = value
+            elif subkey:
+                # Handle extension-like keys
+                if not isinstance(current, dict):
+                    current = {}
+                    if i == 0:
+                        dict_list_element = current
+                current.setdefault(key, {}).setdefault(subkey, {})
+                current = current[key][subkey]
+            else:
+                # Determine if the next key is numeric (for list creation)
+                next_key_is_numeric = (
+                    keys[i + 1].isnumeric() if i + 1 < len(keys) else False
+                )
+                if isinstance(current, list):
+                    if current[key] is None:
+                        current[key] = [] if next_key_is_numeric else {}
+                else:
+                    if not isinstance(current, dict):
+                        current = {}
+                        if i == 0:
+                            dict_list_element = current
+                    if key not in current or not isinstance(
+                        current[key], (dict, list),
+                    ):
+                        current[key] = [] if next_key_is_numeric else {}
+                current = current[key]
+        except IndexError as ie:
+            print("IndexError :", ie)
+
+    # Final return to get full dict or list
     return dict_list_element
 
 
