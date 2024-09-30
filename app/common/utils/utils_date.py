@@ -1,4 +1,4 @@
-import dateparser
+from dateparser import parse
 
 
 def parse_date(
@@ -23,7 +23,7 @@ def parse_date(
         locales = [user_locale] if user_locale else None
         date_formats = [date_format] if date_format else None
 
-        date = dateparser.parse(
+        date = parse(
             date_string=date_string,
             locales=locales,
             date_formats=date_formats,

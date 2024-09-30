@@ -5,6 +5,7 @@ from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnu
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
+from .exceptions import MapperError
 from .mapping_engine import MappingEngine
 from .repositories.contracts.repository import MappingRepository
 
@@ -63,6 +64,9 @@ class Mapper:
         :param output_format: The desired output format
         :return: The converted trace
         """
+        if not self.schema:
+            raise MapperError("Mapping schema not loaded")
+
         engine = MappingEngine(
             input_format=CustomTraceFormatModelEnum[input_trace.format.name],
             mapping_to_apply=self.schema,
