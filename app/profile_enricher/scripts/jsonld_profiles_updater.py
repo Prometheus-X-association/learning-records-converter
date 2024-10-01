@@ -70,10 +70,10 @@ class JsonLdProfilesUpdater:
                 profile_json=profile_json,
             )
             self.logger.info("Successfully updated profile", log_context)
-        except ProfileNotFoundError:
-            self.logger.error("Profile not found", log_context)
-        except ProfileValidationError:
-            self.logger.error("Profile validation failed", log_context)
+        except ProfileNotFoundError as e:
+            self.logger.exception("Profile not found", e, log_context)
+        except ProfileValidationError as e:
+            self.logger.exception("Profile validation failed", e, log_context)
         except Exception as e:
             self.logger.exception("Unexpected error updating profile", e, log_context)
 
