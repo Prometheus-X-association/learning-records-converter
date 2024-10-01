@@ -47,8 +47,8 @@ class JsonLdProfileRepository(ProfileRepository):
                 group_name=group_name,
                 template_name=template_name,
             )
-        except Exception:
-            self.logger.error("Error while loading template")
+        except Exception as e:
+            self.logger.exception("Error while loading template", e)
             return
 
         # Build enriched data with template data
@@ -86,8 +86,8 @@ class JsonLdProfileRepository(ProfileRepository):
                 group_name=group_name,
                 template_name=template_name,
             )
-        except Exception:
-            self.logger.error("Error while loading template")
+        except Exception as e:
+            self.logger.exception("Error while loading template", e)
             return []
 
         return self.trace_validator.validate_trace(template=template, trace=trace)
@@ -115,8 +115,8 @@ class JsonLdProfileRepository(ProfileRepository):
                 group_name=group_name,
                 template_name=template_name,
             )
-        except Exception:
-            self.logger.error("Error while loading template")
+        except Exception as e:
+            self.logger.exception("Error while loading template", e)
             return []
 
         return self.trace_validator.get_recommendations(template=template, trace=trace)

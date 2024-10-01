@@ -25,7 +25,6 @@ lint.ignore = [
   "EM",  # flake8-errmsg
   "INP001",  # implicit-namespace-package
   "TRY003",  # raise-vanilla-args
-  "TRY400",  # error-instead-of-exception
   "TRY401",  # verbose-log-message
 ]
 lint.extend-unfixable = [
@@ -37,7 +36,6 @@ lint.extend-unfixable = [
 lint.pydocstyle.convention = "pep257"
 lint.flake8-bandit.check-typed-exception = true
 lint.flake8-type-checking.strict = true
-
 
 [tool.mypy]
 python_version = "3.12"
