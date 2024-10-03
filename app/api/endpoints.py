@@ -189,7 +189,8 @@ class LRCAPIRouter:
 
         meta = TransformInputTraceResponseMetaModel(
             input_format=input_trace.format,
-            recommendations=recommendations,
+            output_format=output_trace.format,
+            profile=output_trace.profile,
         )
 
         self.logger.info(
@@ -198,6 +199,7 @@ class LRCAPIRouter:
         )
         return TransformInputTraceResponseModel(
             output_trace=output_trace.data,
+            recommendations=recommendations,
             meta=meta,
         )
 

@@ -47,10 +47,8 @@ class TransformInputTraceResponseMetaModel(BaseModel):
     """Model for transform input trace response metadata."""
 
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format")
-    recommendations: list[ValidationRecommendation] = Field(
-        default_factory=list,
-        description="List of recommendations to improve output trace",
-    )
+    output_format: CustomTraceFormatStrEnum = Field(description="Output trace format")
+    profile: str | None = None
 
 
 class TransformInputTraceResponseModel(BaseModel):
@@ -58,6 +56,10 @@ class TransformInputTraceResponseModel(BaseModel):
 
     output_trace: JsonType = Field(
         description="Transformed output trace in JSON format",
+    )
+    recommendations: list[ValidationRecommendation] = Field(
+        default_factory=list,
+        description="List of recommendations to improve output trace",
     )
     meta: TransformInputTraceResponseMetaModel
 
