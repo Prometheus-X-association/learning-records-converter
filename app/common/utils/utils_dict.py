@@ -205,7 +205,8 @@ def set_value_from_flat_key(
                         if i == 0:
                             dict_list_element = current
                     if key not in current or not isinstance(
-                        current[key], (dict, list),
+                        current[key],
+                        (dict, list),
                     ):
                         current[key] = [] if next_key_is_numeric else {}
                 current = current[key]
