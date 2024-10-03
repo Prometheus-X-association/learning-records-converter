@@ -11,15 +11,33 @@ class Trace(BaseModel):
 
     This class encapsulates the trace data and its associated format.
     It provides a method for automatic format detection.
-
-    :param data: The raw trace data
-    :param format: The format of the trace
-    :param profile: The profile associated with this trace, if any
     """
 
     data: JsonType
     format: CustomTraceFormatStrEnum
     profile: str | None = None
+
+    def __init__(self, **data):
+        """
+        Initialize a new Trace instance.
+
+        :param data: Keyword arguments containing the trace data, format, and optional profile
+        :raises ValueError: If the trace data is invalid for the specified format
+        """
+        super().__init__(**data)
+        self._validate_trace()
+
+    def _validate_trace(self) -> None:
+        """
+        Validate the trace data against its specified format.
+
+        :raises ValueError: If the trace data is invalid for the specified format
+        """
+        format_model = CustomTraceFormatModelEnum[self.format.name]
+        try:
+            format_model.value(**self.data)
+        except (ValidationError, V1ValidationError) as e:
+            raise ValueError("Invalid trace") from e
 
     @classmethod
     def create_with_format_detection(cls, data: JsonType) -> "Trace":
@@ -34,6 +52,8 @@ class Trace(BaseModel):
         :raises ValueError: If the trace format cannot be detected
         """
         for trace_format in CustomTraceFormatModelEnum:
+            if trace_format == CustomTraceFormatModelEnum.CUSTOM:
+                continue
             try:
                 trace_format.value(**data)
                 return cls(
