@@ -3,9 +3,8 @@ import json
 from fastapi import APIRouter, FastAPI, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import Json
-from starlette.responses import StreamingResponse
 
 from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.infrastructure.config.contract import ConfigContract
@@ -77,7 +76,9 @@ class LRCAPIRouter:
             "/convert_custom",
             self.transform_custom_file,
             methods=["POST"],
-            response_model=None,
+            response_class=StreamingResponse,
+            tags=["Custom transformation"],
+            description="Transform a custom file using a provided mapping file and parsing configuration.",
             status_code=200,
         )
 
@@ -208,6 +209,18 @@ class LRCAPIRouter:
         config: Json[CustomConfigModel] | None = Form(default=None),
         output_format: CustomTraceFormatStrEnum = Form(default=DEFAULT_OUTPUT_FORMAT),
     ) -> StreamingResponse:
+        """
+        Transform a custom file using a provided mapping file and parsing configuration.
+
+        This method processes an uploaded file, applies a custom mapping, and streams the
+        transformed data as xAPI statements.
+
+        :param data_file: The uploaded file containing the data to be transformed
+        :param mapping_file: The uploaded file containing the mapping configuration
+        :param config: Optional custom configuration for parsing
+        :param output_format: The desired output format for the transformation
+        :return: A streaming response containing the transformed xAPI statements
+        """
         parser = ParserFactory.get_parser(
             mime_type=data_file.content_type,
             logger=self.logger,

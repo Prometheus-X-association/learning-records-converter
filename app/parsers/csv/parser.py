@@ -117,14 +117,24 @@ class CSVParser(Parser):
         :param value: The value to normalize
         :return: The normalized value
         """
+        # If the value is not a string, return it as is
         if not isinstance(value, str):
             return value
+
+        # Remove leading and trailing whitespace
         value = value.strip()
+
+        # Convert empty strings to None (to have null in JSON)
         if not value:
             return None
+
         try:
+            # Attempt to convert the string to a Decimal and normalize it
+            # This will remove trailing zeros and convert scientific notation to standard notation
+            # With CustomJSONEncoder this allows the value to be serialized as a number in JSON
             return Decimal(value).normalize()
         except InvalidOperation:
+            # If the string can't be converted to a Decimal, return the original stripped string
             return value
 
     def _get_csv_params(self, detected_dialect: csv.Dialect) -> dict[str, Any]:
