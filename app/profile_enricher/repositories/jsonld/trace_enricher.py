@@ -48,12 +48,14 @@ class TraceEnricher:
             "verb.id": str(template.verb),
             "verb.display.en-US": template.pref_label.en,
             "object.definition.type": str(template.object_activity_type),
-            "context.contextActivities.category.0": {
-                "id": f"{CONTEXT_ACTIVITIES_CATEGORY_ID}/{group_name}",
-                "definition": {
-                    "type": {CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE},
+            "context.contextActivities.category": [
+                {
+                    "id": f"{CONTEXT_ACTIVITIES_CATEGORY_ID}/{group_name}",
+                    "definition": {
+                        "type": {CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE},
+                    },
                 },
-            },
+            ],
         }
 
         # Enriched more for rules with only one value

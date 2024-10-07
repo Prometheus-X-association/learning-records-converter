@@ -205,7 +205,8 @@ def set_value_from_flat_key(
                         if i == 0:
                             dict_list_element = current
                     if key not in current or not isinstance(
-                        current[key], (dict, list),
+                        current[key],
+                        (dict, list),
                     ):
                         current[key] = [] if next_key_is_numeric else {}
                 current = current[key]
@@ -285,18 +286,31 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> None:
 
     Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``dct``.
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``target_dict``.
 
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
     :return: None.
     """
-    for k in merge_dct:
-        if (
-            k in target_dict
-            and isinstance(target_dict[k], dict)
-            and isinstance(merge_dct[k], dict)
-        ):
-            deep_merge(target_dict[k], merge_dct[k])
+    for key, value in merge_dct.items():
+        if key in target_dict:
+            if isinstance(target_dict[key], dict):
+                if isinstance(value, dict):
+                    # Recursive merge for nested dictionaries
+                    deep_merge(target_dict=target_dict[key], merge_dct=value)
+                elif isinstance(value, list):
+                    # Merging a list into a dict: create a new list with the dict as its first element
+                    target_dict[key] = [target_dict[key], *value]
+            elif isinstance(target_dict[key], list):
+                if isinstance(value, list):
+                    # Extend the existing list with the new list
+                    target_dict[key].extend(value)
+                else:
+                    # Append the new value to the existing list
+                    target_dict[key].append(value)
+            else:
+                # For all other cases, replace the existing value
+                target_dict[key] = value
         else:
-            target_dict[k] = merge_dct[k]
+            # The key doesn't exist in target_dict, simply add it
+            target_dict[key] = value
