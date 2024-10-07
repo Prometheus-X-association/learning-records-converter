@@ -293,24 +293,28 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> None:
     :return: None.
     """
     for key, value in merge_dct.items():
-        if key in target_dict:
-            if isinstance(target_dict[key], dict):
-                if isinstance(value, dict):
-                    # Recursive merge for nested dictionaries
-                    deep_merge(target_dict=target_dict[key], merge_dct=value)
-                elif isinstance(value, list):
-                    # Merging a list into a dict: create a new list with the dict as its first element
-                    target_dict[key] = [target_dict[key], *value]
-            elif isinstance(target_dict[key], list):
-                if isinstance(value, list):
-                    # Extend the existing list with the new list
-                    target_dict[key].extend(value)
-                else:
-                    # Append the new value to the existing list
-                    target_dict[key].append(value)
-            else:
-                # For all other cases, replace the existing value
-                target_dict[key] = value
+        target_value = target_dict.get(key)
+
+        # If both target and merge values are dictionaries, merge recursively
+        if isinstance(target_value, dict) and isinstance(value, dict):
+            deep_merge(target_value, value)
+        # If both are sets, perform union
+        elif isinstance(target_value, set) and isinstance(value, set):
+            target_value.update(value)
+        # If target is a list and merge value is a list, extend it
+        elif isinstance(target_value, list) and isinstance(value, list):
+            target_value.extend(value)
+        # If target is a list and merge value is not a list, append to the list
+        elif isinstance(target_value, list):
+            target_value.append(value)
+        # If target is a dictionary but merge value is a list, wrap target in a list
+        elif isinstance(target_value, dict) and isinstance(value, list):
+            target_dict[key] = [target_value, *value]
+        # Handle cases where one value is None: keep the non-None value
+        elif target_value is None:
+            target_dict[key] = value
+        elif value is None:
+            continue  # Keep the target value unchanged if the merge value is None
+        # In all other cases, replace the target value with the merge value
         else:
-            # The key doesn't exist in target_dict, simply add it
             target_dict[key] = value
