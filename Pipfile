@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [scripts]
-start = "uvicorn app.api.endpoints:app --host 0.0.0.0 --port 8000 --reload"
+start = "uvicorn app.api.main:app --host 0.0.0.0 --port 8000 --reload"
 test = "python -m pytest --cov"
 
 [packages]
