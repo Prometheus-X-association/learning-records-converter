@@ -4,10 +4,13 @@ from app.mapper.mapper import Mapper
 from app.profile_enricher.profiler import Profiler
 
 from ..dependencies import get_mapper, get_profiler
-from ..schemas import (TransformInputTraceRequestModel,
-                       TransformInputTraceResponseMetaModel,
-                       TransformInputTraceResponseModel, ValidateInputTraceRequestModel,
-                       ValidateInputTraceResponseModel)
+from ..schemas import (
+    TransformInputTraceRequestModel,
+    TransformInputTraceResponseMetaModel,
+    TransformInputTraceResponseModel,
+    ValidateInputTraceRequestModel,
+    ValidateInputTraceResponseModel,
+)
 
 router = APIRouter()
 

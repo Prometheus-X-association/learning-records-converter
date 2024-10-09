@@ -16,12 +16,14 @@ def configure_exception_handlers(app: FastAPI):
         TypeError,
     ]:
         app.add_exception_handler(
-            exc_class_or_status_code=exception, handler=known_exception_handler
+            exc_class_or_status_code=exception,
+            handler=known_exception_handler,
         )
 
     # Add a catch-all handler for any unhandled exceptions
     app.add_exception_handler(
-        exc_class_or_status_code=Exception, handler=global_exception_handler
+        exc_class_or_status_code=Exception,
+        handler=global_exception_handler,
     )
 
 
