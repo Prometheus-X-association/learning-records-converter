@@ -1,8 +1,8 @@
-import json
 from decimal import Decimal
+from json import JSONEncoder
 
 
-class CustomJSONEncoder(json.JSONEncoder):
+class CustomJSONEncoder(JSONEncoder):
     """
     A custom JSON encoder that handles Decimal objects.
     """

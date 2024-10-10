@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from typing import BinaryIO
 
 from extensions.enums import CustomTraceFormatStrEnum
+from pydantic import ValidationError
 
+from app.mapper.exceptions import MappingConfigToModelError
 from app.mapper.models.mapping_schema import MappingSchema
 
 
@@ -37,3 +39,23 @@ class MappingRepository(ABC):
         :return: The parsed mapping schema
         """
         raise NotImplementedError
+
+    @staticmethod
+    def get_mapping_model(config: dict) -> MappingSchema:
+        """
+        Load and validate a configuration dict into a MappingSchema.
+
+        :param config: The mapping configuration dictionary
+        :return: A validated MappingSchema instance
+        :raises MappingConfigToModelError: If the configuration is invalid
+        """
+        try:
+            return MappingSchema(**config)
+        except ValidationError as e:
+            raise MappingConfigToModelError("Mapping validation failed") from e
+        except TypeError as e:
+            raise MappingConfigToModelError("Invalid data type in mapping") from e
+        except Exception as e:
+            raise MappingConfigToModelError(
+                "Unexpected error during mapping file validation",
+            ) from e
