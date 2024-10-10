@@ -32,7 +32,6 @@ async def lifespan(app: FastAPI) -> dict[str, Any]:
 app = FastAPI(
     title="LRC API",
     version="0.0.1",
-    servers=[{"url": "", "description": ""}],
     debug=config.get_log_level() == "DEBUG",
     lifespan=lifespan,
 )
