@@ -163,7 +163,10 @@ class CSVParser(Parser):
         }
 
     def _validate_csv_structure(
-        self, reader: csv.DictReader, file: TextIOWrapper, has_header: bool
+        self,
+        reader: csv.DictReader,
+        file: TextIOWrapper,
+        has_header: bool,
     ) -> None:
         """
         Validate the structure of the CSV file.

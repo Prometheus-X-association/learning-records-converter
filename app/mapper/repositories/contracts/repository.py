@@ -57,5 +57,5 @@ class MappingRepository(ABC):
             raise MappingConfigToModelError("Invalid data type in mapping") from e
         except Exception as e:
             raise MappingConfigToModelError(
-                "Unexpected error during mapping file validation"
+                "Unexpected error during mapping file validation",
             ) from e

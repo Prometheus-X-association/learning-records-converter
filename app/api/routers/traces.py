@@ -1,10 +1,19 @@
-from fastapi import APIRouter, Depends, Request
+from json import dumps
 
+from fastapi import APIRouter, Depends, Form, Request, UploadFile
+from fastapi.responses import StreamingResponse
+from pydantic import Json
+
+from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.mapper.mapper import Mapper
+from app.parsers.factory import ParserFactory
+from app.parsers.jsonencoder import CustomJSONEncoder
 from app.profile_enricher.profiler import Profiler
 
 from ..dependencies import get_mapper, get_profiler
 from ..schemas import (
+    DEFAULT_OUTPUT_FORMAT,
+    CustomConfigModel,
     TransformInputTraceRequestModel,
     TransformInputTraceResponseMetaModel,
     TransformInputTraceResponseModel,
@@ -102,6 +111,11 @@ async def transform_input_trace(
 
     input_trace = query.get_trace()
 
+    mapper.load_schema_by_formats(
+        input_format=input_trace.format,
+        output_format=query.output_format,
+    )
+
     # Convert
     output_trace = mapper.convert(
         input_trace=input_trace,
@@ -127,3 +141,50 @@ async def transform_input_trace(
 
     logger.info("Convert endpoint completed", {"input_format": input_trace.format})
     return TransformInputTraceResponseModel(output_trace=output_trace.data, meta=meta)
+
+
+@router.post(
+    "/convert_custom",
+    response_class=StreamingResponse,
+    tags=["Custom transformation"],
+    description="Transform a custom file using a provided mapping file and parsing configuration.",
+    status_code=200,
+)
+async def transform_custom_file(
+    request: Request,
+    data_file: UploadFile,
+    mapping_file: UploadFile,
+    config: Json[CustomConfigModel] | None = Form(default=None),
+    output_format: CustomTraceFormatStrEnum = Form(default=DEFAULT_OUTPUT_FORMAT),
+    mapper: Mapper = Depends(get_mapper),
+) -> StreamingResponse:
+    """
+    Transform a custom file using a provided mapping file and parsing configuration.
+    This method processes an uploaded file, applies a custom mapping, and streams the
+    transformed data as xAPI statements.
+    :param data_file: The uploaded file containing the data to be transformed
+    :param mapping_file: The uploaded file containing the mapping configuration
+    :param config: Optional custom configuration for parsing
+    :param output_format: The desired output format for the transformation
+    :return: A streaming response containing the transformed xAPI statements
+    """
+    parser = ParserFactory.get_parser(
+        mime_type=data_file.content_type,
+        logger=request.state.logger,
+        parsing_config=config,
+    )
+
+    mapper.load_schema_by_file(file=mapping_file.file)
+
+    async def generate_xapi_statements():
+        for trace in parser.parse(file=data_file.file):
+            output_trace = mapper.convert(
+                input_trace=trace,
+                output_format=output_format,
+            )
+            yield dumps(obj=output_trace.data, cls=CustomJSONEncoder) + "\n"
+
+    return StreamingResponse(
+        content=generate_xapi_statements(),
+        media_type="application/x-ndjson",
+    )
