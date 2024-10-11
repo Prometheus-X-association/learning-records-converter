@@ -1,10 +1,8 @@
-from typing import Optional
-
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import BaseModel, ValidationError
 from pydantic.v1 import ValidationError as V1ValidationError
 
-from app.common.type.types import JsonType
+from app.common.common_types import JsonType
 
 
 class Trace(BaseModel):
@@ -21,7 +19,7 @@ class Trace(BaseModel):
 
     data: JsonType
     format: CustomTraceFormatStrEnum
-    profile: Optional[str] = None
+    profile: str | None = None
 
     @classmethod
     def create_with_format_detection(cls, data: JsonType) -> "Trace":
@@ -39,7 +37,8 @@ class Trace(BaseModel):
             try:
                 trace_format.value(**data)
                 return cls(
-                    data=data, format=CustomTraceFormatStrEnum[trace_format.name]
+                    data=data,
+                    format=CustomTraceFormatStrEnum[trace_format.name],
                 )
             except (ValidationError, V1ValidationError):
                 continue

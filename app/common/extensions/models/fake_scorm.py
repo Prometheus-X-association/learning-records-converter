@@ -1,32 +1,32 @@
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
 class FakeScormActorModel(BaseModel):
-    value: Optional[Any] = Field(default=None)
+    value: Any | None = Field(default=None)
 
 
 class FakeScormObjectModel(BaseModel):
-    value: Optional[str] = Field(default=None)
+    value: str | None = Field(default=None)
 
 
 class FakeScormAuthorModel(BaseModel):
-    firstname: Optional[str] = Field(default=None)
-    lastname: Optional[str] = Field(default=None)
-    age: Optional[int] = Field(default=None)
+    firstname: str | None = Field(default=None)
+    lastname: str | None = Field(default=None)
+    age: int | None = Field(default=None)
 
 
 class FakeScormContextModel(BaseModel):
-    where: Optional[str] = Field(default=None)
-    why: Optional[str] = Field(default=None)
+    where: str | None = Field(default=None)
+    why: str | None = Field(default=None)
 
 
 class FakeScormRootModel(BaseModel):
-    actor: Optional[FakeScormActorModel] = Field(default=None)
-    object: Optional[FakeScormObjectModel] = Field(default=None)
-    author: Optional[FakeScormAuthorModel] = Field(default=None)
-    context: Optional[FakeScormContextModel] = Field(default=None)
+    actor: FakeScormActorModel | None = Field(default=None)
+    object: FakeScormObjectModel | None = Field(default=None)
+    author: FakeScormAuthorModel | None = Field(default=None)
+    context: FakeScormContextModel | None = Field(default=None)
 
 
 class FakeScormModel(BaseModel):

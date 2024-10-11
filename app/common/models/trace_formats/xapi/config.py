@@ -1,19 +1,23 @@
 """Base xAPI model configuration."""
+from typing import Annotated
 
-from pydantic.v1 import BaseModel, Extra
+from pydantic import BaseModel, ConfigDict, StringConstraints
 
 
 class BaseModelWithConfig(BaseModel):
     """Pydantic model for base configuration shared among all models."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.forbid
-        min_anystr_length = 1
+    model_config = ConfigDict(
+        extra="forbid", str_min_length=1, coerce_numbers_to_str=True
+    )
 
 
 class BaseExtensionModelWithConfig(BaseModel):
     """Pydantic model for extension configuration shared among all models."""
 
-    class Config:  # pylint: disable=missing-class-docstring # noqa: D106
-        extra = Extra.allow
-        min_anystr_length = 0
+    model_config = ConfigDict(
+        extra="allow", str_min_length=0, coerce_numbers_to_str=True
+    )
+
+
+NonEmptyStrictStr = Annotated[str, StringConstraints(min_length=1, strict=True)]

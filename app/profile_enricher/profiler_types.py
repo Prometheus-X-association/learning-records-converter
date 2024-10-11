@@ -23,12 +23,8 @@ class ValidationResult:
 
 
 class ValidationError(ValidationResult):
-    """
-    Represents an error that occurred during trace validation against a profile rule.
-    """
+    """Represents an error that occurred during trace validation against a profile rule."""
 
 
 class ValidationRecommendation(ValidationResult):
-    """
-    Represents a recommended rule in a profile that was not met by the trace.
-    """
+    """Represents a recommended rule in a profile that was not met by the trace."""

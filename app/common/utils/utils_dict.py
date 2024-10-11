@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import Any, overload
 
 import yaml
@@ -15,7 +16,7 @@ def remove_empty_elements(dictionary: dict) -> dict: ...
 
 
 def remove_empty_elements(dictionary: list | dict) -> list | dict:
-    """Remove empty fields
+    """Remove empty fields.
 
     Args:
         dictionary : dictionary to remove empty fields
@@ -23,30 +24,33 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
     Returns:
         dictionnary with removed fields
     """
-    if not isinstance(dictionary, (dict, list)):
+    if not isinstance(dictionary, dict | list):
         return dictionary
-    elif isinstance(dictionary, list):
+    if isinstance(dictionary, list):
         return [
             value
             for value in (remove_empty_elements(value) for value in dictionary)
             if not is_empty(value)
         ]
-    else:
-        return {
-            key: value
-            for key, value in (
-                (key, remove_empty_elements(value)) for key, value in dictionary.items()
-            )
-            if not is_empty(value)
-        }
+    return {
+        key: value
+        for key, value in (
+            (key, remove_empty_elements(value)) for key, value in dictionary.items()
+        )
+        if not is_empty(value)
+    }
 
 
 def get_value_from_flat_key(
-    dict_element: dict | list, flat_key: str, default_value=None, return_copy=True
+    dict_element: dict | list,
+    flat_key: str,
+    default_value=None,
+    return_copy=True,
 ) -> Any:
-    """Get value from a dict element by using a flatten key (keys separated with dotes)
+    """Get value from a dict element by using a flatten key (keys separated with dotes).
+
     If the value exists (even if it's empty), the method returns the value.
-    Else, the 'default_value' is returned
+    Else, the 'default_value' is returned.
 
     TODO :
         - use default_value really when value does not exist
@@ -67,8 +71,7 @@ def get_value_from_flat_key(
         if key.isnumeric() and isinstance(value, list):
             try:
                 value = value[int(key)]
-            except IndexError as ie:
-                print("out of index in list:", ie)
+            except IndexError:
                 value = default_value
         elif not key.isnumeric() and isinstance(value, dict):
             value = value.get(key, default_value)
@@ -78,21 +81,26 @@ def get_value_from_flat_key(
             if index < total_list_key_len:
                 value = default_value
             break
-    if return_copy and isinstance(value, (list, dict)):
+    if return_copy and isinstance(value, list | dict):
         return value.copy()
-    else:
-        return value
+    return value
 
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: dict, flat_key: str, value: Any, overwrite: bool = True
+    dict_list_element: dict,
+    flat_key: str,
+    value: Any,
+    overwrite: bool = True,
 ) -> dict: ...
 
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: list, flat_key: str, value: Any, overwrite: bool = True
+    dict_list_element: list,
+    flat_key: str,
+    value: Any,
+    overwrite: bool = True,
 ) -> list: ...
 
 
@@ -104,6 +112,7 @@ def set_value_from_flat_key(
 ) -> dict | list:
     """
     Set recursively a value into a dict element by using a flatten key (keys separated with dotes).
+
     Integer (numeric) are considered as list indexes.
 
     TODO :
@@ -133,15 +142,9 @@ def set_value_from_flat_key(
         # If not overwrite but found element is not list, dict or None, return
         if (
             not overwrite
-            and not (
-                isinstance(dict_list_element, list)
-                or isinstance(dict_list_element, dict)
-            )
+            and not isinstance(dict_list_element, list | dict)
             and not is_empty(dict_list_element)  # before : None
         ):
-            print(
-                "> Warning - an item already have value and behavior is : NOT overwriting"
-            )
             # Return current value
             return dict_list_element
 
@@ -153,9 +156,7 @@ def set_value_from_flat_key(
                 dict_list_element = []
             # If all indexes not there, create them
             if len(dict_list_element) - 1 < index:
-                dict_list_element.extend(
-                    [None for _ in range(len(dict_list_element), index + 1)]
-                )
+                dict_list_element.extend([None] * (index + 1 - len(dict_list_element)))
 
             try:
                 dict_list_element[index] = set_value_from_flat_key(
@@ -164,8 +165,8 @@ def set_value_from_flat_key(
                     value,
                     overwrite=overwrite,
                 )
-            except IndexError as ie:
-                print("IndexError :", ie)
+            except IndexError:
+                pass
 
         # Other keys (dict)
         else:
@@ -175,25 +176,24 @@ def set_value_from_flat_key(
             temp_dict_value = dict_list_element.get(first_key, {})
 
             dict_list_element[first_key] = set_value_from_flat_key(
-                temp_dict_value, ".".join(list_key), value, overwrite=overwrite
+                temp_dict_value,
+                ".".join(list_key),
+                value,
+                overwrite=overwrite,
             )
 
     # If no keys left (stop condition)
     elif is_empty(flat_key):
         if not overwrite and not is_empty(dict_list_element):
-            print(
-                "> Warning - dict_list_element already have value and behavior is : NOT overwriting"
-            )
             # Return current value
             return dict_list_element
-        else:
-            # Return new value
-            return value
+        # Return new value
+        return value
 
     # Error during split
     else:
         raise ValueError(
-            "> Empty split not possible, something went wrong while setting dot dict"
+            "> Empty split not possible, something went wrong while setting dot dict",
         )
 
     # Final return to get full dict or list
@@ -201,9 +201,10 @@ def set_value_from_flat_key(
 
 
 def get_nested_from_flat(
-    flat_field: dict[str, Any], nested_field: dict | list | None = None
+    flat_field: dict[str, Any],
+    nested_field: dict | list | None = None,
 ) -> dict | list:
-    """Generate nested json from a flatten json
+    """Generate nested json from a flatten json.
 
     Args:
         flat_field (dict):
@@ -232,13 +233,13 @@ def get_nested_from_flat(
     # Format validation
     if nested_field is None:
         all_field_start_with_numeric = [
-            re.split(r"(?<!\\)\.", key)[0].isnumeric() for key in flat_field.keys()
+            re.split(r"(?<!\\)\.", key)[0].isnumeric() for key in flat_field
         ]
         if all(all_field_start_with_numeric):
             nested_field = []
         elif any(all_field_start_with_numeric):
             raise ValueError(
-                "Either all fields starts with a numerical value, or none of them do"
+                "Either all fields starts with a numerical value, or none of them do",
             )
         else:
             nested_field = {}
@@ -248,41 +249,38 @@ def get_nested_from_flat(
     return nested_field
 
 
-def convert_yaml_file_to_json(yaml_path: str) -> dict:
+def convert_yaml_file_to_json(yaml_path: Path) -> dict:
     """Convert a YAML file into a dict.
-    The path to the YAML file is passed to the function and is loaded afterward
+
+    The path to the YAML file is passed to the function and is loaded afterward.
 
     Args:
-        yaml_path (str): File path to YAML file
-
-    Raises:
-        ValueError: empty path
+        yaml_path (Path): File path to YAML file
 
     Returns:
         dict: Converted YAML
     """
-    if yaml_path:
-        with open(yaml_path, "r") as file:
-            return yaml.safe_load(file)
-    else:
-        raise ValueError("'yaml_path' cannot be empty")
+    with yaml_path.open(mode="r") as file:
+        return yaml.safe_load(file)
 
 
-def deep_merge(target_dict: dict, merge_dct: dict) -> dict:
-    """Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
+def deep_merge(target_dict: dict, merge_dct: dict) -> None:
+    """Recursive dict merge.
+
+    Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
-    ``dct``.
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``dct``.
+
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
-    :return: None
+    :return: None.
     """
-    for k, v in merge_dct.items():
+    for k in merge_dct:
         if (
             k in target_dict
             and isinstance(target_dict[k], dict)
             and isinstance(merge_dct[k], dict)
-        ):  # noqa
+        ):
             deep_merge(target_dict[k], merge_dct[k])
         else:
             target_dict[k] = merge_dct[k]

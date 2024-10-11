@@ -1,9 +1,10 @@
+from collections.abc import Callable
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 
 
 class CaseInsensitiveStrEnum(Enum):
-    """Case-insensitive when looking for value in enum"""
+    """Case-insensitive when looking for value in enum."""
 
     # Case-insensitive
     @classmethod
@@ -11,10 +12,12 @@ class CaseInsensitiveStrEnum(Enum):
         for member in cls:
             if member.value.lower().strip() == str(value).lower().strip():
                 return member
+        return None
 
 
 def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
     """Python does not allow Enum to inherit other Enum.
+
     This decorator "adds" the list of inherited enums into the decorated enum.
 
     Args:
@@ -35,7 +38,8 @@ def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], 
 
 
 def str_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any]:
-    """Transform an Enum into a StrEnum
+    """Transform an Enum into a StrEnum.
+
     This decorator transforms the list of enums to get all ENUM_KEY = 'enum_key' in one StrEnum.
 
     Args:

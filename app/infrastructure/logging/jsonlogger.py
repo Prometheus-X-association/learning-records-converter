@@ -1,7 +1,7 @@
 import json
 import logging
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from .contract import LoggerContract
 
@@ -25,8 +25,10 @@ class JsonLoggingFormatter(logging.Formatter):
             "timestamp": self.formatTime(record=record, datefmt=self.datefmt),
             "level": record.levelname,
             "message": record.getMessage(),
-            "context": getattr(record, "context", {}),
         }
+        context = getattr(record, "context", {})
+        if context:
+            log_data["context"] = context
         return json.dumps(obj=log_data, default=str)
 
 
@@ -37,7 +39,7 @@ class JsonLogger(LoggerContract):
     This implementation formats logs as JSON and supports adding context to log messages.
     """
 
-    def __init__(self, name: str, level: str):
+    def __init__(self, name: str, level: str) -> None:
         """
         Initialize the JsonLogger.
 
@@ -52,7 +54,10 @@ class JsonLogger(LoggerContract):
         self._logger.addHandler(handler)
 
     def _log(
-        self, level: int, message: str, context: Optional[dict[str, Any]] = None
+        self,
+        level: int,
+        message: str,
+        context: dict[str, Any] | None = None,
     ) -> None:
         """
         Internal method to handle logging at different levels.
@@ -64,30 +69,33 @@ class JsonLogger(LoggerContract):
         extra = {"context": context} if context else {}
         self._logger.log(level=level, msg=message, extra=extra)
 
-    def debug(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerContract.debug"""
+    def debug(self, message: str, context: dict[str, Any] | None = None) -> None:
+        """Inherited from LoggerContract.debug."""
         self._log(level=logging.DEBUG, message=message, context=context)
 
-    def info(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerContract.info"""
+    def info(self, message: str, context: dict[str, Any] | None = None) -> None:
+        """Inherited from LoggerContract.info."""
         self._log(level=logging.INFO, message=message, context=context)
 
-    def warning(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerContract.warning"""
+    def warning(self, message: str, context: dict[str, Any] | None = None) -> None:
+        """Inherited from LoggerContract.warning."""
         self._log(level=logging.WARNING, message=message, context=context)
 
-    def error(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerContract.error"""
+    def error(self, message: str, context: dict[str, Any] | None = None) -> None:
+        """Inherited from LoggerContract.error."""
         self._log(level=logging.ERROR, message=message, context=context)
 
-    def critical(self, message: str, context: Optional[dict[str, Any]] = None) -> None:
-        """Inherited from LoggerContract.critical"""
+    def critical(self, message: str, context: dict[str, Any] | None = None) -> None:
+        """Inherited from LoggerContract.critical."""
         self._log(level=logging.CRITICAL, message=message, context=context)
 
     def exception(
-        self, message: str, exc: Exception, context: Optional[dict[str, Any]] = None
+        self,
+        message: str,
+        exc: Exception,
+        context: dict[str, Any] | None = None,
     ) -> None:
-        """Inherited from LoggerContract.exception"""
+        """Inherited from LoggerContract.exception."""
         exc_context = {
             "exception_type": type(exc).__name__,
             "exception_message": str(exc),

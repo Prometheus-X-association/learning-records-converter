@@ -1,9 +1,10 @@
 from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
+from app.common.common_types import JsonType
 from app.common.models.trace import Trace
-from app.common.type.types import JsonType
-from app.profile_enricher.types import ValidationRecommendation
+from app.parsers.types import DelimiterEnum, QuotingEnum
+from app.profile_enricher.profiler_types import ValidationRecommendation
 
 DEFAULT_OUTPUT_FORMAT = CustomTraceFormatStrEnum.XAPI
 
@@ -13,7 +14,8 @@ class InputTraceRequestModel(BaseModel):
 
     input_trace: JsonType = Field(..., description="Input trace data")
     input_format: CustomTraceFormatStrEnum | None = Field(
-        default=None, description="Input trace format"
+        default=None,
+        description="Input trace format",
     )
 
     def get_trace(self) -> Trace:
@@ -28,8 +30,7 @@ class InputTraceRequestModel(BaseModel):
         """
         if self.input_format:
             return Trace(data=self.input_trace, format=self.input_format)
-        else:
-            return Trace.create_with_format_detection(data=self.input_trace)
+        return Trace.create_with_format_detection(data=self.input_trace)
 
 
 # Transformation models
@@ -37,7 +38,8 @@ class TransformInputTraceRequestModel(InputTraceRequestModel):
     """Model for transform input trace request."""
 
     output_format: CustomTraceFormatStrEnum = Field(
-        default=DEFAULT_OUTPUT_FORMAT, description="Output trace format"
+        default=DEFAULT_OUTPUT_FORMAT,
+        description="Output trace format",
     )
 
 
@@ -55,7 +57,7 @@ class TransformInputTraceResponseModel(BaseModel):
     """Model for transform input trace response."""
 
     output_trace: JsonType = Field(
-        description="Transformed output trace in JSON format"
+        description="Transformed output trace in JSON format",
     )
     meta: TransformInputTraceResponseMetaModel
 
@@ -69,3 +71,39 @@ class ValidateInputTraceResponseModel(BaseModel):
     """Model for validate input trace response."""
 
     input_format: CustomTraceFormatStrEnum = Field(description="Input trace format.")
+
+
+# Custom file transformation models
+class CustomConfigModel(BaseModel):
+    encoding: str | None = Field(
+        default="utf-8",
+        description="Encoding of the file",
+    )
+    delimiter: DelimiterEnum | None = Field(
+        default=None,
+        description="Separator used in the file, if applicable",
+    )
+    quotechar: str | None = Field(
+        default=None,
+        description="Character used to quote fields",
+    )
+    escapechar: str | None = Field(
+        default=None,
+        description="Character used to escape special characters",
+    )
+    doublequote: bool | None = Field(
+        default=None,
+        description="Whether to double quote characters within quoted fields",
+    )
+    skipinitialspace: bool | None = Field(
+        default=None,
+        description="Whether to skip initial spaces in fields",
+    )
+    lineterminator: str | None = Field(
+        default=None,
+        description="Character(s) used to terminate lines",
+    )
+    quoting: QuotingEnum | None = Field(
+        default=None,
+        description="Quoting style used in the CSV file",
+    )

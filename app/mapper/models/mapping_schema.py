@@ -1,10 +1,10 @@
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
 
 class BasicModel(BaseModel):
-    description: Optional[str] = Field(
+    description: str | None = Field(
         default=None,
         description="Description of the mapping.",
         examples=["Convert SCORM student ID to xAPI actor mbox"],
@@ -12,44 +12,45 @@ class BasicModel(BaseModel):
 
 
 class OutputMappingModel(BasicModel):
-    output_field: Optional[str] = Field(
+    output_field: str | None = Field(
         default=None,
         description="Output field for the mapping.",
         examples=["actor.mbox"],
     )
 
-    value: Optional[Any] = Field(
+    value: Any | None = Field(
         default=None,
         description="Static value",
         examples=["http://example.com/xapi/verbs/completed"],
     )
 
-    custom: Optional[list[str]] = Field(
+    custom: list[str] | None = Field(
         default=None,
         description="list of custom lambda (python) code?",
         examples=[
-            "lambda val: 'http://example.com/xapi/verbs/completed' if val == 'completed' else None"
+            "lambda val: 'http://example.com/xapi/verbs/completed' if val == 'completed' else None",
         ],
     )
 
-    switch: Optional[list["ConditionOutputMappingModel"]] = Field(
+    switch: list["ConditionOutputMappingModel"] | None = Field(
         default=None,
         description="Static value",
         examples=["http://example.com/xapi/verbs/completed"],
     )
 
-    multiple: Optional[list["OutputMappingModel"]] = Field(
+    multiple: list["OutputMappingModel"] | None = Field(
         default=[],
         description="list of multiple output mapping.",
     )
 
-    profile: str = Field(
+    profile: str | None = Field(
         default=None,
         description="Dases profile to apply.",
     )
 
     @model_validator(mode="before")
-    def validate_output_field_transformation_xor_multiple(cls, values):
+    @staticmethod
+    def validate_output_field_transformation_xor_multiple(values):
         output_field, value, custom, switch, multiple, profile = (
             values.get("output_field"),
             values.get("value"),
@@ -74,7 +75,8 @@ class ConditionOutputMappingModel(OutputMappingModel):
     )
 
     @model_validator(mode="before")
-    def validate_output_field_transformation(cls, values):
+    @staticmethod
+    def validate_output_field_transformation(values):
         output_field, value, custom, switch = (
             values.get("output_field"),
             values.get("value"),
@@ -83,7 +85,7 @@ class ConditionOutputMappingModel(OutputMappingModel):
         )
         if (value or custom or switch) and not output_field:
             raise ValueError(
-                "If 'transformation' is defined, 'output_field' also needs to be define."
+                "If 'transformation' is defined, 'output_field' also needs to be define.",
             )
 
         return values

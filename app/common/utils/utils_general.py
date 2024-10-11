@@ -4,7 +4,7 @@ EMPTY_STRINGS = {"nan", "none", "nat", "null", ""}
 
 
 def is_empty(x: Any) -> bool:
-    """Check if an element is empty
+    """Check if an element is empty.
 
     Args:
         x (_type_): element to check
@@ -14,13 +14,13 @@ def is_empty(x: Any) -> bool:
     """
     if x is None:
         return True
-    if isinstance(x, (str, list, dict, set, tuple)):
+    if isinstance(x, str | list | dict | set | tuple):
         return len(x) == 0
     return str(x).lower() in EMPTY_STRINGS
 
 
 def replace_empty(value: Any, replace_value: Any = "") -> Any:
-    """Replace a value if it's empty
+    """Replace a value if it's empty.
 
     Args:
         value (Any): Any value

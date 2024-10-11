@@ -3,15 +3,11 @@
 # Nota bene: we split object definitions into `objects.py` and `unnested_objects.py`
 # because of the circular dependency : objects -> context -> objects.
 
+import sys
 from datetime import datetime
 from typing import List, Optional, Union
 
-try:
-    from typing import Literal
-except ImportError:
-    from typing_extensions import Literal
-
-from ...config import BaseModelWithConfig
+from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
 from .attachments import BaseXapiAttachment
 from .contexts import BaseXapiContext
@@ -19,6 +15,11 @@ from .groups import BaseXapiGroup
 from .results import BaseXapiResult
 from .unnested_objects import BaseXapiUnnestedObject
 from .verbs import BaseXapiVerb
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 class BaseXapiSubStatement(BaseModelWithConfig):
@@ -35,10 +36,10 @@ class BaseXapiSubStatement(BaseModelWithConfig):
     verb: BaseXapiVerb
     object: BaseXapiUnnestedObject
     objectType: Literal["SubStatement"]
-    result: Optional[BaseXapiResult]
-    context: Optional[BaseXapiContext]
-    timestamp: Optional[datetime]
-    attachments: Optional[List[BaseXapiAttachment]]
+    result: Optional[BaseXapiResult] = None
+    context: Optional[BaseXapiContext] = None
+    timestamp: Optional[datetime] = None
+    attachments: Optional[List[BaseXapiAttachment]] = None
 
 
 BaseXapiObject = Union[

@@ -1,11 +1,10 @@
 from types import UnionType
-from typing import Any, List, Union
+from typing import Any, Union, get_origin
 
 from pydantic import BaseModel, field_validator
 from pydantic.fields import FieldInfo
 from pydantic_core import ValidationError
 from pydantic_core.core_schema import ValidationInfo
-from typing_extensions import get_origin
 
 
 class ExtendedTypeBaseModel(BaseModel):
@@ -54,8 +53,8 @@ class ExtendedTypeBaseModel(BaseModel):
             yield annotation
 
     @classmethod
-    def _get_correct_value(cls, value: Any, annotations: List) -> Any:
-        """Get the correct model instance depending on value
+    def _get_correct_value(cls, value: Any, annotations: list) -> Any:
+        """Get the correct model instance depending on value.
 
         Args:
             value (Any): Data for the model
@@ -68,13 +67,15 @@ class ExtendedTypeBaseModel(BaseModel):
             if issubclass(each_type, BaseModel) and isinstance(value, dict):
                 try:
                     return each_type(**value)
-                except ValidationError as ve:
+                except ValidationError:
                     pass
         return value
 
     @field_validator("*", mode="before")
+    @classmethod
     def validation(cls, value: Any, extra_info: ValidationInfo) -> Any:
         """Validator applied to all fields of a Model.
+
         The purpose is to auto detect child classes for a field that uses models for typing.
 
         Caution:
@@ -92,7 +93,8 @@ class ExtendedTypeBaseModel(BaseModel):
         """
         # Get FieldInfo
         field = cls.model_fields.get(
-            extra_info.field_name if extra_info.field_name else "", None
+            extra_info.field_name if extra_info.field_name else "",
+            None,
         )
 
         # Check if condition gathered to treat
@@ -107,10 +109,10 @@ class ExtendedTypeBaseModel(BaseModel):
 
             # Return correct instance
             if get_origin(field.annotation) is list and isinstance(value, list):
-                new_value = []
-                for each_value in value:
-                    new_value.append(cls._get_correct_value(each_value, new_annotation))
-                return new_value
-            else:
-                return cls._get_correct_value(value, new_annotation)
+                return [
+                    cls._get_correct_value(each_value, new_annotation)
+                    for each_value in value
+                ]
+
+            return cls._get_correct_value(value, new_annotation)
         return value

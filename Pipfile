@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [scripts]
-start = "uvicorn app.api.endpoints:app --host 0.0.0.0 --port 8000 --reload"
+start = "uvicorn app.api.main:app --host 0.0.0.0 --port 8000 --reload"
 test = "python -m pytest --cov"
 
 [packages]
-fastapi = "==0.112.4"
+fastapi = "==0.105.0"
 pyyaml = "==6.0.2"
 langcodes = "==3.4.0"
 rfc3987 = "==1.3.8"
@@ -18,15 +18,16 @@ aenum = "==2.2.6"
 typing_extensions = ">4"
 jsonpath-ng = "==1.6.1"
 python-dotenv = "==1.0.1"
+python-multipart = "==0.0.10"
+dateparser = "==1.2.0"
 
 [dev-packages]
-black = "*"
-flake8 = "*"
-isort = "*"
 mypy = "*"
 pytest = "*"
 pytest-cov = "*"
 httpx = "==0.26.0"
+ruff = "*"
+vulture = "*"
 
 [requires]
 python_version = "3.12"

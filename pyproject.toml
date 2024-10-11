@@ -1,0 +1,58 @@
+[project]
+name = "Learning Records Converter (LRC)"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { file = "LICENSE" }
+
+[tool.ruff]
+output-format = "concise"
+target-version = "py312"
+line-length = 88
+indent-width = 4
+
+extend-exclude = [
+  "app/common/models/trace_formats/xapi",
+  "legacy-code",
+]
+
+lint.select = ["ALL"]
+lint.ignore = [
+  "PLE1205",  # logging-too-many-args
+  "FBT",  # flake8-boolean-trap
+  "E501",  # line-too-long
+  "D",  # pydocstyle,
+  "ANN",  # flake8-annotations
+  "EM",  # flake8-errmsg
+  "INP001",  # implicit-namespace-package
+  "TRY003",  # raise-vanilla-args
+  "TRY401",  # verbose-log-message
+]
+lint.extend-unfixable = [
+  "TCH002",
+  "TRY400",
+  "SIM105",
+]
+
+lint.pydocstyle.convention = "pep257"
+lint.flake8-bandit.check-typed-exception = true
+lint.flake8-type-checking.strict = true
+
+[tool.mypy]
+python_version = "3.12"
+explicit_package_bases = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = [
+  "pydantic.mypy"
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.vulture]
+paths = ["app/"]
+min_confidence = 70

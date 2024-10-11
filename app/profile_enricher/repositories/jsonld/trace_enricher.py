@@ -1,5 +1,5 @@
+from app.common.common_types import JsonType
 from app.common.models.trace import Trace
-from app.common.type.types import JsonType
 from app.common.utils.utils_dict import deep_merge, get_nested_from_flat
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiles.jsonld import PresenceTypeEnum, StatementTemplate
@@ -15,11 +15,19 @@ CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE = (
 class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
-    def __init__(self, logger: LoggerContract):
+    def __init__(self, logger: LoggerContract) -> None:
+        """
+        Initialize the TraceEnricher.
+
+        :param logger: The logger instance for logging operations.
+        """
         self.logger = logger
 
     def get_enriched_data(
-        self, group_name: str, template: StatementTemplate, trace: Trace
+        self,
+        group_name: str,
+        template: StatementTemplate,
+        trace: Trace,
     ) -> JsonType:
         """
         Get enriched data based on the given template.
@@ -51,14 +59,14 @@ class TraceEnricher:
         # Enriched more for rules with only one value
         if template.rules:
             enriched_data.update(
-                self._enrich_with_rules(template=template, trace=trace)
+                self._enrich_with_rules(template=template, trace=trace),
             )
 
         return get_nested_from_flat(flat_field=enriched_data)
 
     def _enrich_with_rules(self, template: StatementTemplate, trace: Trace) -> JsonType:
         """
-        Get enriched data based on the template's rules than contain only one value
+        Get enriched data based on the template's rules than contain only one value.
 
         :param template: The template to use for enrichment.
         :param trace: The trace that needs to be enriched.

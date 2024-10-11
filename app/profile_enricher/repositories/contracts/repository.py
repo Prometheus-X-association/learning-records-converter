@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
 
 from app.common.models.trace import Trace
-from app.profile_enricher.types import ValidationError, ValidationRecommendation
+from app.profile_enricher.profiler_types import (
+    ValidationError,
+    ValidationRecommendation,
+)
 
 
 class ProfileRepository(ABC):
     """
     Abstract base class for profile repositories.
+
     Defines the interface for enriching and validating traces based on profiles.
     """
 
@@ -23,7 +27,10 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def validate_trace(
-        self, group_name: str, template_name: str, trace: Trace
+        self,
+        group_name: str,
+        template_name: str,
+        trace: Trace,
     ) -> list[ValidationError]:
         """
         Validate a trace against its profile rules.
@@ -37,7 +44,10 @@ class ProfileRepository(ABC):
 
     @abstractmethod
     def get_recommendations(
-        self, group_name: str, template_name: str, trace: Trace
+        self,
+        group_name: str,
+        template_name: str,
+        trace: Trace,
     ) -> list[ValidationRecommendation]:
         """
         Generate recommendations for a trace based on a specific template.
