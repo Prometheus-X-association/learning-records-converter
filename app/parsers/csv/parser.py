@@ -73,10 +73,11 @@ class CSVParser(Parser):
                 delimiters=[e.value for e in DelimiterEnum],
             )
             has_header = sniffer.has_header(sample=sample)
-            return dialect, has_header
         except csv.Error:
             self.logger.warning("Unable to detect CSV dialect, falling back to excel")
             return csv.excel, True
+        else:
+            return dialect, has_header
 
     def _create_csv_reader(
         self,

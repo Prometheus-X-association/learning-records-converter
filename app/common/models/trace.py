@@ -34,7 +34,10 @@ class Trace(BaseModel):
             raise ValueError("Input trace data is required")
 
         if input_format:
-            if not cls.validate_format(trace_data=input_data, trace_format=input_format):
+            if not cls.validate_format(
+                trace_data=input_data,
+                trace_format=input_format,
+            ):
                 raise ValueError(f"Invalid trace for specified format: {input_format}")
         else:
             detected_format = cls.detect_format(input_data)
@@ -46,7 +49,10 @@ class Trace(BaseModel):
         return values
 
     @staticmethod
-    def validate_format(trace_data: JsonType, trace_format: CustomTraceFormatStrEnum) -> bool:
+    def validate_format(
+        trace_data: JsonType,
+        trace_format: CustomTraceFormatStrEnum,
+    ) -> bool:
         """
         Validate the input data against a specified format.
 
