@@ -8,3 +8,7 @@ class ParserFactoryError(Exception):
 
 class CSVParsingError(ParserError):
     """Exception raised for errors during CSV parsing."""
+
+
+class InvalidCSVStructureError(CSVParsingError):
+    """Exception raised when the CSV structure is invalid (e.g., no header or single column)."""

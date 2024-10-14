@@ -1,14 +1,13 @@
 from pathlib import Path
 from typing import BinaryIO
 
-import yaml
 from enums import TraceFormatEnum
 from extensions.enums import (
     CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,
 )
-from pydantic import ValidationError
 from utils.utils_dict import convert_yaml_file_to_json
+from yaml import safe_load
 
 from app.infrastructure.logging.contract import LoggerContract
 from app.mapper.exceptions import MappingConfigToModelError
@@ -53,7 +52,13 @@ class YamlMappingRepository(MappingRepository):
         json_config = convert_yaml_file_to_json(yaml_path=mapping_path)
         self.logger.info("Mapping config loaded", {"path": mapping_path})
 
-        return self._get_config_model(config=json_config)
+        try:
+            mapping_model = self.get_mapping_model(config=json_config)
+        except MappingConfigToModelError as e:
+            self.logger.exception("Mapping validation failed", e)
+            raise
+
+        return mapping_model
 
     def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
         """
@@ -66,10 +71,16 @@ class YamlMappingRepository(MappingRepository):
         :raises MappingConfigToModelError: If the YAML fails to parse or the resulting schema is invalid
         """
         contents = mapping_file.read()
-        json_config = yaml.safe_load(stream=contents)
+        json_config = safe_load(stream=contents)
         self.logger.info("Mapping config loaded")
 
-        return self._get_config_model(config=json_config)
+        try:
+            model = self.get_mapping_model(config=json_config)
+        except MappingConfigToModelError as e:
+            self.logger.exception("Mapping validation failed", e)
+            raise
+
+        return model
 
     def _get_mapping_by_input_and_output_format(
         self,
@@ -121,27 +132,3 @@ class YamlMappingRepository(MappingRepository):
         )
 
         return Path(mapping_path)
-
-    def _get_config_model(self, config: dict) -> MappingSchema:
-        """
-        Load and validate a configuration dict into a MappingSchema.
-
-        :param config: The mapping configuration
-        :return: A validated CompleteConfigModel instance
-        :raises MappingConfigToModelError: If the configuration file is invalid or cannot be loaded
-        """
-        # Load mapping in Model
-        try:
-            return MappingSchema(**config)
-        except ValidationError as e:
-            msg = "Mapping validation failed"
-            self.logger.exception(msg, e)
-            raise MappingConfigToModelError(msg) from e
-        except TypeError as e:
-            msg = "Invalid data type in mapping"
-            self.logger.exception(msg, e)
-            raise MappingConfigToModelError(msg) from e
-        except Exception as e:
-            msg = "Unexpected error during mapping file validation"
-            self.logger.exception(msg, e)
-            raise MappingConfigToModelError(msg) from e
