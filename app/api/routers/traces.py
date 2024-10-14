@@ -4,14 +4,8 @@ from fastapi import APIRouter, Depends, Form, Request, UploadFile
 from fastapi.responses import StreamingResponse
 from pydantic import Json
 
-from app.common.extensions.enums import CustomTraceFormatStrEnum
-from app.mapper.mapper import Mapper
-from app.parsers.factory import ParserFactory
-from app.parsers.jsonencoder import CustomJSONEncoder
-from app.profile_enricher.profiler import Profiler
-
-from ..dependencies import get_mapper, get_profiler
-from ..schemas import (
+from app.api.dependencies import get_mapper, get_profiler
+from app.api.schemas import (
     DEFAULT_OUTPUT_FORMAT,
     CustomConfigModel,
     TransformInputTraceRequestModel,
@@ -20,6 +14,11 @@ from ..schemas import (
     ValidateInputTraceRequestModel,
     ValidateInputTraceResponseModel,
 )
+from app.common.extensions.enums import CustomTraceFormatStrEnum
+from app.mapper.mapper import Mapper
+from app.parsers.factory import ParserFactory
+from app.parsers.jsonencoder import CustomJSONEncoder
+from app.profile_enricher.profiler import Profiler
 
 router = APIRouter()
 

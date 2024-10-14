@@ -1,5 +1,5 @@
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, model_validator
 from pydantic.v1 import ValidationError as V1ValidationError
 
 from app.common.common_types import JsonType
@@ -17,49 +17,64 @@ class Trace(BaseModel):
     format: CustomTraceFormatStrEnum
     profile: str | None = None
 
-    def __init__(self, **data):
+    @model_validator(mode="before")
+    @classmethod
+    def validate_data_and_format(cls, values: dict) -> dict:
         """
-        Initialize a new Trace instance.
+        Validates the input data and format.
+        If no format is provided, it attempts to detect the format automatically.
 
         :param data: Keyword arguments containing the trace data, format, and optional profile
         :raises ValueError: If the trace data is invalid for the specified format
         """
-        super().__init__(**data)
-        self._validate_trace()
+        input_data = values.get("data")
+        input_format = values.get("format")
 
-    def _validate_trace(self) -> None:
-        """
-        Validate the trace data against its specified format.
+        if not input_data:
+            raise ValueError("Input trace data is required")
 
-        :raises ValueError: If the trace data is invalid for the specified format
+        if input_format:
+            if not cls.validate_format(trace_data=input_data, trace_format=input_format):
+                raise ValueError(f"Invalid trace for specified format: {input_format}")
+        else:
+            detected_format = cls.detect_format(input_data)
+            if detected_format:
+                values["format"] = detected_format
+            else:
+                raise ValueError("Unable to detect trace format")
+
+        return values
+
+    @staticmethod
+    def validate_format(trace_data: JsonType, trace_format: CustomTraceFormatStrEnum) -> bool:
         """
-        format_model = CustomTraceFormatModelEnum[self.format.name]
+        Validate the input data against a specified format.
+
+        :param trace_data: The input trace data to validate
+        :param trace_format: The format to validate against
+
+        :return: True if the data is valid for the specified format, False otherwise
+        """
         try:
-            format_model.value(**self.data)
-        except (ValidationError, V1ValidationError) as e:
-            raise ValueError("Invalid trace") from e
+            CustomTraceFormatModelEnum[trace_format.name].value(**trace_data)
+        except (ValidationError, V1ValidationError):
+            return False
+        return True
 
     @classmethod
-    def create_with_format_detection(cls, data: JsonType) -> "Trace":
+    def detect_format(cls, data: JsonType) -> CustomTraceFormatStrEnum | None:
         """
-        Create a Trace instance with automatic format detection.
+        Attempt to detect the format of the input trace data.
 
-        This method attempts to detect the format of the trace by validating
-        it against known formats.
+        This method tries to validate the data against all known formats.
 
-        :param data: The raw trace data
-        :return: A new Trace instance with the detected format
-        :raises ValueError: If the trace format cannot be detected
+        :param data: The input trace data to analyze
+
+        :return: The detected format, or None if no format matches
         """
-        for trace_format in CustomTraceFormatModelEnum:
-            if trace_format == CustomTraceFormatModelEnum.CUSTOM:
+        for trace_format in CustomTraceFormatStrEnum:
+            if trace_format == CustomTraceFormatStrEnum.CUSTOM:
                 continue
-            try:
-                trace_format.value(**data)
-                return cls(
-                    data=data,
-                    format=CustomTraceFormatStrEnum[trace_format.name],
-                )
-            except (ValidationError, V1ValidationError):
-                continue
-        raise ValueError("Unable to detect trace format")
+            if cls.validate_format(trace_data=data, trace_format=trace_format):
+                return trace_format
+        return None
