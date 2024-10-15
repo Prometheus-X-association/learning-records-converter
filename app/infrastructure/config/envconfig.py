@@ -17,7 +17,7 @@ class EnvConfig(ConfigContract):
 
     def get_log_level(self) -> LogLevel:
         """Inherited from ConfigContract.get_log_level."""
-        log_level = self._get("LOG_LEVEL", LogLevel.INFO.value).upper()
+        log_level = self._get("LOG_LEVEL", LogLevel.INFO.name).upper()
         try:
             return LogLevel[log_level]
         except KeyError:
@@ -25,7 +25,7 @@ class EnvConfig(ConfigContract):
 
     def get_environment(self) -> Environment:
         """Inherited from ConfigContract.get_environment."""
-        env = self._get("ENVIRONMENT", Environment.PRODUCTION.value).upper()
+        env = self._get("ENVIRONMENT", Environment.PRODUCTION.name).upper()
         try:
             return Environment[env]
         except KeyError:

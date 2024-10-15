@@ -91,14 +91,11 @@ class MappingEngine:
             msg = "Input format validation failed"
             self.logger.exception(msg, e, self.log_context)
             raise InputTraceToModelError(msg) from e
-        except TypeError as e:
+        except (TypeError, ValueError, KeyError) as e:
             msg = "Invalid data type in input trace"
             self.logger.exception(msg, e, self.log_context)
             raise InputTraceToModelError(msg) from e
-        except Exception as e:
-            msg = "Input trace does not match the specified input format"
-            self.logger.exception(msg, e, self.log_context)
-            raise InputTraceToModelError(msg) from e
+
         self.logger.debug("Input trace is valid against his format", self.log_context)
 
     def _apply_mapping(self, input_data: JsonType) -> JsonType:
@@ -165,12 +162,8 @@ class MappingEngine:
             msg = "Output format validation failed"
             self.logger.exception(msg, e, self.log_context)
             raise OutputTraceToModelError(msg) from e
-        except TypeError as e:
+        except (TypeError, ValueError, KeyError) as e:
             msg = "Invalid data type in output trace"
-            self.logger.exception(msg, e, self.log_context)
-            raise OutputTraceToModelError(msg) from e
-        except Exception as e:
-            msg = "Output trace does not match the specified output format"
             self.logger.exception(msg, e, self.log_context)
             raise OutputTraceToModelError(msg) from e
 
@@ -329,7 +322,7 @@ class MappingEngine:
                         ),
                     )
                     return list_response
-            except TypeError as e:
+            except Exception as e:
                 msg = "Error in lambda condition"
                 self.logger.exception(
                     msg,

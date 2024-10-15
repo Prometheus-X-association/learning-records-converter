@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.mapper.exceptions import (
@@ -29,6 +30,7 @@ class ExceptionHandler:
         self.error_mapping: dict[type[Exception], int] = {
             ValueError: status.HTTP_400_BAD_REQUEST,
             TypeError: status.HTTP_500_INTERNAL_SERVER_ERROR,
+            RequestValidationError: status.HTTP_422_UNPROCESSABLE_ENTITY,
             # MapperError and its subclasses
             MapperError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             MappingConfigToModelError: status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -147,4 +149,8 @@ class ExceptionHandler:
             and status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         ):
             return {"detail": "An internal server error occurred."}
-        return {"detail": str(exc)}
+
+        details = {"detail": str(exc)}
+        if exc.__cause__ is not None:
+            details["cause"] = str(exc.__cause__)
+        return details
