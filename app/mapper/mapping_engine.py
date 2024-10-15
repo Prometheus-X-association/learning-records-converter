@@ -1,8 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
-from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
-from pydantic import ValidationError
+from extensions.enums import CustomTraceFormatStrEnum
 from utils.utils_dict import (
     get_value_from_flat_key,
     remove_empty_elements,
@@ -15,12 +14,7 @@ from app.infrastructure.logging.contract import LoggerContract
 
 # This import is used for the eval method :
 from .available_functions.mapping_runnable_functions import *  # noqa: F403
-from .exceptions import (
-    CodeEvaluationError,
-    InputTraceToModelError,
-    MapperError,
-    OutputTraceToModelError,
-)
+from .exceptions import CodeEvaluationError
 from .models.mapping_models import FinalMappingModel
 from .models.mapping_schema import (
     ConditionOutputMappingModel,
@@ -34,150 +28,148 @@ DEFAULT_CONDITION = "default"
 class MappingEngine:
     """Handles mapping from an input format to an output format using a config model."""
 
-    def __init__(
-        self,
-        input_format: CustomTraceFormatModelEnum,
-        mapping_to_apply: MappingSchema,
-        output_format: CustomTraceFormatModelEnum,
-        logger: LoggerContract,
-    ) -> None:
+    def __init__(self, logger: LoggerContract) -> None:
         """
         Initialize the MappingEngine.
 
-        :param input_format: The input format of the trace
-        :param mapping_to_apply: The mapping configuration to apply
-        :param output_format: The desired output format
         :param logger: LoggerContract implementation for logging
         """
-        self.input_format = input_format
-        self.output_format = output_format
-        self.mapping_to_apply = mapping_to_apply
         self.logger = logger
-        self.log_context: dict[str, str] = {
-            "input_format": self.input_format.name,
-            "output_format": self.output_format.name,
-        }
+        self.log_context: dict[str, str] = {}
         self.profile: str | None = None
 
-    def run(self, input_trace: Trace) -> Trace:
+    def run(
+        self,
+        input_trace: Trace,
+        mapping_to_apply: MappingSchema,
+        output_format: CustomTraceFormatStrEnum,
+    ) -> Trace:
         """
         Main function : run the mapping process on the input trace.
 
         :param input_trace: The input trace to map
+        :param mapping_to_apply: The mapping configuration to apply
+        :param output_format: The desired output format
         :return: The mapped output trace
         """
-        self._validate_inputs(input_trace=input_trace)
-        mapped_data = self._apply_mapping(input_data=input_trace.data)
-        output_data = self._post_process(mapped_data=mapped_data)
-        return self._create_output_trace(output_data=output_data)
+        self.log_context = {
+            "input_format": input_trace.format.name,
+            "output_format": output_format.name,
+        }
 
-    def _validate_inputs(self, input_trace: Trace) -> None:
-        """
-        Validate the input trace and configuration.
+        mapped_data = self._apply_mapping(
+            input_trace=input_trace,
+            mapping_schema=mapping_to_apply,
+            output_format=output_format,
+        )
+        output_data = self._post_process(
+            mapped_data=mapped_data,
+            mapping_schema=mapping_to_apply,
+        )
+        output_trace = self._create_output_trace(
+            output_data=output_data,
+            output_format=output_format,
+        )
 
-        :param input_trace: The input trace to map
-        :raises MapperError: If validation fails
-        """
-        if not all([self.input_format, self.output_format, self.mapping_to_apply]):
-            self.logger.error("Incomplete mapping informations", self.log_context)
-            raise MapperError(
-                "Input format, output format, and mapping configuration must be specified",
-            )
+        self.logger.info("Mapping done", self.log_context)
 
-        # Check if input_trace match input_format (model validation)
-        try:
-            self.input_format.value(**input_trace.data)
-        except ValidationError as e:
-            msg = "Input format validation failed"
-            self.logger.exception(msg, e, self.log_context)
-            raise InputTraceToModelError(msg) from e
-        except (TypeError, ValueError, KeyError) as e:
-            msg = "Invalid data type in input trace"
-            self.logger.exception(msg, e, self.log_context)
-            raise InputTraceToModelError(msg) from e
+        return output_trace
 
-        self.logger.debug("Input trace is valid against his format", self.log_context)
-
-    def _apply_mapping(self, input_data: JsonType) -> JsonType:
+    def _apply_mapping(
+        self,
+        input_trace: Trace,
+        mapping_schema: MappingSchema,
+        output_format: CustomTraceFormatStrEnum,
+    ) -> JsonType:
         """
         Apply the mapping to the input trace.
 
-        :param input_data: The prepared input data
+        :param input_trace: The prepared input trace
+        :param mapping_schema: The mapping schema to apply
+        :param output_format: The desired output format
         :return: The mapped output trace
         """
-        # We start from the input trace if the formats are the same
-        output_trace = input_data if self.input_format == self.output_format else {}
+        input_data = input_trace.data
 
-        for mapping in self.mapping_to_apply.mappings:
+        # We start from the input trace if the formats are the same
+        output_data = input_data if input_trace.format == output_format else {}
+
+        for mapping in mapping_schema.mappings:
             input_values = []
             for input_field in mapping.input_fields:
                 value = get_value_from_flat_key(input_data, input_field)
                 input_values.append(value)
-            output_trace = self._build_trace_with_output(
+            output_data = self._build_trace_with_output(
                 output_content=mapping.output_fields,
-                output_trace=output_trace,
+                output_data=output_data,
                 overwrite=True,
                 arguments=input_values,
             )
-        return output_trace
+        return output_data
 
-    def _post_process(self, mapped_data: JsonType) -> JsonType:
+    def _post_process(
+        self,
+        mapped_data: JsonType,
+        mapping_schema: MappingSchema,
+    ) -> JsonType:
         """
         Apply post-processing to the mapped data.
 
         :param mapped_data: The mapped data to post-process
+        :param mapping_schema: The mapping schema to apply
         :return: The post-processed data
         """
-        output_trace = remove_empty_elements(dictionary=mapped_data)
-        return self._apply_default_values(output_trace=output_trace)
+        output_data = remove_empty_elements(dictionary=mapped_data)
+        return self._apply_default_values(
+            output_data=output_data,
+            mapping_schema=mapping_schema,
+        )
 
-    def _apply_default_values(self, output_trace: JsonType) -> JsonType:
+    def _apply_default_values(
+        self,
+        output_data: JsonType,
+        mapping_schema: MappingSchema,
+    ) -> JsonType:
         """
-        Apply default values to the output trace.
+        Apply default values to the output data.
 
-        :param output_trace: The output trace to apply default values to
-        :return: The output trace with default values applied
+        :param output_data: The output trace to apply default values to
+        :param mapping_schema: The mapping schema to apply
+        :return: The output data with default values applied
         """
         self.logger.debug("Apply mapping default values", self.log_context)
-        for default_value in self.mapping_to_apply.default_values:
-            output_trace = self._build_trace_with_output(
+        for default_value in mapping_schema.default_values:
+            output_data = self._build_trace_with_output(
                 output_content=default_value,
-                output_trace=output_trace,
+                output_data=output_data,
                 overwrite=False,
             )
-        return output_trace
+        return output_data
 
-    def _create_output_trace(self, output_data: JsonType) -> Trace:
+    def _create_output_trace(
+        self,
+        output_data: JsonType,
+        output_format: CustomTraceFormatStrEnum,
+    ) -> Trace:
         """
         Create the final output trace.
 
         :param output_data: The output data to create the trace from
+        :param output_format: The desired output format
         :return: The final output trace
-        :raises MapperError: If the output trace does not match the specified output format
         """
         self.logger.debug("Create output trace", self.log_context)
-        try:
-            self.output_format.value(**output_data)
-        except ValidationError as e:
-            msg = "Output format validation failed"
-            self.logger.exception(msg, e, self.log_context)
-            raise OutputTraceToModelError(msg) from e
-        except (TypeError, ValueError, KeyError) as e:
-            msg = "Invalid data type in output trace"
-            self.logger.exception(msg, e, self.log_context)
-            raise OutputTraceToModelError(msg) from e
 
-        self.logger.debug("Mapping done", self.log_context)
         return Trace(
             data=output_data,
-            format=CustomTraceFormatStrEnum(self.output_format.name),
+            format=output_format,
             profile=self.profile,
         )
 
     def _build_trace_with_output(
         self,
         output_content: OutputMappingModel,
-        output_trace: dict[str, Any],
+        output_data: dict[str, Any],
         overwrite: bool,
         arguments: list[Any] | None = None,
     ) -> dict[str, Any]:
@@ -185,7 +177,7 @@ class MappingEngine:
         Build the output trace based on the output content.
 
         :param output_content: The output mapping model
-        :param output_trace: The current output trace
+        :param output_data: The current output trace
         :param overwrite: Whether to overwrite existing values
         :param arguments: Input arguments
         :return: The updated output trace
@@ -195,13 +187,13 @@ class MappingEngine:
         outputs = self._handle_output(output_model=output_content, arguments=arguments)
         for output in outputs:
             if output.output_field:
-                output_trace = set_value_from_flat_key(
-                    dict_list_element=output_trace,
+                output_data = set_value_from_flat_key(
+                    dict_list_element=output_data,
                     flat_key=output.output_field,
                     value=output.value,
                     overwrite=overwrite,
                 )
-        return output_trace
+        return output_data
 
     def _handle_output(
         self,
@@ -261,7 +253,7 @@ class MappingEngine:
         :param custom_input: List of custom transformation strings
         :param arguments: Input arguments for the transformations
         :return: The result of applying all transformations
-        :raises MapperError: If there's an error in the custom transformation
+        :raises CodeEvaluationError: If there's an error in the custom transformation
         """
         for custom_code in custom_input:
             try:
@@ -300,6 +292,7 @@ class MappingEngine:
         :param switch_value: List of condition-based output mappings
         :param arguments: Input arguments for the conditions
         :return: List of FinalMappingModel instances
+        :raises CodeEvaluationError: If there's an error in the lambda condition
         """
         if not arguments:
             arguments = []

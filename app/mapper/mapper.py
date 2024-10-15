@@ -1,6 +1,6 @@
 from typing import BinaryIO
 
-from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
+from extensions.enums import CustomTraceFormatStrEnum
 
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
@@ -68,9 +68,10 @@ class Mapper:
             raise MapperError("Mapping schema not loaded")
 
         engine = MappingEngine(
-            input_format=CustomTraceFormatModelEnum[input_trace.format.name],
-            mapping_to_apply=self.schema,
-            output_format=CustomTraceFormatModelEnum[output_format.name],
             logger=self.logger,
         )
-        return engine.run(input_trace=input_trace)
+        return engine.run(
+            input_trace=input_trace,
+            mapping_to_apply=self.schema,
+            output_format=output_format,
+        )
