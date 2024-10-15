@@ -2,12 +2,11 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from app.common.exceptions import InvalidTraceError, TraceError, UnknownFormatError
 from app.mapper.exceptions import (
     CodeEvaluationError,
-    InputTraceToModelError,
     MapperError,
     MappingConfigToModelError,
-    OutputTraceToModelError,
 )
 from app.parsers.exceptions import (
     CSVParsingError,
@@ -31,11 +30,13 @@ class ExceptionHandler:
             ValueError: status.HTTP_400_BAD_REQUEST,
             TypeError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             RequestValidationError: status.HTTP_422_UNPROCESSABLE_ENTITY,
+            # TraceError and its subclasses
+            TraceError: status.HTTP_400_BAD_REQUEST,
+            InvalidTraceError: status.HTTP_400_BAD_REQUEST,
+            UnknownFormatError: status.HTTP_400_BAD_REQUEST,
             # MapperError and its subclasses
             MapperError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             MappingConfigToModelError: status.HTTP_500_INTERNAL_SERVER_ERROR,
-            InputTraceToModelError: status.HTTP_422_UNPROCESSABLE_ENTITY,
-            OutputTraceToModelError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             CodeEvaluationError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             # ProfilerError and its subclasses
             ProfilerError: status.HTTP_500_INTERNAL_SERVER_ERROR,

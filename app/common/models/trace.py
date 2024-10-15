@@ -3,6 +3,7 @@ from pydantic import BaseModel, ValidationError, model_validator
 from pydantic.v1 import ValidationError as V1ValidationError
 
 from app.common.common_types import JsonType
+from app.common.exceptions import InvalidTraceError, UnknownFormatError
 
 
 class Trace(BaseModel):
@@ -25,26 +26,29 @@ class Trace(BaseModel):
         If no format is provided, it attempts to detect the format automatically.
 
         :param data: Keyword arguments containing the trace data, format, and optional profile
-        :raises ValueError: If the trace data is invalid for the specified format
+        :raises InvalidTraceError: If the trace data is invalid for the specified format
+        :raises UnknownFormatError: If the trace format can't be detected
         """
         input_data = values.get("data")
         input_format = values.get("format")
 
         if not input_data:
-            raise ValueError("Input trace data is required")
+            raise InvalidTraceError("Input trace data is required")
 
         if input_format:
             if not cls.validate_format(
                 trace_data=input_data,
                 trace_format=input_format,
             ):
-                raise ValueError(f"Invalid trace for specified format: {input_format}")
+                raise InvalidTraceError(
+                    f"Invalid trace for specified format: {input_format}",
+                )
         else:
             detected_format = cls.detect_format(input_data)
             if detected_format:
                 values["format"] = detected_format
             else:
-                raise ValueError("Unable to detect trace format")
+                raise UnknownFormatError("Unable to detect trace format")
 
         return values
 
