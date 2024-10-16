@@ -121,8 +121,8 @@ class ExceptionHandler:
             ),
         )
 
+    @staticmethod
     def get_error_detail(
-        self,
         exc: Exception,
         status_code: int,
         request: Request,

@@ -25,7 +25,7 @@ class Trace(BaseModel):
         Validates the input data and format.
         If no format is provided, it attempts to detect the format automatically.
 
-        :param data: Keyword arguments containing the trace data, format, and optional profile
+        :param values: Keyword arguments containing the trace data, format, and optional profile
         :raises InvalidTraceError: If the trace data is invalid for the specified format
         :raises UnknownFormatError: If the trace format can't be detected
         """

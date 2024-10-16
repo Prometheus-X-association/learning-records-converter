@@ -166,10 +166,12 @@ async def transform_custom_file(
     Transform a custom file using a provided mapping file and parsing configuration.
     This method processes an uploaded file, applies a custom mapping, and streams the
     transformed data as xAPI statements.
+    :param request: The request object
     :param data_file: The uploaded file containing the data to be transformed
     :param mapping_file: The uploaded file containing the mapping configuration
     :param config: Optional custom configuration for parsing
     :param output_format: The desired output format for the transformation
+    :param mapper: The Mapper instance for trace conversion
     :return: A streaming response containing the transformed xAPI statements
     """
     parser = ParserFactory.get_parser(
