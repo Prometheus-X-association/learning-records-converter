@@ -145,6 +145,10 @@ def set_value_from_flat_key(
     if is_empty(flat_key):
         return value if overwrite else dict_list_element
 
+    # Handle the case where dict_list_element is empty and overwrite is False
+    if not dict_list_element and not overwrite:
+        return dict_list_element
+
     current = dict_list_element
     for i, full_key in enumerate(keys):
         # Handle keys with brackets (e.g., for extensions)
