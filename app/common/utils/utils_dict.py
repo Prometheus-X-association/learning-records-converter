@@ -145,6 +145,10 @@ def set_value_from_flat_key(
     if is_empty(flat_key):
         return value if overwrite else dict_list_element
 
+    # Handle the case where dict_list_element is empty and overwrite is False
+    if not dict_list_element and not overwrite:
+        return dict_list_element
+
     current = dict_list_element
     for i, full_key in enumerate(keys):
         # Handle keys with brackets (e.g., for extensions)
@@ -286,18 +290,35 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> None:
 
     Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``dct``.
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``target_dict``.
 
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
     :return: None.
     """
-    for k in merge_dct:
-        if (
-            k in target_dict
-            and isinstance(target_dict[k], dict)
-            and isinstance(merge_dct[k], dict)
-        ):
-            deep_merge(target_dict[k], merge_dct[k])
+    for key, value in merge_dct.items():
+        target_value = target_dict.get(key)
+
+        # If both target and merge values are dictionaries, merge recursively
+        if isinstance(target_value, dict) and isinstance(value, dict):
+            deep_merge(target_value, value)
+        # If both are sets, perform union
+        elif isinstance(target_value, set) and isinstance(value, set):
+            target_value.update(value)
+        # If target is a list and merge value is a list, extend it
+        elif isinstance(target_value, list) and isinstance(value, list):
+            target_value.extend(value)
+        # If target is a list and merge value is not a list, append to the list
+        elif isinstance(target_value, list):
+            target_value.append(value)
+        # If target is a dictionary but merge value is a list, wrap target in a list
+        elif isinstance(target_value, dict) and isinstance(value, list):
+            target_dict[key] = [target_value, *value]
+        # Handle cases where one value is None: keep the non-None value
+        elif target_value is None:
+            target_dict[key] = value
+        elif value is None:
+            continue  # Keep the target value unchanged if the merge value is None
+        # In all other cases, replace the target value with the merge value
         else:
-            target_dict[k] = merge_dct[k]
+            target_dict[key] = value

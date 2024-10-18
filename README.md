@@ -161,16 +161,18 @@ Response format:
   "output_trace": {
     // Converted xAPI trace data
   },
+  "recommendations": [
+    {
+      "rule": "presence",
+      "path": "$.result.completion",
+      "expected": "included",
+      "actual": "missing"
+    }
+  ],
   "meta": {
     "input_format": "<input_format>",
-    "recommendations": [
-      {
-        "rule": "presence",
-        "path": "$.result.completion",
-        "expected": "included",
-        "actual": "missing"
-      }
-    ]
+    "output_format": "<output_format>",
+    "profile": "<DASES profile found>"
   }
 }
 ```
