@@ -10,71 +10,73 @@ mappings:
       switch:
         - condition: '
             lambda verb_id, obj_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/accessed",
-                "http://activitystrea.ms/schema/1.0/access",
-                "http://activitystrea.ms/access",
-                "http://id.tincanapi.com/verb/viewed",
-                "https://w3id.org/xapi/dod-isd/verbs/accessed"
-              ] and 
-              obj_type in [
-                "http://activitystrea.ms/schema/1.0/page",
-                "http://activitystrea.ms/page",
-                "http://adlnet.gov/expapi/activities/module",
-                "http://id.tincanapi.com/activitytype/blog",
-                "http://id.tincanapi.com/activitytype/community-site"
-                "https://w3id.org/xapi/acrossx/activities/page",
-                "https://w3id.org/xapi/acrossx/activities/webpage",
-                "https://xapi.org.au/sociallearningprofile/article",
-                "http://activitystrea.ms/article",
-                "http://xapi.org.au/contentprofile/activitytype/journal_article",
-                "http://xapi.org.au/contentprofile/activitytype/newspaper_article"
-              ]'
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/accessed",
+                "activitystrea.ms/schema/1.0/access",
+                "activitystrea.ms/access",
+                "id.tincanapi.com/verb/viewed",
+                "w3id.org/xapi/dod-isd/verbs/accessed"
+              )) and 
+              obj_type.endswith((
+                "activitystrea.ms/schema/1.0/page",
+                "activitystrea.ms/page",
+                "adlnet.gov/expapi/activities/module",
+                "id.tincanapi.com/activitytype/blog",
+                "id.tincanapi.com/activitytype/community-site",
+                "w3id.org/xapi/acrossx/activities/page",
+                "w3id.org/xapi/acrossx/activities/webpage",
+                "xapi.org.au/sociallearningprofile/article",
+                "activitystrea.ms/article",
+                "activitystrea.ms/schema/1.0/article",
+                "xapi.org.au/contentprofile/activitytype/journal_article",
+                "xapi.org.au/contentprofile/activitytype/newspaper_article"
+              ))
+          '
           profile: "lms.accessed-page"
 
         - condition: '
             lambda verb_id, obj_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/accessed",
-                "http://activitystrea.ms/schema/1.0/access",
-                "http://activitystrea.ms/access",
-                "http://id.tincanapi.com/verb/viewed",
-                "https://w3id.org/xapi/dod-isd/verbs/accessed",
-                "https://w3id.org/xapi/netc/verbs/opened"
-              ] and 
-              obj_type in [
-                "http://activitystrea.ms/schema/1.0/file",
-                "http://activitystrea.ms/file",
-                "http://adlnet.gov/expapi/activities/file",
-                "http://adlnet.gov/expapi/activities/media"
-              ] 
-              '
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/accessed",
+                "activitystrea.ms/schema/1.0/access",
+                "activitystrea.ms/access",
+                "id.tincanapi.com/verb/viewed",
+                "w3id.org/xapi/dod-isd/verbs/accessed",
+                "w3id.org/xapi/netc/verbs/opened"
+              )) and 
+              obj_type.endswith((
+                "activitystrea.ms/schema/1.0/file",
+                "activitystrea.ms/file",
+                "adlnet.gov/expapi/activities/file",
+                "adlnet.gov/expapi/activities/media"
+              ))
+          '
           profile: "lms.accessed-file"
 
         - condition: '
             lambda verb_id, obj_type:
-              verb_id in [
-                "http://adlnet.gov/expapi/verbs/registered",
-                "https://w3id.org/xapi/tla/verbs/registered"
-              ] and 
-              obj_type in [
-                "http://adlnet.gov/expapi/activities/course",
-                "http://id.tincanapi.com/activitytype/lms/course"
-              ]
-              '
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/registered",
+                "w3id.org/xapi/tla/verbs/registered"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/course",
+                "id.tincanapi.com/activitytype/lms/course"
+              ))
+          '
           profile: "lms.registered-course"
 
         - condition: '
             lambda verb_id, obj_type:
-              verb_id in [
-                "http://adlnet.gov/expapi/verbs/unregistered",
-                "http://id.tincanapi.com/verb/unregistered"
-              ] and 
-              obj_type in [
-                "http://adlnet.gov/expapi/activities/course",
-                "http://id.tincanapi.com/activitytype/lms/course"
-              ]
-              '
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/unregistered",
+                "id.tincanapi.com/verb/unregistered"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/course",
+                "id.tincanapi.com/activitytype/lms/course"
+              ))
+          '
           profile: "lms.unregistered-course"
 
   - input_fields:
@@ -85,146 +87,207 @@ mappings:
       switch:
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/uploaded",
-                "http://activitystrea.ms/schema/1.0/add",
-                "http://activitystrea.ms/add",
-                "http://activitystrea.ms/schema/1.0/submit",
-                "http://activitystrea.ms/submit",
-                "https://xapi.org.au/contentprofile/verb/added"
-              ] and 
-              (obj_type in [
-                "http://activitystrea.ms/schema/1.0/audio", 
-                "http://activitystrea.ms/audio", 
-                "https://w3id.org/xapi/audio/activity-type/audio",
-                "http://xapi.org.au/contentprofile/activitytype/audio_recording",
-                "http://id.tincanapi.com/activitytype/voicemail"
-              ] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/uploaded",
+                "activitystrea.ms/schema/1.0/add",
+                "activitystrea.ms/add",
+                "activitystrea.ms/schema/1.0/submit",
+                "activitystrea.ms/submit",
+                "xapi.org.au/contentprofile/verb/added"
+              )) and 
+              (obj_type.endswith((
+                "activitystrea.ms/schema/1.0/audio", 
+                "activitystrea.ms/audio", 
+                "w3id.org/xapi/audio/activity-type/audio",
+                "xapi.org.au/contentprofile/activitytype/audio_recording",
+                "id.tincanapi.com/activitytype/voicemail"
+              )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and mime_type.startswith("audio/")
                )
-              )'
+              )
+          '
           profile: "lms.uploaded-audio"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/uploaded",
-                "http://activitystrea.ms/schema/1.0/add",
-                "http://activitystrea.ms/add",
-                "http://activitystrea.ms/schema/1.0/submit",
-                "http://activitystrea.ms/submit",
-                "https://xapi.org.au/contentprofile/verb/added"
-              ] and 
-              (obj_type in ["http://id.tincanapi.com/activitytype/document", "https://w3id.org/xapi/acrossx/activities/e-book"] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/uploaded",
+                "activitystrea.ms/schema/1.0/add",
+                "activitystrea.ms/add",
+                "activitystrea.ms/schema/1.0/submit",
+                "activitystrea.ms/submit",
+                "xapi.org.au/contentprofile/verb/added"
+              )) and 
+              (obj_type.endswith((
+                "id.tincanapi.com/activitytype/document",
+                "w3id.org/xapi/acrossx/activities/e-book"
+              )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and 
                 (mime_type.startswith("application/") or mime_type.startswith("text/"))
                )
-              )'
+              )
+          '
           profile: "lms.uploaded-document"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/uploaded",
-                "http://activitystrea.ms/schema/1.0/add",
-                "http://activitystrea.ms/add",
-                "http://activitystrea.ms/schema/1.0/submit",
-                "http://activitystrea.ms/submit",
-                "https://xapi.org.au/contentprofile/verb/added"
-              ] and 
-              (obj_type in [
-                "http://activitystrea.ms/schema/1.0/video",
-                "http://activitystrea.ms/video",
-                "https://w3id.org/xapi/video/activity-type/video",
-                "https://w3id.org/xapi/acrossx/activities/video",
-               ] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/uploaded",
+                "activitystrea.ms/schema/1.0/add",
+                "activitystrea.ms/add",
+                "activitystrea.ms/schema/1.0/submit",
+                "activitystrea.ms/submit",
+                "xapi.org.au/contentprofile/verb/added"
+              )) and 
+              (obj_type.endswith((
+                "activitystrea.ms/schema/1.0/video",
+                "activitystrea.ms/video",
+                "w3id.org/xapi/video/activity-type/video",
+                "w3id.org/xapi/acrossx/activities/video",
+               )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and mime_type.startswith("video/")
                )
-              )'
+              )
+          '
           profile: "lms.uploaded-video"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id in [
-                "https://w3id.org/xapi/netc/verbs/uploaded",
-                "http://activitystrea.ms/schema/1.0/add",
-                "http://activitystrea.ms/add",
-                "http://activitystrea.ms/schema/1.0/submit",
-                "http://activitystrea.ms/submit",
-                "https://xapi.org.au/contentprofile/verb/added"
-              ] and 
-              obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file"] and 
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/uploaded",
+                "activitystrea.ms/schema/1.0/add",
+                "activitystrea.ms/add",
+                "activitystrea.ms/schema/1.0/submit",
+                "activitystrea.ms/submit",
+                "xapi.org.au/contentprofile/verb/added"
+              )) and 
+              obj_type.endswith((
+                "activitystrea.ms/schema/1.0/file",
+                "activitystrea.ms/file",
+                "adlnet.gov/expapi/activities/file"
+              )) and 
               (mime_type is None or 
                (not mime_type.startswith("audio/") and 
                 not mime_type.startswith("video/") and 
                 not mime_type.startswith("application/") and 
                 not mime_type.startswith("text/")
                )
-              )'
+              )
+          '
           profile: "lms.uploaded-file"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
-              (obj_type in [
-                "http://activitystrea.ms/schema/1.0/audio",
-                "http://activitystrea.ms/audio",
-                "https://w3id.org/xapi/audio/activity-type/audio",
-                "http://xapi.org.au/contentprofile/activitytype/audio_recording",
-                "http://id.tincanapi.com/activitytype/voicemail"
-              ] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+               "id.tincanapi.com/verb/downloaded"
+              )) and 
+              (obj_type.endswith((
+                "activitystrea.ms/schema/1.0/audio",
+                "activitystrea.ms/audio",
+                "w3id.org/xapi/audio/activity-type/audio",
+                "xapi.org.au/contentprofile/activitytype/audio_recording",
+                "id.tincanapi.com/activitytype/voicemail"
+              )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and mime_type.startswith("audio/")
                )
-              )'
+              )
+          '
           profile: "lms.downloaded-audio"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
-              (obj_type in ["http://id.tincanapi.com/activitytype/document", "https://w3id.org/xapi/acrossx/activities/e-book"] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "id.tincanapi.com/verb/downloaded"
+              )) and  
+              (obj_type.endswith((
+                "id.tincanapi.com/activitytype/document",
+                "w3id.org/xapi/acrossx/activities/e-book"
+              )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and 
                 (mime_type.startswith("application/") or mime_type.startswith("text/"))
                )
-              )'
+              )
+          '
           profile: "lms.downloaded-document"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id in [
-                "http://id.tincanapi.com/verb/downloaded",
-                "https://w3id.org/xapi/acrossx/verbs/watched",
-                "http://activitystrea.ms/watch",
-                "https://w3id.org/xapi/adb/verbs/watched"
-              ] and 
-              (obj_type in [
-                "http://activitystrea.ms/schema/1.0/video",
-                "http://activitystrea.ms/video",
-                "https://w3id.org/xapi/video/activity-type/video",
-                "https://w3id.org/xapi/acrossx/activities/video"
-              ] or 
-               (obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "id.tincanapi.com/verb/downloaded",
+                "w3id.org/xapi/acrossx/verbs/watched",
+                "activitystrea.ms/watch",
+                "activitystrea.ms/schema/1.0/watch",
+                "w3id.org/xapi/adb/verbs/watched"
+              )) and 
+              (obj_type.endswith((
+                "activitystrea.ms/schema/1.0/video",
+                "activitystrea.ms/video",
+                "w3id.org/xapi/video/activity-type/video",
+                "w3id.org/xapi/acrossx/activities/video"
+              )) or 
+               (obj_type.endswith((
+                 "activitystrea.ms/schema/1.0/file",
+                 "activitystrea.ms/file",
+                 "adlnet.gov/expapi/activities/file",
+                 "adlnet.gov/expapi/activities/media"
+               )) and 
                 mime_type is not None and mime_type.startswith("video/")
                )
-              )'
+              )
+          '
           profile: "lms.downloaded-video"
 
         - condition: '
             lambda verb_id, obj_type, mime_type:
-              verb_id == "http://id.tincanapi.com/verb/downloaded" and 
-              obj_type in ["http://activitystrea.ms/schema/1.0/file", "http://activitystrea.ms/file", "http://adlnet.gov/expapi/activities/file", "http://adlnet.gov/expapi/activities/media"] and 
+              verb_id.endswith((
+                "id.tincanapi.com/verb/downloaded"
+              )) and  
+              obj_type.endswith((
+                "activitystrea.ms/schema/1.0/file",
+                "activitystrea.ms/file",
+                "adlnet.gov/expapi/activities/file",
+                "adlnet.gov/expapi/activities/media"
+              )) and 
               (mime_type is None or 
                (not mime_type.startswith("audio/") and 
                 not mime_type.startswith("video/") and 
                 not mime_type.startswith("application/") and 
                 not mime_type.startswith("text/")
                )
-              )'
+              )
+          '
           profile: "lms.downloaded-file"
+
 
   # Virtual Classroom Profiles
   - input_fields:
@@ -234,261 +297,383 @@ mappings:
     output_fields:
       switch:
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id == "http://adlnet.gov/expapi/verbs/initialized" and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ]
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/initialized"
+              )) and  
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              ))
           '
           profile: "virtual-classroom.initialized"
 
         - condition: '
             lambda verb_id, obj_type, context_extensions:
-              verb_id in [
-                "http://adlnet.gov/expapi/verbs/terminated",
-                "http://activitystrea.ms/terminate"
-              ] and  
-              obj_type in [
-                "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "http://adlnet.gov/expapi/activities/meeting",
-                "http://id.tincanapi.com/activitytype/tutor-session"
-              ]
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/terminated",
+                "activitystrea.ms/terminate",
+                "activitystrea.ms/schema/1.0/terminate"
+              )) and  
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              ))
           '
           profile: "virtual-classroom.terminated"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/attended",
-              "http://activitystrea.ms/schema/1.0/join",
-              "http://activitystrea.ms/schema/1.0/attend",
-              "http://activitystrea.ms/schema/1.0/checkin",
-              "http://activitystrea.ms/join",
-              "http://activitystrea.ms/attend",
-              "http://activitystrea.ms/checkin",
-              "https://w3id.org/xapi/adb/verbs/attended",
-              "https://xapi.org.au/sociallearningprofile/joined"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ]
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/attended",
+                "activitystrea.ms/schema/1.0/join",
+                "activitystrea.ms/schema/1.0/attend",
+                "activitystrea.ms/schema/1.0/checkin",
+                "activitystrea.ms/join",
+                "activitystrea.ms/attend",
+                "activitystrea.ms/checkin",
+                "w3id.org/xapi/adb/verbs/attended",
+                "xapi.org.au/sociallearningprofile/joined"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              ))
           '
           profile: "virtual-classroom.joined"
 
         - condition: '
             lambda verb_id, obj_type, context_extensions:
-              verb_id in [
-                "http://activitystrea.ms/schema/1.0/leave",
-                "http://activitystrea.ms/leave",
-                "http://adlnet.gov/expapi/verbs/exited",
-                "https://xapi.org.au/sociallearningprofile/left"
-              ] and 
-              obj_type in [
-                "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-                "http://adlnet.gov/expapi/activities/meeting",
-                "http://id.tincanapi.com/activitytype/tutor-session"
-              ]
+              verb_id.endswith((
+                "activitystrea.ms/schema/1.0/leave",
+                "activitystrea.ms/leave",
+                "adlnet.gov/expapi/verbs/exited",
+                "xapi.org.au/sociallearningprofile/left"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              ))
           '
           profile: "virtual-classroom.left"
 
         - condition: '
             lambda verb_id, obj_type, context_extensions:
-              verb_id in [
-                "http://adlnet.gov/expapi/verbs/asked",
-                "http://activitystrea.ms/schema/1.0/start",
-                "http://activitystrea.ms/start"
-              ] and 
-              obj_type in [
-                "http://adlnet.gov/expapi/activities/cmi.interaction",
-                "http://activitystrea.ms/schema/1.0/question",
-                "http://activitystrea.ms/question",
-                "http://adlnet.gov/expapi/activities/question",
-                "http://id.tincanapi.com/activitytype/survey",
-                "https://xapi.org.au/contentprofile/activitytype/survey"
-              ]
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/asked",
+                "activitystrea.ms/schema/1.0/start",
+                "activitystrea.ms/start"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/cmi.interaction",
+                "activitystrea.ms/schema/1.0/question",
+                "activitystrea.ms/question",
+                "adlnet.gov/expapi/activities/question",
+                "id.tincanapi.com/activitytype/survey",
+                "xapi.org.au/contentprofile/activitytype/survey"
+              ))
           '
           profile: "virtual-classroom.started-poll"
 
         - condition: '
             lambda verb_id, obj_type, context_extensions:
-              verb_id in [
-                "http://adlnet.gov/expapi/verbs/answered",
-                "http://adlnet.gov/expapi/verbs/responded",
-                "https://w3id.org/xapi/dod-isd/verbs/answered"
-              ] and 
-              obj_type in [
-                "http://adlnet.gov/expapi/activities/cmi.interaction",
-                "http://activitystrea.ms/schema/1.0/question",
-                "http://activitystrea.ms/question",
-                "http://adlnet.gov/expapi/activities/question",
-                "http://id.tincanapi.com/activitytype/survey",
-                "https://xapi.org.au/contentprofile/activitytype/survey"
-              ]
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/answered",
+                "adlnet.gov/expapi/verbs/responded",
+                "w3id.org/xapi/dod-isd/verbs/answered"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/cmi.interaction",
+                "activitystrea.ms/schema/1.0/question",
+                "activitystrea.ms/question",
+                "adlnet.gov/expapi/activities/question",
+                "id.tincanapi.com/activitytype/survey",
+                "xapi.org.au/contentprofile/activitytype/survey"
+              ))
           '
           profile: "virtual-classroom.answered-poll"
 
         - condition: '
             lambda verb_id, obj_type, context_extensions:
-              verb_id in [
-                "https://w3id.org/xapi/acrossx/verbs/posted",
-                "http://id.tincanapi.com/verb/replied"
-              ] and 
-              obj_type in [
-                "https://w3id.org/xapi/acrossx/activities/message",
-                "http://id.tincanapi.com/activitytype/chat-message"
-              ]
+              verb_id.endswith((
+                "w3id.org/xapi/acrossx/verbs/posted",
+                "id.tincanapi.com/verb/replied"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/acrossx/activities/message",
+                "id.tincanapi.com/activitytype/chat-message"
+              ))
           '
           profile: "virtual-classroom.posted-public-message"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact",
-              "http://id.tincanapi.com/verb/requested-attention"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == True
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact",
+                "id.tincanapi.com/verb/requested-attention"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == True
+              )
+          '
           profile: "virtual-classroom.raised-hand"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact",
-              "http://id.tincanapi.com/verb/requested-attention"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == False
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact",
+                "id.tincanapi.com/verb/requested-attention"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == False
+              )
+          '
           profile: "virtual-classroom.lowered-hand"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == True
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == True
+              )
+          '
           profile: "virtual-classroom.shared-screen"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == False
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == False
+              )
+          '
           profile: "virtual-classroom.unshared-screen"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == False
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == False
+              )
+          '
           profile: "virtual-classroom.muted"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == True
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == True
+              )
+          '
           profile: "virtual-classroom.unmuted"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == True
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == True
+              )
+          '
           profile: "virtual-classroom.started-camera"
 
         - condition: '
-          lambda verb_id, obj_type, context_extensions:
-            verb_id in [
-              "http://adlnet.gov/expapi/verbs/interacted",
-              "http://activitystrea.ms/schema/1.0/interact",
-              "http://activitystrea.ms/interact"
-            ] and 
-            obj_type in [
-              "https://w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
-              "http://adlnet.gov/expapi/activities/meeting",
-              "http://id.tincanapi.com/activitytype/tutor-session"
-            ] and (
-              "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
-              and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == False
-            )
-        '
+            lambda verb_id, obj_type, context_extensions:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/interacted",
+                "activitystrea.ms/schema/1.0/interact",
+                "activitystrea.ms/interact"
+              )) and 
+              obj_type.endswith((
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
+                "adlnet.gov/expapi/activities/meeting",
+                "id.tincanapi.com/activitytype/tutor-session"
+              )) and (
+                "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
+                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == False
+              )
+          '
           profile: "virtual-classroom.stopped-camera"
+
+
+  # Forum Profiles
+  - input_fields:
+      - "verb.id"
+      - "object.definition.type"
+    output_fields:
+      switch:
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "w3id.org/xapi/netc/verbs/accessed",
+                "activitystrea.ms/schema/1.0/access",
+                "activitystrea.ms/access",
+                "id.tincanapi.com/verb/viewed",
+                "w3id.org/xapi/dod-isd/verbs/accessed"
+              )) and 
+              obj_type.endswith((
+                "id.tincanapi.com/activitytype/discussion",
+                "id.tincanapi.com/activitytype/forum-reply",
+                "id.tincanapi.com/activitytype/forum-topic"
+              ))
+          '
+          profile: "forum.accessed-page"
+
+
+  # Assessment Profiles
+  - input_fields:
+      - "verb.id"
+      - "object.definition.type"
+    output_fields:
+      switch:
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "activitystrea.ms/schema/1.0/start",
+                "activitystrea.ms/start",
+                "adlnet.gov/expapi/verbs/launched"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/assessment",
+                "w3id.org/xapi/acrossx/activities/printed-assessment",
+                "w3id.org/xapi/openedx/activity/timed-assessment",
+                "w3id.org/xapi/tla/activity-types/assessment",
+                "ed3chain.com/xapi/boll/activity#printed-assessment",
+                "pttportal.af.mil/xapi/activity-type/ground-training-assessment"
+              ))
+          '
+          profile: "assessment.started"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/terminated",
+                "activitystrea.ms/terminate",
+                "activitystrea.ms/schema/1.0/terminate",
+                "adlnet.gov/expapi/verbs/passed",
+                "adlnet.gov/expapi/verbs/terminated"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/assessment",
+                "w3id.org/xapi/acrossx/activities/printed-assessment",
+                "w3id.org/xapi/openedx/activity/timed-assessment",
+                "w3id.org/xapi/tla/activity-types/assessment",
+                "ed3chain.com/xapi/boll/activity#printed-assessment",
+                "pttportal.af.mil/xapi/activity-type/ground-training-assessment"
+              ))
+          '
+          profile: "assessment.terminated"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/answered",
+                "adlnet.gov/expapi/verbs/responded",
+                "w3id.org/xapi/dod-isd/verbs/answered"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/assessment",
+                "w3id.org/xapi/acrossx/activities/printed-assessment",
+                "w3id.org/xapi/openedx/activity/timed-assessment",
+                "w3id.org/xapi/tla/activity-types/assessment",
+                "ed3chain.com/xapi/boll/activity#printed-assessment",
+                "pttportal.af.mil/xapi/activity-type/ground-training-assessment"
+              ))
+          '
+          profile: "assessment.answered-question"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/initialized"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/assessment",
+                "w3id.org/xapi/acrossx/activities/printed-assessment",
+                "w3id.org/xapi/openedx/activity/timed-assessment",
+                "w3id.org/xapi/tla/activity-types/assessment",
+                "ed3chain.com/xapi/boll/activity#printed-assessment",
+                "pttportal.af.mil/xapi/activity-type/ground-training-assessment"
+              ))
+          '
+          profile: "assessment.initialized"
+
+        - condition: '
+            lambda verb_id, obj_type:
+              verb_id.endswith((
+                "adlnet.gov/expapi/verbs/completed"
+              )) and 
+              obj_type.endswith((
+                "adlnet.gov/expapi/activities/assessment",
+                "w3id.org/xapi/acrossx/activities/printed-assessment",
+                "w3id.org/xapi/openedx/activity/timed-assessment",
+                "w3id.org/xapi/tla/activity-types/assessment",
+                "ed3chain.com/xapi/boll/activity#printed-assessment",
+                "pttportal.af.mil/xapi/activity-type/ground-training-assessment"
+              ))
+          '
+          profile: "assessment.completed"
 
 default_values:
   - description: "Default xAPI version"

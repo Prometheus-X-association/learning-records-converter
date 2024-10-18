@@ -132,69 +132,90 @@ def set_value_from_flat_key(
     Returns:
         Union[dict, list]: The original dict or list, modified if not overwrite.
     """
-    list_key = re.split(r"(?<!\\)\.", flat_key)
-
-    # If there is at least one key to navigate
-    if not is_empty(flat_key) and len(list_key) > 0:
-        first_key = list_key.pop(0)
-        first_key = first_key.replace(r"\.", ".")
-
-        # If not overwrite but found element is not list, dict or None, return
-        if (
-            not overwrite
-            and not isinstance(dict_list_element, list | dict)
-            and not is_empty(dict_list_element)  # before : None
-        ):
-            # Return current value
-            return dict_list_element
-
-        # Numeric keys (list)
-        if first_key.isnumeric():
-            index = int(first_key)
-            # If not list, create one
-            if not isinstance(dict_list_element, list):
-                dict_list_element = []
-            # If all indexes not there, create them
-            if len(dict_list_element) - 1 < index:
-                dict_list_element.extend([None] * (index + 1 - len(dict_list_element)))
-
-            try:
-                dict_list_element[index] = set_value_from_flat_key(
-                    dict_list_element[index],
-                    ".".join(list_key),
-                    value,
-                    overwrite=overwrite,
-                )
-            except IndexError:
-                pass
-
-        # Other keys (dict)
-        else:
-            # If not dict, create one
-            if not isinstance(dict_list_element, dict):
-                dict_list_element = {}
-            temp_dict_value = dict_list_element.get(first_key, {})
-
-            dict_list_element[first_key] = set_value_from_flat_key(
-                temp_dict_value,
-                ".".join(list_key),
-                value,
-                overwrite=overwrite,
-            )
-
-    # If no keys left (stop condition)
-    elif is_empty(flat_key):
-        if not overwrite and not is_empty(dict_list_element):
-            # Return current value
-            return dict_list_element
-        # Return new value
-        return value
+    # Split the flat_key, but keep keys with brackets intact
+    keys = re.split(r"\.(?![^\[]*\])", flat_key)
 
     # Error during split
-    else:
+    if not keys:
         raise ValueError(
             "> Empty split not possible, something went wrong while setting dot dict",
         )
+
+    # If flat_key is empty, return the value or the original dict_list_element based on overwrite
+    if is_empty(flat_key):
+        return value if overwrite else dict_list_element
+
+    # Handle the case where dict_list_element is empty and overwrite is False
+    if not dict_list_element and not overwrite:
+        return dict_list_element
+
+    current = dict_list_element
+    for i, full_key in enumerate(keys):
+        # Handle keys with brackets (e.g., for extensions)
+        match = re.match(r"(.+?)\[(.+)\]", full_key)
+        if match:
+            key, subkey = match.group(1), match.group(2).strip("'\"")
+        else:
+            key, subkey = full_key.replace(r"\.", "."), None
+
+        try:
+            # Handle numeric keys for list indexing
+            if key.isnumeric():
+                key = int(key)
+                if not isinstance(current, list):
+                    current = []
+                    if i == 0:
+                        dict_list_element = current
+                # Extend the list if the index is out of range
+                while len(current) <= key:
+                    current.append(None)
+
+            if i == len(keys) - 1:
+                # We've reached the final key
+                if subkey:
+                    # Handle extension-like keys
+                    if not isinstance(current, dict):
+                        current = {}
+                        if i == 0:
+                            dict_list_element = current
+                    current.setdefault(key, {})
+                    if (
+                        overwrite
+                        or subkey not in current[key]
+                        or is_empty(current[key][subkey])
+                    ):
+                        current[key][subkey] = value
+                elif overwrite or key not in current or is_empty(current[key]):
+                    current[key] = value
+            elif subkey:
+                # Handle extension-like keys
+                if not isinstance(current, dict):
+                    current = {}
+                    if i == 0:
+                        dict_list_element = current
+                current.setdefault(key, {}).setdefault(subkey, {})
+                current = current[key][subkey]
+            else:
+                # Determine if the next key is numeric (for list creation)
+                next_key_is_numeric = (
+                    keys[i + 1].isnumeric() if i + 1 < len(keys) else False
+                )
+                if isinstance(current, list):
+                    if current[key] is None:
+                        current[key] = [] if next_key_is_numeric else {}
+                else:
+                    if not isinstance(current, dict):
+                        current = {}
+                        if i == 0:
+                            dict_list_element = current
+                    if key not in current or not isinstance(
+                        current[key],
+                        (dict, list),
+                    ):
+                        current[key] = [] if next_key_is_numeric else {}
+                current = current[key]
+        except IndexError as ie:
+            print("IndexError :", ie)
 
     # Final return to get full dict or list
     return dict_list_element
@@ -269,18 +290,35 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> None:
 
     Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``dct``.
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``target_dict``.
 
     :param target_dict: dict onto which the merge is executed
     :param merge_dct: dct merged into dct
     :return: None.
     """
-    for k in merge_dct:
-        if (
-            k in target_dict
-            and isinstance(target_dict[k], dict)
-            and isinstance(merge_dct[k], dict)
-        ):
-            deep_merge(target_dict[k], merge_dct[k])
+    for key, value in merge_dct.items():
+        target_value = target_dict.get(key)
+
+        # If both target and merge values are dictionaries, merge recursively
+        if isinstance(target_value, dict) and isinstance(value, dict):
+            deep_merge(target_value, value)
+        # If both are sets, perform union
+        elif isinstance(target_value, set) and isinstance(value, set):
+            target_value.update(value)
+        # If target is a list and merge value is a list, extend it
+        elif isinstance(target_value, list) and isinstance(value, list):
+            target_value.extend(value)
+        # If target is a list and merge value is not a list, append to the list
+        elif isinstance(target_value, list):
+            target_value.append(value)
+        # If target is a dictionary but merge value is a list, wrap target in a list
+        elif isinstance(target_value, dict) and isinstance(value, list):
+            target_dict[key] = [target_value, *value]
+        # Handle cases where one value is None: keep the non-None value
+        elif target_value is None:
+            target_dict[key] = value
+        elif value is None:
+            continue  # Keep the target value unchanged if the merge value is None
+        # In all other cases, replace the target value with the merge value
         else:
-            target_dict[k] = merge_dct[k]
+            target_dict[key] = value

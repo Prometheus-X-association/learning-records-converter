@@ -6,8 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.infrastructure.config.envconfig import EnvConfig
 from app.infrastructure.logging.jsonlogger import JsonLogger
+from app.infrastructure.logging.types import LogLevel
 
-from .exception_handlers import configure_exception_handlers
+from .exception_handlers import ExceptionHandler
 from .routers.traces import router as traces_router
 
 config = EnvConfig()
@@ -22,7 +23,13 @@ async def lifespan(app: FastAPI) -> dict[str, Any]:
     :yield: A dictionary containing logger and config objects
     """
     logger = JsonLogger(name=__name__, level=config.get_log_level())
-    logger.info("Application starting")
+    logger.info(
+        "Application starting",
+        {
+            "app_log_level": config.get_log_level().name,
+            "app_env": config.get_environment().name,
+        },
+    )
 
     yield {"logger": logger, "config": config}
 
@@ -32,11 +39,12 @@ async def lifespan(app: FastAPI) -> dict[str, Any]:
 app = FastAPI(
     title="LRC API",
     version="0.0.1",
-    debug=config.get_log_level() == "DEBUG",
+    debug=config.get_log_level() == LogLevel.DEBUG and not config.is_env_production(),
     lifespan=lifespan,
 )
 
-configure_exception_handlers(app)
+exception_handler = ExceptionHandler()
+exception_handler.configure(app)
 
 app.include_router(router=traces_router)
 

@@ -11,6 +11,7 @@ from models.trace_formats import (
     CustomDataModel,
     IMSCaliperSensorModel1_1,
     IMSCaliperSensorModel1_2,
+    MatomoDataModel,
     SCORM2004DataModel,
 )
 
@@ -25,6 +26,7 @@ class TraceFormatModelEnum(TraceFormatEnum):
     CUSTOM = CustomDataModel
     IMSCALIPER1_1 = IMSCaliperSensorModel1_1
     IMSCALIPER1_2 = IMSCaliperSensorModel1_2
+    MATOMO = MatomoDataModel
     SCORM_2004 = SCORM2004DataModel
     XAPI = BaseXapiStatement
 
@@ -34,6 +36,7 @@ class TraceFormatToXapiMappingEnum(TraceFormatEnum):
 
     IMSCALIPER1_1 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
     IMSCALIPER1_2 = "data/mappers/mapping_imscaliper_1_1_to_xapi.yml"
+    MATOMO = "data/mappers/mapping_matomo_to_xapi.yml"
     SCORM_2004 = "data/mappers/mapping_scorm2004_to_xapi.yml"
     XAPI = "data/mappers/mapping_xapi_to_xapi.yml"
 

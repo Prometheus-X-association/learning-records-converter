@@ -1,0 +1,165 @@
+version: 1.0
+input_format: "Matomo"
+output_format: "xAPI"
+mappings:
+
+  # Timestamp
+  - input_fields:
+      - "actionDetails.timestamp"
+    output_fields:
+      output_field: "timestamp"
+      custom:
+        - "lambda timestamp: parse_date(timestamp)"
+
+  # Actor
+  - input_fields:
+      - "visitorId"
+    output_fields:
+      output_field: "actor.account.name"
+
+  - input_fields:
+      - "siteName"
+    output_fields:
+      output_field: "actor.account.homePage"
+      custom:
+        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+
+  # Object
+  - input_fields:
+      - "actionDetails.url"
+    output_fields:
+      output_field: "object.id"
+      custom:
+        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+
+  - input_fields:
+      - "actionDetails.title"
+    output_fields:
+      output_field: "object.definition.name.en-US"
+
+  # Result
+  - input_fields:
+      - "actionDetails.timeSpent"
+    output_fields:
+      output_field: "result.duration"
+      custom:
+        - "lambda time_spent: f'PT{time_spent}S'"
+
+  - input_fields:
+      - "actionDetails.pageviewPosition"
+    output_fields:
+      output_field: "result.score.raw"
+
+  - input_fields:
+      - "interactions"
+    output_fields:
+      output_field: "result.score.max"
+
+  # Context language
+  - input_fields:
+      - "languageCode"
+    output_fields:
+      output_field: "context.language"
+
+  # Context browser
+  - input_fields:
+      - "browserName"
+      - "browserVersion"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/browser-info]"
+      custom:
+        - "lambda browser_name, browser_version: {'name': browser_name, 'version': browser_version}"
+
+  # Context geolocation
+  - input_fields:
+      - "continent"
+      - "continentCode"
+      - "country"
+      - "countryCode"
+      - "region"
+      - "regionCode"
+      - "city"
+      - "latitude"
+      - "longitude"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/geojson]"
+      custom:
+        - "lambda continent, continent_code, country, country_code, region, region_code, city, lat, lon: {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [float(lon), float(lat)]}, 'properties': {'continent': continent, 'continentCode': continent_code, 'country': country, 'countryCode': country_code, 'region': region, 'regionCode': region_code, 'city': city}}"
+
+  - input_fields:
+      - "latitude"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/latitude]"
+
+  - input_fields:
+      - "longitude"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/longitude]"
+
+  - input_fields:
+      - "location"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/location]"
+
+  # Context IP address
+  - input_fields:
+      - "visitIp"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/ip-address]"
+
+  # Context tags
+  - input_fields:
+      - "referrerKeyword"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/tags]"
+
+  # Context referrer
+  - input_fields:
+      - "referrerUrl"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/referrer]"
+      custom:
+        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+
+  # Context IRL
+  - input_fields:
+      - "actionDetails.url"
+    output_fields:
+      output_field: "context.extensions[http://id.tincanapi.com/extension/irl]"
+      custom:
+        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+
+  # DASES Profiles
+  - input_fields:
+      - "actionDetails.type"
+    output_fields:
+      switch:
+        - condition: "lambda type: type in ['action']"
+          profile: "lms.accessed-page"
+
+default_values:
+  - output_field: "actor.objectType"
+    value: "Agent"
+  - output_field: "verb"
+    value: {
+      "id": "http://id.tincanapi.com/verb/viewed",
+      "display": {
+        "en-US": "viewed"
+      }
+    }
+  - output_field: "object"
+    value: {
+      "objectType": "Activity",
+      "definition": {
+        "type": "http://activitystrea.ms/schema/1.0/page"
+      }
+    }
+  - description: "Default xAPI version"
+    output_field: "version"
+    value: "1.0.0"
+
+metadata:
+  author: "Inokufu"
+  date:
+    publication: "2024-09-25"
+    update: "2024-09-25"

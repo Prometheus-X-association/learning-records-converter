@@ -134,8 +134,6 @@ dmypy.json
 package-lock.json
 __pycache__
 .pytest_cache
-.env
-.venv
 *.egg-info
 cdk.out
 node_modules

@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
 
+from app.infrastructure.logging.types import LogLevel
 from app.profile_enricher.exceptions import BasePathError
 
 from .contract import ConfigContract
+from .types import Environment
 
 
 class EnvConfig(ConfigContract):
@@ -13,9 +15,21 @@ class EnvConfig(ConfigContract):
         """Initialize the EnvConfig."""
         self.env = os.environ
 
-    def get_log_level(self) -> str:
+    def get_log_level(self) -> LogLevel:
         """Inherited from ConfigContract.get_log_level."""
-        return self._get("LOG_LEVEL", "INFO").upper()
+        log_level = self._get("LOG_LEVEL", LogLevel.INFO.name).upper()
+        try:
+            return LogLevel[log_level]
+        except KeyError:
+            return LogLevel.INFO
+
+    def get_environment(self) -> Environment:
+        """Inherited from ConfigContract.get_environment."""
+        env = self._get("ENVIRONMENT", Environment.PRODUCTION.name).upper()
+        try:
+            return Environment[env]
+        except KeyError:
+            return Environment.PRODUCTION
 
     def get_download_timeout(self) -> int:
         """Inherited from ConfigContract.get_download_timeout."""

@@ -2,7 +2,7 @@ from dateparser import parse
 
 
 def parse_date(
-    date_string: str,
+    date: str | int,
     date_format: str | None = None,
     user_locale: str | None = None,
 ) -> str | None:
@@ -13,7 +13,7 @@ def parse_date(
     and convert them to ISO 8601 format in UTC. It supports custom date formats
     and locales for more accurate parsing.
 
-    :param date_string: The date string to be parsed
+    :param date: The date to be parsed
     :param date_format: Optional custom date format to use for parsing
     :param user_locale: Optional locale to use for parsing (e.g., 'fr' for French)
     :return: The parsed date in ISO 8601 format, or None if parsing fails
@@ -23,8 +23,8 @@ def parse_date(
         locales = [user_locale] if user_locale else None
         date_formats = [date_format] if date_format else None
 
-        date = parse(
-            date_string=date_string,
+        parsed_date = parse(
+            date_string=str(date),
             locales=locales,
             date_formats=date_formats,
             settings={
@@ -35,6 +35,6 @@ def parse_date(
                 "PREFER_DATES_FROM": "past",
             },
         )
-        return date.isoformat() if date is not None else date_string
+        return parsed_date.isoformat() if parsed_date is not None else parsed_date
     except (ValueError, TypeError):
-        return date_string
+        return date
