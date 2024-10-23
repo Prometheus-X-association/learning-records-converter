@@ -377,7 +377,8 @@ class Pattern(ProfileElement):
     def validate_alternates(value: list[AnyUrl] | None) -> list[AnyUrl] | None:
         """Validator to ensure that 'alternates' does not directly contain 'optional' or 'zeroOrMore'."""
         if value is not None and any(
-            x.endsWith("/optional") or x.endsWith("/zeroOrMore") for x in value
+            str(x).endswith("/optional") or str(x).endswith("/zeroOrMore")
+            for x in value
         ):
             raise ValueError(
                 "MUST NOT put optional or zeroOrMore directly inside alternates",

@@ -198,14 +198,9 @@ class ProfileLoader:
         except ValidationError as e:
             self.logger.exception("Profile validation failed", e)
             raise ProfileValidationError("Profile validation failed") from e
-        except TypeError as e:
+        except (TypeError, ValueError, KeyError) as e:
             self.logger.exception("Invalid data type in profile", e)
             raise ProfileValidationError("Invalid data type in profile") from e
-        except Exception as e:
-            self.logger.exception("Unexpected error during profile validation", e)
-            raise ProfileValidationError(
-                "Unexpected error during profile validation",
-            ) from e
 
     @staticmethod
     def _get_template_in_profile(
