@@ -53,5 +53,5 @@ class MappingRepository(ABC):
             return MappingSchema(**config)
         except ValidationError as e:
             raise MappingConfigToModelError("Mapping validation failed") from e
-        except (TypeError, ValueError, KeyError) as e:
+        except (TypeError, ValueError) as e:
             raise MappingConfigToModelError("Invalid data type in mapping") from e
