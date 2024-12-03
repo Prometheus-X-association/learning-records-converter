@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.common.exceptions import InvalidTraceError, TraceError, UnknownFormatError
+from app.infrastructure.logging.types import LogLevel
 from app.mapper.exceptions import (
     CodeEvaluationError,
     MapperError,
@@ -113,10 +114,10 @@ class ExceptionHandler:
         request.state.logger.warning("Unhandled exception", type(exc).__name__)
 
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=self.get_error_detail(
                 exc=exc,
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 request=request,
             ),
         )
@@ -137,14 +138,6 @@ class ExceptionHandler:
         :param request: The request that caused the exception
         :return: A dictionary containing the error detail
         """
-        request.state.logger.exception(
-            "HTTP Error",
-            exc,
-            {
-                "status_code": status_code,
-            },
-        )
-
         if (
             request.state.config.is_env_production()
             and status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -154,4 +147,16 @@ class ExceptionHandler:
         details = {"detail": str(exc)}
         if exc.__cause__ is not None:
             details["cause"] = str(exc.__cause__)
+
+        request.state.logger.exception(
+            "HTTP Error",
+            exc,
+            {
+                "status_code": status_code,
+                "details": details
+                if request.state.config.get_log_level() == LogLevel.DEBUG
+                else None,
+            },
+        )
+
         return details
