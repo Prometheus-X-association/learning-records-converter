@@ -52,7 +52,7 @@ class TraceEnricher:
                 {
                     "id": f"{CONTEXT_ACTIVITIES_CATEGORY_ID}/{group_name}",
                     "definition": {
-                        "type": {CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE},
+                        "type": CONTEXT_ACTIVITIES_CATEGORY_DEFINITION_TYPE,
                     },
                 },
             ],
