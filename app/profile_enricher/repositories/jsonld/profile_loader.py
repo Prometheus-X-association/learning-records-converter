@@ -198,7 +198,7 @@ class ProfileLoader:
         except ValidationError as e:
             self.logger.exception("Profile validation failed", e)
             raise ProfileValidationError("Profile validation failed") from e
-        except (TypeError, ValueError, KeyError) as e:
+        except (TypeError, ValueError) as e:
             self.logger.exception("Invalid data type in profile", e)
             raise ProfileValidationError("Invalid data type in profile") from e
 

@@ -1,6 +1,5 @@
 from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
-from pydantic import BaseModel, ValidationError, model_validator
-from pydantic.v1 import ValidationError as V1ValidationError
+from pydantic import BaseModel, model_validator
 
 from app.common.common_types import JsonType
 from app.common.exceptions import InvalidTraceError, UnknownFormatError
@@ -33,16 +32,13 @@ class Trace(BaseModel):
         input_format = values.get("format")
 
         if not input_data:
-            raise InvalidTraceError("Input trace data is required")
+            raise InvalidTraceError("Trace data is required")
 
         if input_format:
-            if not cls.validate_format(
+            cls.validate_format(
                 trace_data=input_data,
                 trace_format=input_format,
-            ):
-                raise InvalidTraceError(
-                    f"Invalid trace for specified format: {input_format}",
-                )
+            )
         else:
             detected_format = cls.detect_format(input_data)
             if detected_format:
@@ -63,12 +59,15 @@ class Trace(BaseModel):
         :param trace_data: The input trace data to validate
         :param trace_format: The format to validate against
 
-        :return: True if the data is valid for the specified format, False otherwise
+        :return: True if the data is valid for the specified format
+        :raises InvalidTraceError: If the trace format is incorrect
         """
         try:
             CustomTraceFormatModelEnum[trace_format.name].value(**trace_data)
-        except (ValidationError, V1ValidationError):
-            return False
+        except (ValueError, TypeError) as e:
+            raise InvalidTraceError(
+                f"Invalid trace for specified format: {trace_format.name}",
+            ) from e
         return True
 
     @classmethod
@@ -85,6 +84,9 @@ class Trace(BaseModel):
         for trace_format in CustomTraceFormatStrEnum:
             if trace_format == CustomTraceFormatStrEnum.CUSTOM:
                 continue
-            if cls.validate_format(trace_data=data, trace_format=trace_format):
-                return trace_format
+            try:
+                if cls.validate_format(trace_data=data, trace_format=trace_format):
+                    return trace_format
+            except InvalidTraceError:
+                continue
         return None

@@ -84,7 +84,7 @@ mappings:
     output_fields:
       output_field: "context.extensions[http://id.tincanapi.com/extension/geojson]"
       custom:
-        - "lambda continent, continent_code, country, country_code, region, region_code, city, lat, lon: {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [float(lon), float(lat)]}, 'properties': {'continent': continent, 'continentCode': continent_code, 'country': country, 'countryCode': country_code, 'region': region, 'regionCode': region_code, 'city': city}}"
+        - "lambda continent, continent_code, country, country_code, region, region_code, city, lat, lon: {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [float(lon) if lon else None, float(lat) if lat else None]}, 'properties': {'continent': continent, 'continentCode': continent_code, 'country': country, 'countryCode': country_code, 'region': region, 'regionCode': region_code, 'city': city}}"
 
   - input_fields:
       - "latitude"

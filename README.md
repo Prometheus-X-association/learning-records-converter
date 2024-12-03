@@ -172,14 +172,56 @@ Response format:
   "meta": {
     "input_format": "<input_format>",
     "output_format": "<output_format>",
-    "profile": "<DASES profile found>"
+    "profile": "<DASES profile found>" // Optional, present when a DASES profile is detected
   }
 }
 ```
 
+The meta object contains essential information about the conversion process.
+
+#### Custom Mapping
+
+The `/convert_custom` endpoint allows for flexible conversion of custom data formats using mapping files:
+
+```http
+POST /convert_custom
+Content-Type: multipart/form-data
+
+data_file: <your_data_file>
+mapping_file: <your_mapping_file>
+config: { // Optional
+  "encoding": "utf-8",
+  "delimiter": ",",
+  "quotechar": "\"",
+  "escapechar": "\\",
+  "doublequote": true,
+  "skipinitialspace": true,
+  "lineterminator": "\r\n",
+  "quoting": "QUOTE_MINIMAL"
+}
+output_format: "xAPI" (default)
+```
+
+The endpoint supports:
+
+- CSV files with custom parsing configurations
+- Automatically detects delimiters and structure if not provided
+- Custom mapping files for data transformation
+- Normalizes input data for consistent JSON output
+- Built-in date format conversion to xAPI requirements
+- Streaming response for large datasets
+
+Example mapping file structure:
+
 #### Validating Traces
 
-This endpoint validates the input trace and returns the confirmed input format. If the validation fails, an appropriate error response will be returned instead.
+The endpoint will:
+- Validate the trace structure and content
+- Attempt to detect the format if not provided
+- Verify against the specified format if provided
+- Return validation errors if the trace is invalid, against Pydantic models
+- Return the confirmed input format.
+
 Send a POST request to the `/validate` endpoint:
 
 ```
@@ -190,7 +232,7 @@ Content-Type: application/json
   "input_trace": {
     // Your input trace data here
   },
-  "input_format": "<input_format>"
+  "input_format": "<input_format>" // Optional
 }
 ```
 
@@ -198,7 +240,7 @@ Response format:
 
 ```json
 {
-  "input_format": "<input_format>"
+  "input_format": "<detected_or_confirmed_format>"
 }
 ```
 
@@ -216,7 +258,11 @@ These interfaces provide detailed information about all available endpoints, req
 
 #### Code Formatting and Linting
 
-The project uses Black for code formatting, Flake8 for linting, and isort for import sorting. You can run these tools using their respective commands in the pipenv environment.
+The project uses Ruff for linting and formatting. Ruff is configured in `pyproject.toml` with strict settings:
+- All rules enabled by default
+- Python 3.12 target version
+- 88 character line length
+- Custom rule configurations for specific project needs
 
 #### Mapping
 
@@ -232,6 +278,7 @@ The following table details the environment variables used in the project:
 
 | Variable | Description | Required | Default Value | Possible Values |
 |----------|-------------|----------|---------------|-----------------|
+| ENVIRONMENT | Affects error handling and logging throughout the application | No | development | development, production |
 | LOG_LEVEL | Minimum logging level for the application | No | info | debug, info, warning, error, critical |
 | DOWNLOAD_TIMEOUT | Timeout for downloading profiles (in seconds) | No | 10 | Any positive integer |
 | CORS_ALLOWED_ORIGINS | Allowed origins for CORS | No | * | Comma-separated list of origins or * for all |
@@ -245,6 +292,21 @@ Note: The URLs for the profiles are examples and may change. Always use the most
 
 Refer to `.env.default` for a complete list of configurable environment variables and their default values.
 
+### Errors
+
+The API uses standard HTTP status codes:
+
+| Status Code | Description | Possible Causes |
+|-------------|-------------|-----------------|
+| 400 | Bad Request | Invalid input format, malformed JSON |
+| 404 | Not Found | Invalid endpoint, resource doesn't exist (profile file) |
+| 422 | Validation Error | Format validation failed |
+| 500 | Internal Server Error | Server-side processing error |
+
+**Notes:**
+- Error responses include a `detail` field with human-readable message
+- Development mode includes additional debug information
+- Production mode omits sensitive error details
 
 ## Contribution guidelines
 
