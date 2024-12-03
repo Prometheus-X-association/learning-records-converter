@@ -113,10 +113,10 @@ class ExceptionHandler:
         request.state.logger.warning("Unhandled exception", type(exc).__name__)
 
         return JSONResponse(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=self.get_error_detail(
                 exc=exc,
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 request=request,
             ),
         )
