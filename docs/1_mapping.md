@@ -162,6 +162,51 @@ metadata:
     update: "2023-02-01"
 ```
 
+### Available Functions in Lambdas
+When writing custom transformations in your mapping files, several utility functions are available for use in your lambda expressions:
+
+**Date and Time Functions**
+
+```python
+parse_date(date: str | int, date_format: str | None = None, user_locale: str | None = None) -> str | None
+```
+- Converts various date formats to ISO 8601 format
+- Supports custom date formats and locales
+- Handles timestamps, string dates, and common formats
+
+**URL and Path Functions**
+
+```python
+urlparse(url: str) -> ParseResult
+```
+- Parses URLs into components
+- Access scheme, netloc, path, params, query, and fragment
+ 
+```python
+path_join(*paths: str) -> str
+```
+- Joins URL or file system paths
+- Handles leading/trailing slashes correctly
+
+**String Functions**
+```python
+search(pattern, string)
+```
+Search for pattern in string
+
+```python
+match(pattern, string)
+```
+Match pattern at start of string
+
+**Data Validation**
+
+```python
+is_empty(x: Any) -> bool
+```
+Checks if a value is empty (None, empty string, empty list/dict, etc.).
+
+
 ## How to create my own YAML file? <a name="create-own-yaml"></a>
 
 Please refer to the [YAML File](#yaml-file) section to create your own config file. The example (in the `example` folder) can also help with understanding and creating a new YAML file. Once this file is created, here are the steps to follow:
