@@ -1,4 +1,5 @@
 """Base xAPI model configuration."""
+
 from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, StringConstraints
