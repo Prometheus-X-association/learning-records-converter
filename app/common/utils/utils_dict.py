@@ -210,12 +210,12 @@ def set_value_from_flat_key(
                             dict_list_element = current
                     if key not in current or not isinstance(
                         current[key],
-                        (dict, list),
+                        dict | list,
                     ):
                         current[key] = [] if next_key_is_numeric else {}
                 current = current[key]
-        except IndexError as ie:
-            print("IndexError :", ie)
+        except IndexError:
+            pass
 
     # Final return to get full dict or list
     return dict_list_element
