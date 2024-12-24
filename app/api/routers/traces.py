@@ -1,4 +1,5 @@
 from json import dumps
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Request, UploadFile
 from fastapi.responses import StreamingResponse
@@ -25,7 +26,6 @@ router = APIRouter()
 
 @router.post(
     "/validate",
-    response_model=ValidateInputTraceResponseModel,
     tags=["Trace validation"],
     description="Validate an input trace. If a trace format is provided, it will check only that format. Otherwise, it will attempt to detect the format.",
     status_code=200,
@@ -64,7 +64,6 @@ async def validate_input_trace(
 
 @router.post(
     "/convert",
-    response_model=TransformInputTraceResponseModel,
     tags=["Trace transformation"],
     description="Transform an input trace into a specific output trace.",
     status_code=200,
@@ -72,8 +71,8 @@ async def validate_input_trace(
 async def transform_input_trace(
     request: Request,
     query: TransformInputTraceRequestModel,
-    mapper: Mapper = Depends(get_mapper),
-    profiler: Profiler = Depends(get_profiler),
+    mapper: Annotated[Mapper, Depends(get_mapper)],
+    profiler: Annotated[Profiler, Depends(get_profiler)],
 ) -> TransformInputTraceResponseModel:
     """
     Transform and enrich a trace from one format to another.
