@@ -329,10 +329,10 @@ Please note this project is work in progress.
 * [x] Quantitative inventory of the main software learning outcomes standards and tools used in the field of education and training in France and in Europe from the list identified in the working groups of the Data space Education & Skills (i.e. SCORM, xAPI, cmi5, IMS Caliper)
 * [x] Definition of the architecture of the API endpoints in accordance with the technical recommendations of GAIA-X
 * [x] Development of the endpoints necessary for parsing the various priority standards identified above
-* [ ] API testing with model datasets provided by Prometheus volunteer partners
-* [ ] Deployment of the service in a managed version in one of the partner cloud providers
-* [ ] Development of automated service deployment scripts for multi-cloud use (infrastructure as code e.g. Terraform) at partner cloud providers
-* [ ] Drafting of the final public documentation
+* [x] API testing with model datasets provided by Prometheus volunteer partners
+* [x] Deployment of the service in a managed version in one of the partner cloud providers
+* [x] Development of automated service deployment scripts for multi-cloud use (infrastructure as code e.g. Terraform) at partner cloud providers
+* [x] Drafting of the final public documentation
 
 
 ## Interoperability of Learning Records: State-of-the-Art in 2023
