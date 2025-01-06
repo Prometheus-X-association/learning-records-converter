@@ -90,7 +90,50 @@ The LRC currently supports theses main profiles :
 
 ## Setup and installation
 
-### Getting Started
+You can run the application either directly with **pipenv** or using **Docker**.
+
+**But first, clone the repository**:
+ ```
+ git clone [repository_url]
+ cd [project_directory]
+ ```
+
+Then, set up environment variables: create a `.env` file in the project root by **copying** `.env.default`:
+ ```
+ cp .env.default .env
+ ```
+ You can then modify the variables in `.env` as needed.
+
+### With Docker
+
+The application is containerized using Docker, with a robust and flexible deployment strategy that leverages:
+- Docker for containerization with a multi-environment support (dev and prod) using Docker Compose profiles
+- Traefik as a reverse proxy and load balancer, with built-in SSL/TLS support via Let's Encrypt, and a dashboard in dev environment.
+- Gunicorn as the production-grade WSGI HTTP server, with configurable worker processes and threads, and dynamic scaling based on system resources.
+
+#### Prerequisites
+
+- Docker and Docker Compose installed on your machine.
+
+#### Development Environment
+
+Build and run the development environment:
+```
+docker-compose --profile dev up --build
+```
+
+The API will be available at : `http://lrc.localhost`
+
+Traefik Dashboard will be available at : `http://traefik.lrc.localhost:8080`
+
+#### Production Environment
+
+Configure production-specific settings, then build and run the production environment:
+```
+docker-compose --profile prod up --build
+```
+
+### With pipenv
 
 #### Prerequisites
 
@@ -98,37 +141,21 @@ The LRC currently supports theses main profiles :
 
 #### Installation
 
-1. Clone the repository:
-   ```
-   git clone [repository_url]
-   cd [project_directory]
-   ```
-
-2. Install pipenv if you haven't already:
+1. Install pipenv if you haven't already:
    ```
    pip install pipenv
    ```
 
-3. Install the project dependencies:
+2. Install the project dependencies:
    ```
    pipenv install
    ```
+3. Start the FastAPI server using the script defined in Pipfile:
+  ```
+  pipenv run start
+  ```
 
-4. Set up environment variables:
-   Create a `.env` file in the project root by copying `.env.default`:
-   ```
-   cp .env.default .env
-   ```
-   You can then modify the variables in `.env` as needed.
-
-### Usage
-
-#### Running the Application
-
-Start the FastAPI server using the script defined in Pipfile:
-```
-pipenv run start
-```
+### Running the Application
 
 The API will be available at `http://localhost:8000`.
 
@@ -153,6 +180,7 @@ Supported input formats:
 - imscaliper1_2
 - imscaliper1_1
 - scorm_2004
+- matomo
 
 Response format:
 
@@ -278,15 +306,30 @@ The following table details the environment variables used in the project:
 
 | Variable | Description | Required | Default Value | Possible Values |
 |----------|-------------|----------|---------------|-----------------|
-| ENVIRONMENT | Affects error handling and logging throughout the application | No | development | development, production |
-| LOG_LEVEL | Minimum logging level for the application | No | info | debug, info, warning, error, critical |
-| DOWNLOAD_TIMEOUT | Timeout for downloading profiles (in seconds) | No | 10 | Any positive integer |
-| CORS_ALLOWED_ORIGINS | Allowed origins for CORS | No | * | Comma-separated list of origins or * for all |
-| PROFILES_BASE_PATH | Base path for storing profile files | Yes | data/dases_profiles | Any valid directory path |
-| PROFILES_NAMES | Names of the profiles to be used | Yes | lms,forum,assessment | Comma-separated list of profile names |
-| PROFILE_LMS_URL | URL for the LMS profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-lms/master/profile/profile.jsonld | Any valid URL |
-| PROFILE_FORUM_URL | URL for the Forum profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-forum/master/profile/base.jsonld | Any valid URL |
-| PROFILE_ASSESSMENT_URL | URL for the Assessment profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-assessment/add-mandatory-statements/profile/profile.jsonld | Any valid URL |
+| **Environment Configuration** | | | | |
+| `ENVIRONMENT` | Application environment mode | No | `development` | `development`, `production` |
+| `LOG_LEVEL` | Minimum logging level | No | `info` | `debug`, `info`, `warning`, `error`, `critical` |
+| `DOWNLOAD_TIMEOUT` | Timeout for downloading profiles | No | `10` | Positive integer |
+| `CORS_ALLOWED_ORIGINS` | Allowed CORS origins | No | `*` | Comma-separated origins |
+| **Internal Application Configuration** | | | | |
+| `APP_INTERNAL_HOST` | Host for internal application binding | No | `0.0.0.0` | Valid host/IP |
+| `APP_INTERNAL_PORT` | Port for internal application binding | No | `8000` | Any valid port |
+| **External Routing Configuration** | | | | |
+| `APP_EXTERNAL_HOST` | External hostname for the application | Yes | `lrc.localhost` | Valid hostname |
+| `APP_EXTERNAL_PORT` | External port for routing (dev env only) | No | `80` | Any valid port |
+| **Traefik Configuration** | | | | |
+| `TRAEFIK_RELEASE` | Traefik image version | No | `v3.2.3` | Valid Traefik version |
+| `TRAEFIK_ADMIN_PORT` | Port for Traefik admin dashboard (dev env only) | No | `8080` | Any valid port |
+| `LETS_ENCRYPT_EMAIL` | Email for Let's Encrypt certificate | Yes | `test@example.com` | Valid email |
+| **Profile Configuration** | | | | |
+| `PROFILES_BASE_PATH` | Base path for storing profile files | Yes | `data/dases_profiles` | Valid directory path |
+| `PROFILES_NAMES` | Names of profiles to use | Yes | `lms,forum,assessment` | Comma-separated profile names |
+| `PROFILE_LMS_URL` | URL for LMS profile JSON-LD | Yes | GitHub LMS profile URL | Valid URL |
+| `PROFILE_FORUM_URL` | URL for Forum profile JSON-LD | Yes | GitHub Forum profile URL | Valid URL |
+| `PROFILE_ASSESSMENT_URL` | URL for Assessment profile JSON-LD | Yes | GitHub Assessment profile URL | Valid URL |
+| **Performance Configuration** | | | | |
+| `WORKERS_COUNT` | Number of worker processes | No | `4` | Positive integer |
+| `THREADS_PER_WORKER` | Number of threads per worker | No | `2` | Positive integer |
 
 Note: The URLs for the profiles are examples and may change. Always use the most up-to-date URLs for your project.
 
@@ -348,4 +391,4 @@ This study is available [here](https://github.com/Prometheus-X-association/learn
 
 <https://prometheus-x.org/>
 
-<https://dataspace.prometheus-x.org/building-blocks/interoperability/learning-records>
+<https://dataspace.prometheus-x.org/building-blocks/interoperability/learning-records>**
