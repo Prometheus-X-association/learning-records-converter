@@ -9,5 +9,35 @@ services:
       - .:/app
       - ./data:/app/data
     ports:
-      - "8000:8000"
+      - "${APP_INTERNAL_PORT:-8000}:${APP_INTERNAL_PORT:-8000}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lrc.rule=Host(`${APP_EXTERNAL_HOST}`)"
+      - "traefik.http.routers.lrc.entrypoints=web"
+      - "traefik.http.services.lrc.loadbalancer.server.port=${APP_INTERNAL_PORT:-8000}"
     profiles: [ "dev" ]
+
+  traefik-dev:
+    image: traefik:${TRAEFIK_RELEASE:-v3.2.3}
+    command:
+      # App configuration
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:${APP_EXTERNAL_PORT:-80}"
+      - "--log.level=${LOG_LEVEL:-DEBUG}"
+
+      # Admin interface configuration
+      - "--api.dashboard=true"
+      - "--entrypoints.dashboard.address=:${TRAEFIK_ADMIN_PORT:-8080}"
+    labels:
+      # Admin interface configuration
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.${APP_EXTERNAL_HOST}`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=dashboard"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+    ports:
+      - "${APP_EXTERNAL_PORT:-80}:${APP_EXTERNAL_PORT:-80}" # App port
+      - "${TRAEFIK_ADMIN_PORT:-8080}:${TRAEFIK_ADMIN_PORT:-8080}" # Admin interface port
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    profiles: ["dev"]
