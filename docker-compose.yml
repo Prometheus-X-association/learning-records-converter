@@ -4,10 +4,8 @@ services:
       target: dev
     env_file: .env
     volumes:
-      - .:/app
+      - ./app:/app/app
       - ./data:/app/data
-    ports:
-      - "${APP_INTERNAL_PORT:-8000}:${APP_INTERNAL_PORT:-8000}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.lrc.rule=Host(`${APP_EXTERNAL_HOST:-lrc.localhost}`)"
@@ -27,16 +25,13 @@ services:
 
       # Admin interface configuration
       - "--api.dashboard=true"
-      - "--entrypoints.dashboard.address=:${TRAEFIK_ADMIN_PORT:-8080}"
     labels:
       # Admin interface configuration
       - "traefik.enable=true"
       - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.${APP_EXTERNAL_HOST:-lrc.localhost}`)"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=dashboard"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
     ports:
-      - "${APP_EXTERNAL_PORT:-80}:${APP_EXTERNAL_PORT:-80}" # App port
-      - "${TRAEFIK_ADMIN_PORT:-8080}:${TRAEFIK_ADMIN_PORT:-8080}" # Admin interface port
+      - "${APP_EXTERNAL_PORT:-80}:${APP_EXTERNAL_PORT:-80}"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     profiles: [ "dev" ]

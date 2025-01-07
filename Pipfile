@@ -3,6 +3,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+start = "uvicorn app.api.main:app --host ${APP_INTERNAL_HOST} --port ${APP_INTERNAL_PORT} --reload"
+test = "python -m pytest --cov"
+
 [packages]
 fastapi = "==0.105.0"
 pyyaml = "==6.0.2"

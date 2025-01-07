@@ -1,5 +1,45 @@
 # Learning Records Converter (LRC)
 
+<!-- TOC -->
+* [Learning Records Converter (LRC)](#learning-records-converter-lrc)
+  * [Overview](#overview)
+  * [Approach](#approach)
+    * [Phase 1: Learning Records to xAPI](#phase-1-learning-records-to-xapi)
+      * [Input Data Validation](#input-data-validation)
+      * [Data Transformation](#data-transformation)
+    * [Phase 2: xAPI to DASES](#phase-2-xapi-to-dases)
+        * [Enriched Fields](#enriched-fields)
+      * [DASES Profiles in Detail](#dases-profiles-in-detail)
+        * [LMS Profile](#lms-profile)
+        * [Forum Profile](#forum-profile)
+        * [Assessment Profile](#assessment-profile)
+  * [Setup and installation](#setup-and-installation)
+    * [With Docker](#with-docker)
+      * [Prerequisites](#prerequisites)
+      * [Development Environment](#development-environment)
+      * [Quick Start (Without volumes or Traefik)](#quick-start-without-volumes-or-traefik)
+      * [Production Environment](#production-environment)
+    * [With pipenv](#with-pipenv)
+      * [Prerequisites](#prerequisites-1)
+      * [Installation](#installation)
+      * [Running the Application](#running-the-application)
+  * [Endpoints](#endpoints)
+    * [Convert Traces](#convert-traces)
+    * [Custom Mapping](#custom-mapping)
+    * [Validate Traces](#validate-traces)
+  * [Development](#development)
+    * [API Documentation](#api-documentation)
+    * [Code Formatting and Linting](#code-formatting-and-linting)
+    * [Mapping](#mapping)
+    * [Project Architecture](#project-architecture)
+    * [Environment Variables](#environment-variables)
+    * [Errors](#errors)
+  * [Contribution guidelines](#contribution-guidelines)
+  * [Project status](#project-status)
+  * [Interoperability of Learning Records: State-of-the-Art in 2023](#interoperability-of-learning-records-state-of-the-art-in-2023)
+  * [References](#references)
+<!-- TOC -->
+
 ## Overview
 
 Learning Records are available in many formats, either standardized (xAPI, SCORM, IMS Caliper, cmi5) or proprietary (Google Classroom, MS Teams, csv, etc). This wide variety of formats is a barrier to many use cases of learning records as it prevents the easy combination and sharing of learning records datasets from multiple sources or organizations.
@@ -126,6 +166,14 @@ The API will be available at : `http://lrc.localhost`
 
 Traefik Dashboard will be available at : `http://traefik.lrc.localhost:8080`
 
+#### Quick Start (Without volumes or Traefik)
+For a quick test without full stack:
+```
+docker build --target dev-standalone -t lrc-dev-standalone .
+docker run -p 8000:8000 lrc-dev-standalone
+```
+Note: This version won't reflect source code changes in real-time.
+
 #### Production Environment
 
 Configure production-specific settings, then build and run the production environment:
@@ -155,11 +203,12 @@ docker-compose --profile prod up --build
   pipenv run start
   ```
 
-### Running the Application
+#### Running the Application
 
 The API will be available at `http://localhost:8000`.
 
-#### Converting Traces
+## Endpoints
+### Convert Traces
 
 To convert a trace, send a POST request to the `/convert` endpoint:
 
@@ -207,7 +256,7 @@ Response format:
 
 The meta object contains essential information about the conversion process.
 
-#### Custom Mapping
+### Custom Mapping
 
 The `/convert_custom` endpoint allows for flexible conversion of custom data formats using mapping files:
 
@@ -241,7 +290,7 @@ The endpoint supports:
 
 Example mapping file structure:
 
-#### Validating Traces
+### Validate Traces
 
 The endpoint will:
 - Validate the trace structure and content
@@ -272,7 +321,9 @@ Response format:
 }
 ```
 
-#### API Documentation
+## Development
+
+### API Documentation
 
 Once the server is running, you can access the interactive API documentation:
 
@@ -281,10 +332,7 @@ Once the server is running, you can access the interactive API documentation:
 
 These interfaces provide detailed information about all available endpoints, request/response schemas, and allow you to test the API directly from your browser.
 
-
-### Development
-
-#### Code Formatting and Linting
+### Code Formatting and Linting
 
 The project uses Ruff for linting and formatting. Ruff is configured in `pyproject.toml` with strict settings:
 - All rules enabled by default
@@ -292,11 +340,11 @@ The project uses Ruff for linting and formatting. Ruff is configured in `pyproje
 - 88 character line length
 - Custom rule configurations for specific project needs
 
-#### Mapping
+### Mapping
 
 To understand how mapping works or to create your own mapping, a document is available [here](./docs/1_mapping.md).
 
-#### Project Architecture
+### Project Architecture
 
 An explanation of how the project is organised is available [here](./docs/2_project_architecture.md).
 
@@ -319,7 +367,6 @@ The following table details the environment variables used in the project:
 | `APP_EXTERNAL_PORT` | External port for routing (dev env only) | No | `80` | Any valid port |
 | **Traefik Configuration** | | | | |
 | `TRAEFIK_RELEASE` | Traefik image version | No | `v3.2.3` | Valid Traefik version |
-| `TRAEFIK_ADMIN_PORT` | Port for Traefik admin dashboard (dev env only) | No | `8080` | Any valid port |
 | `LETS_ENCRYPT_EMAIL` | Email for Let's Encrypt certificate | Yes | `test@example.com` | Valid email |
 | **Profile Configuration** | | | | |
 | `PROFILES_BASE_PATH` | Base path for storing profile files | Yes | `data/dases_profiles` | Valid directory path |
