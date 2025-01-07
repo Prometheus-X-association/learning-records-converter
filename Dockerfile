@@ -10,7 +10,7 @@ RUN pip install pipenv==2024.4.0
 FROM base AS dev
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --dev
-COPY .env gunicorn.conf.py pyproject.toml ./
+COPY gunicorn.conf.py pyproject.toml ./
 VOLUME ["/app/app", "/app/data"]
 CMD ["pipenv", "run", "gunicorn", "app.api.main:app"]
 
