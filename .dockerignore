@@ -1,0 +1,61 @@
+# Common
+*.md
+.env
+
+# Docker
+docker-compose.yml
+Dockerfile
+.docker
+.dockerignore
+
+# git
+.git
+.gitattributes
+.gitignore
+.gitlint
+
+# IDE
+.idea
+.vscode
+.editorconfig
+
+# System-specific files
+.DS_Store
+**/.DS_Store
+
+# Python
+__pycache__
+*.py[cod]
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.mypy_cache
+.pytest_cache
+.hypothesis
+*$py.class
+*.so
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Project specific files
+LICENSE
+docs/
+tests/
+legacy-code/
+letsencrypt/

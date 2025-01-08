@@ -1,5 +1,45 @@
 # Learning Records Converter (LRC)
 
+<!-- TOC -->
+* [Learning Records Converter (LRC)](#learning-records-converter-lrc)
+  * [Overview](#overview)
+  * [Approach](#approach)
+    * [Phase 1: Learning Records to xAPI](#phase-1-learning-records-to-xapi)
+      * [Input Data Validation](#input-data-validation)
+      * [Data Transformation](#data-transformation)
+    * [Phase 2: xAPI to DASES](#phase-2-xapi-to-dases)
+        * [Enriched Fields](#enriched-fields)
+      * [DASES Profiles in Detail](#dases-profiles-in-detail)
+        * [LMS Profile](#lms-profile)
+        * [Forum Profile](#forum-profile)
+        * [Assessment Profile](#assessment-profile)
+  * [Setup and installation](#setup-and-installation)
+    * [With Docker](#with-docker)
+      * [Prerequisites](#prerequisites)
+      * [Development Environment](#development-environment)
+      * [Quick Start (Without volumes or Traefik)](#quick-start-without-volumes-or-traefik)
+      * [Production Environment](#production-environment)
+    * [With pipenv](#with-pipenv)
+      * [Prerequisites](#prerequisites-1)
+      * [Installation](#installation)
+      * [Running the Application](#running-the-application)
+  * [Endpoints](#endpoints)
+    * [Convert Traces](#convert-traces)
+    * [Custom Mapping](#custom-mapping)
+    * [Validate Traces](#validate-traces)
+  * [Development](#development)
+    * [API Documentation](#api-documentation)
+    * [Code Formatting and Linting](#code-formatting-and-linting)
+    * [Mapping](#mapping)
+    * [Project Architecture](#project-architecture)
+    * [Environment Variables](#environment-variables)
+    * [Errors](#errors)
+  * [Contribution guidelines](#contribution-guidelines)
+  * [Project status](#project-status)
+  * [Interoperability of Learning Records: State-of-the-Art in 2023](#interoperability-of-learning-records-state-of-the-art-in-2023)
+  * [References](#references)
+<!-- TOC -->
+
 ## Overview
 
 Learning Records are available in many formats, either standardized (xAPI, SCORM, IMS Caliper, cmi5) or proprietary (Google Classroom, MS Teams, csv, etc). This wide variety of formats is a barrier to many use cases of learning records as it prevents the easy combination and sharing of learning records datasets from multiple sources or organizations.
@@ -90,7 +130,58 @@ The LRC currently supports theses main profiles :
 
 ## Setup and installation
 
-### Getting Started
+You can run the application either directly with **pipenv** or using **Docker**.
+
+**But first, clone the repository**:
+ ```
+ git clone [repository_url]
+ cd [project_directory]
+ ```
+
+Then, set up environment variables: create a `.env` file in the project root by **copying** `.env.default`:
+ ```
+ cp .env.default .env
+ ```
+ You can then modify the variables in `.env` as needed.
+
+### With Docker
+
+The application is containerized using Docker, with a robust and flexible deployment strategy that leverages:
+- Docker for containerization with a multi-environment support (dev and prod) using Docker Compose profiles
+- Traefik as a reverse proxy and load balancer, with built-in SSL/TLS support via Let's Encrypt, and a dashboard in dev environment.
+- Gunicorn as the production-grade WSGI HTTP server, with configurable worker processes and threads, and dynamic scaling based on system resources.
+
+#### Prerequisites
+
+- Docker and Docker Compose installed on your machine.
+
+#### Development Environment
+
+Build and run the development environment:
+```
+docker-compose --profile dev up --build
+```
+
+The API will be available at : `http://lrc.localhost`
+
+Traefik Dashboard will be available at : `http://traefik.lrc.localhost:8080`
+
+#### Quick Start (Without volumes or Traefik)
+For a quick test without full stack:
+```
+docker build --target dev-standalone -t lrc-dev-standalone .
+docker run -p 8000:8000 lrc-dev-standalone
+```
+Note: This version won't reflect source code changes in real-time.
+
+#### Production Environment
+
+Configure production-specific settings, then build and run the production environment:
+```
+docker-compose --profile prod up --build
+```
+
+### With pipenv
 
 #### Prerequisites
 
@@ -98,41 +189,26 @@ The LRC currently supports theses main profiles :
 
 #### Installation
 
-1. Clone the repository:
-   ```
-   git clone [repository_url]
-   cd [project_directory]
-   ```
-
-2. Install pipenv if you haven't already:
+1. Install pipenv if you haven't already:
    ```
    pip install pipenv
    ```
 
-3. Install the project dependencies:
+2. Install the project dependencies:
    ```
    pipenv install
    ```
-
-4. Set up environment variables:
-   Create a `.env` file in the project root by copying `.env.default`:
-   ```
-   cp .env.default .env
-   ```
-   You can then modify the variables in `.env` as needed.
-
-### Usage
+3. Start the FastAPI server using the script defined in Pipfile:
+  ```
+  pipenv run start
+  ```
 
 #### Running the Application
 
-Start the FastAPI server using the script defined in Pipfile:
-```
-pipenv run start
-```
-
 The API will be available at `http://localhost:8000`.
 
-#### Converting Traces
+## Endpoints
+### Convert Traces
 
 To convert a trace, send a POST request to the `/convert` endpoint:
 
@@ -153,6 +229,7 @@ Supported input formats:
 - imscaliper1_2
 - imscaliper1_1
 - scorm_2004
+- matomo
 
 Response format:
 
@@ -179,7 +256,7 @@ Response format:
 
 The meta object contains essential information about the conversion process.
 
-#### Custom Mapping
+### Custom Mapping
 
 The `/convert_custom` endpoint allows for flexible conversion of custom data formats using mapping files:
 
@@ -213,7 +290,7 @@ The endpoint supports:
 
 Example mapping file structure:
 
-#### Validating Traces
+### Validate Traces
 
 The endpoint will:
 - Validate the trace structure and content
@@ -244,7 +321,9 @@ Response format:
 }
 ```
 
-#### API Documentation
+## Development
+
+### API Documentation
 
 Once the server is running, you can access the interactive API documentation:
 
@@ -253,10 +332,7 @@ Once the server is running, you can access the interactive API documentation:
 
 These interfaces provide detailed information about all available endpoints, request/response schemas, and allow you to test the API directly from your browser.
 
-
-### Development
-
-#### Code Formatting and Linting
+### Code Formatting and Linting
 
 The project uses Ruff for linting and formatting. Ruff is configured in `pyproject.toml` with strict settings:
 - All rules enabled by default
@@ -264,11 +340,11 @@ The project uses Ruff for linting and formatting. Ruff is configured in `pyproje
 - 88 character line length
 - Custom rule configurations for specific project needs
 
-#### Mapping
+### Mapping
 
 To understand how mapping works or to create your own mapping, a document is available [here](./docs/1_mapping.md).
 
-#### Project Architecture
+### Project Architecture
 
 An explanation of how the project is organised is available [here](./docs/2_project_architecture.md).
 
@@ -278,15 +354,29 @@ The following table details the environment variables used in the project:
 
 | Variable | Description | Required | Default Value | Possible Values |
 |----------|-------------|----------|---------------|-----------------|
-| ENVIRONMENT | Affects error handling and logging throughout the application | No | development | development, production |
-| LOG_LEVEL | Minimum logging level for the application | No | info | debug, info, warning, error, critical |
-| DOWNLOAD_TIMEOUT | Timeout for downloading profiles (in seconds) | No | 10 | Any positive integer |
-| CORS_ALLOWED_ORIGINS | Allowed origins for CORS | No | * | Comma-separated list of origins or * for all |
-| PROFILES_BASE_PATH | Base path for storing profile files | Yes | data/dases_profiles | Any valid directory path |
-| PROFILES_NAMES | Names of the profiles to be used | Yes | lms,forum,assessment | Comma-separated list of profile names |
-| PROFILE_LMS_URL | URL for the LMS profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-lms/master/profile/profile.jsonld | Any valid URL |
-| PROFILE_FORUM_URL | URL for the Forum profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-forum/master/profile/base.jsonld | Any valid URL |
-| PROFILE_ASSESSMENT_URL | URL for the Assessment profile JSON-LD file | Yes | https://raw.githubusercontent.com/gaia-x-dases/xapi-assessment/add-mandatory-statements/profile/profile.jsonld | Any valid URL |
+| **Environment Configuration** | | | | |
+| `ENVIRONMENT` | Application environment mode | No | `development` | `development`, `production` |
+| `LOG_LEVEL` | Minimum logging level | No | `info` | `debug`, `info`, `warning`, `error`, `critical` |
+| `DOWNLOAD_TIMEOUT` | Timeout for downloading profiles | No | `10` | Positive integer |
+| `CORS_ALLOWED_ORIGINS` | Allowed CORS origins | No | `*` | Comma-separated origins |
+| **Internal Application Configuration** | | | | |
+| `APP_INTERNAL_HOST` | Host for internal application binding | No | `0.0.0.0` | Valid host/IP |
+| `APP_INTERNAL_PORT` | Port for internal application binding | No | `8000` | Any valid port |
+| **External Routing Configuration** | | | | |
+| `APP_EXTERNAL_HOST` | External hostname for the application | Yes | `lrc.localhost` | Valid hostname |
+| `APP_EXTERNAL_PORT` | External port for routing (dev env only) | No | `80` | Any valid port |
+| **Traefik Configuration** | | | | |
+| `TRAEFIK_RELEASE` | Traefik image version | No | `v3.2.3` | Valid Traefik version |
+| `LETS_ENCRYPT_EMAIL` | Email for Let's Encrypt certificate | Yes | `test@example.com` | Valid email |
+| **Profile Configuration** | | | | |
+| `PROFILES_BASE_PATH` | Base path for storing profile files | Yes | `data/dases_profiles` | Valid directory path |
+| `PROFILES_NAMES` | Names of profiles to use | Yes | `lms,forum,assessment` | Comma-separated profile names |
+| `PROFILE_LMS_URL` | URL for LMS profile JSON-LD | Yes | GitHub LMS profile URL | Valid URL |
+| `PROFILE_FORUM_URL` | URL for Forum profile JSON-LD | Yes | GitHub Forum profile URL | Valid URL |
+| `PROFILE_ASSESSMENT_URL` | URL for Assessment profile JSON-LD | Yes | GitHub Assessment profile URL | Valid URL |
+| **Performance Configuration** | | | | |
+| `WORKERS_COUNT` | Number of worker processes | No | `4` | Positive integer |
+| `THREADS_PER_WORKER` | Number of threads per worker | No | `2` | Positive integer |
 
 Note: The URLs for the profiles are examples and may change. Always use the most up-to-date URLs for your project.
 
@@ -348,4 +438,4 @@ This study is available [here](https://github.com/Prometheus-X-association/learn
 
 <https://prometheus-x.org/>
 
-<https://dataspace.prometheus-x.org/building-blocks/interoperability/learning-records>
+<https://dataspace.prometheus-x.org/building-blocks/interoperability/learning-records>**

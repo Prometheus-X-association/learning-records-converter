@@ -1,0 +1,88 @@
+x-logging:
+  &default-logging
+  driver: "json-file"
+  options:
+    max-size: "100m"
+    max-file: "14"
+    compress: "true"
+
+services:
+  api-dev:
+    build:
+      target: dev
+    env_file: .env
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lrc.rule=Host(`${APP_EXTERNAL_HOST:-lrc.localhost}`)"
+      - "traefik.http.routers.lrc.entrypoints=web"
+      - "traefik.http.services.lrc.loadbalancer.server.port=${APP_INTERNAL_PORT:-8000}"
+    logging: *default-logging
+    profiles: [ "dev" ]
+
+  traefik-dev:
+    image: traefik:${TRAEFIK_RELEASE:-v3.2.3}
+    command:
+      # App configuration
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:${APP_EXTERNAL_PORT:-80}"
+      - "--log.level=${LOG_LEVEL:-DEBUG}"
+      - "--accesslog=true"
+
+      # Admin interface configuration
+      - "--api.dashboard=true"
+    labels:
+      # Admin interface configuration
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.${APP_EXTERNAL_HOST:-lrc.localhost}`)"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+    ports:
+      - "${APP_EXTERNAL_PORT:-80}:${APP_EXTERNAL_PORT:-80}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    logging: *default-logging
+    profiles: [ "dev" ]
+
+  api-prod:
+    build:
+      target: prod
+    env_file: .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lrc.rule=Host(`${APP_EXTERNAL_HOST}`)"
+      - "traefik.http.routers.lrc.entrypoints=websecure"
+      - "traefik.http.routers.lrc.tls.certresolver=letsencrypt"
+      - "traefik.http.services.lrc.loadbalancer.server.port=${APP_INTERNAL_PORT:-8000}"
+    restart: unless-stopped
+    logging: *default-logging
+    profiles: [ "prod" ]
+
+  traefik-prod:
+    image: traefik:${TRAEFIK_RELEASE:-v3.2.3}
+    command:
+      # App configuration
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--log.level=${LOG_LEVEL:-DEBUG}"
+      - "--accesslog=true"
+      - "--api.dashboard=false"
+
+      # HTTPS Configuration
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETS_ENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt:rw"
+    restart: unless-stopped
+    logging: *default-logging
+    profiles: [ "prod" ]
