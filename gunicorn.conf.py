@@ -1,4 +1,5 @@
 """Gunicorn configuration.
+
 See: https://docs.gunicorn.org/en/stable/settings.html
 """
 

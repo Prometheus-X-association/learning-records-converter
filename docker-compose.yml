@@ -6,8 +6,13 @@ x-logging:
     max-file: "14"
     compress: "true"
 
+networks:
+  traefik-traces:
+    name: traefik-traces
+
 services:
-  api-dev:
+  lrc-dev:
+    container_name: lrc-service
     build:
       target: dev
     env_file: .env
@@ -20,6 +25,8 @@ services:
       - "traefik.http.routers.lrc.entrypoints=web"
       - "traefik.http.services.lrc.loadbalancer.server.port=${APP_INTERNAL_PORT:-8000}"
     logging: *default-logging
+    networks:
+      - traefik-traces
     profiles: [ "dev" ]
 
   traefik-dev:
@@ -44,9 +51,12 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     logging: *default-logging
+    networks:
+      - traefik-traces
     profiles: [ "dev" ]
 
-  api-prod:
+  lrc-prod:
+    container_name: lrc-service
     build:
       target: prod
     env_file: .env
@@ -58,6 +68,8 @@ services:
       - "traefik.http.services.lrc.loadbalancer.server.port=${APP_INTERNAL_PORT:-8000}"
     restart: unless-stopped
     logging: *default-logging
+    networks:
+      - traefik-traces
     profiles: [ "prod" ]
 
   traefik-prod:
@@ -85,4 +97,6 @@ services:
       - "./letsencrypt:/letsencrypt:rw"
     restart: unless-stopped
     logging: *default-logging
+    networks:
+      - traefik-traces
     profiles: [ "prod" ]
