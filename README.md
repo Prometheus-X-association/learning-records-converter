@@ -164,7 +164,7 @@ docker-compose --profile dev up --build
 
 The API will be available at : `http://lrc.localhost`
 
-Traefik Dashboard will be available at : `http://traefik.lrc.localhost:8080`
+Traefik Dashboard will be available at : `http://traefik.lrc.localhost`
 
 #### Quick Start (Without volumes or Traefik)
 For a quick test without full stack:
