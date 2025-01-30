@@ -129,6 +129,11 @@ mappings:
       custom:
         - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
 
+  - input_fields:
+      - "idVisit"
+    output_fields:
+      output_field: "context.extensions[https://w3id.org/xapi/openedx/extension/session-id]"
+
   # DASES Profiles
   - input_fields:
       - "actionDetails.type"
