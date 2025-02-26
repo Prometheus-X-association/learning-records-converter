@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any
 
 from extensions.enums import CustomTraceFormatStrEnum
@@ -169,9 +169,9 @@ class MappingEngine:
     def _build_trace_with_output(
         self,
         output_content: OutputMappingModel,
-        output_data: dict[str, Any],
+        output_data: Mapping[str, Any],
         overwrite: bool,
-        arguments: list[Any] | None = None,
+        arguments: Sequence[Any] | None = None,
     ) -> dict[str, Any]:
         """
         Build the output trace based on the output content.
@@ -198,7 +198,7 @@ class MappingEngine:
     def _handle_output(
         self,
         output_model: OutputMappingModel,
-        arguments: list[Any],
+        arguments: Sequence[Any],
     ) -> list[FinalMappingModel]:
         """
         Handle the output based on the OutputMappingModel.
@@ -244,13 +244,13 @@ class MappingEngine:
 
     def _apply_custom_transformation(
         self,
-        custom_input: list[str],
-        arguments: list[Any],
+        custom_input: Iterable[str],
+        arguments: Sequence[Any],
     ) -> Any:
         """
         Apply a series of custom transformations to the input arguments.
 
-        :param custom_input: List of custom transformation strings
+        :param custom_input: Iterable of custom transformation strings
         :param arguments: Input arguments for the transformations
         :return: The result of applying all transformations
         :raises CodeEvaluationError: If there's an error in the custom transformation
@@ -283,13 +283,13 @@ class MappingEngine:
 
     def _apply_switch_transformation(
         self,
-        switch_value: list[ConditionOutputMappingModel],
-        arguments: list[Any] | None = None,
+        switch_value: Iterable[ConditionOutputMappingModel],
+        arguments: Sequence[Any] | None = None,
     ) -> list[FinalMappingModel]:
         """
         Apply a switch transformation based on conditions.
 
-        :param switch_value: List of condition-based output mappings
+        :param switch_value: Iterable of condition-based output mappings
         :param arguments: Input arguments for the conditions
         :return: List of FinalMappingModel instances
         :raises CodeEvaluationError: If there's an error in the lambda condition
