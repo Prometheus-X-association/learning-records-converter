@@ -1,61 +1,54 @@
 """Base xAPI `Inverse Functional Identifier` definitions."""
 
-from pydantic import StringConstraints
-from typing_extensions import Annotated
+from typing import Annotated
+
+from pydantic import Field, StringConstraints
 
 from ..config import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
-from .common import IRI, MailtoEmail
+from .common import IRI, URI, MailtoEmail
 
 
 class BaseXapiAccount(BaseModelWithConfig):
-    """Pydantic model for IFI `account` property.
+    """Pydantic model for IFI `account` property."""
 
-    Attributes:
-        homePage (IRI): Consists of the home page of the account's service provider.
-        name (str): Consists of the unique id or name of the Actor's account.
-    """
-
-    homePage: IRI
-    name: NonEmptyStrictStr
+    homePage: IRI = Field(
+        description="Home page of the account's service provider",
+        examples=["http://www.example.com"],
+    )
+    name: NonEmptyStrictStr = Field(
+        description="Unique id or name of the Actor's account", examples=["John Doe"]
+    )
 
 
 class BaseXapiMboxIFI(BaseModelWithConfig):
-    """Pydantic model for mailto Inverse Functional Identifier.
+    """Pydantic model for mailto Inverse Functional Identifier."""
 
-    Attributes:
-        mbox (MailtoEmail): Consists of the Agent's email address.
-    """
-
-    mbox: MailtoEmail
+    mbox: MailtoEmail = Field(
+        description="Agent's email address", examples=["mailto:test@example.com"]
+    )
 
 
 class BaseXapiMboxSha1SumIFI(BaseModelWithConfig):
-    """Pydantic model for hash Inverse Functional Identifier.
+    """Pydantic model for hash Inverse Functional Identifier."""
 
-    Attributes:
-        mbox_sha1sum (str): Consists of the SHA1 hash of the Agent's email address.
-    """
-
-    mbox_sha1sum: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{40}$")]
+    mbox_sha1sum: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{40}$")] = Field(
+        description="SHA1 hash of the Agent's email address",
+        examples=["ebd31e95054c018b10727ccffd2ef2ec3a016ee9"],
+    )
 
 
 class BaseXapiOpenIdIFI(BaseModelWithConfig):
-    """Pydantic model for OpenID Inverse Functional Identifier.
+    """Pydantic model for OpenID Inverse Functional Identifier."""
 
-    Attributes:
-        openid (URI): Consists of an openID that uniquely identifies the Agent.
-    """
-
-    openid: str
+    openid: URI = Field(
+        description="OpenID that uniquely identifies the Agent",
+        examples=["http://johndoe.openid.example.org"],
+    )
 
 
 class BaseXapiAccountIFI(BaseModelWithConfig):
-    """Pydantic model for account Inverse Functional Identifier.
+    """Pydantic model for account Inverse Functional Identifier."""
 
-    Attributes:
-        account (dict): See BaseXapiAccount.
-    """
-
-    account: BaseXapiAccount
+    account: BaseXapiAccount = Field(description="See BaseXapiAccount")

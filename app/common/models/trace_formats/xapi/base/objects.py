@@ -3,9 +3,10 @@
 # Nota bene: we split object definitions into `objects.py` and `unnested_objects.py`
 # because of the circular dependency : objects -> context -> objects.
 
-import sys
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Literal
+
+from pydantic import Field
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -16,35 +17,28 @@ from .results import BaseXapiResult
 from .unnested_objects import BaseXapiUnnestedObject
 from .verbs import BaseXapiVerb
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
-
 
 class BaseXapiSubStatement(BaseModelWithConfig):
-    """Pydantic model for `SubStatement` type property.
+    """Pydantic model for `SubStatement` type property."""
 
-    Attributes:
-        actor (dict): See BaseXapiAgent and BaseXapiGroup.
-        verb (dict): See BaseXapiVerb.
-        object (dict): See BaseXapiUnnestedObject.
-        objectType (dict): Consists of the value `SubStatement`.
-    """
+    actor: BaseXapiAgent | BaseXapiGroup = Field(
+        description="See BaseXapiAgent and BaseXapiGroup"
+    )
+    verb: BaseXapiVerb = Field(description="See BaseXapiVerb")
+    object: BaseXapiUnnestedObject = Field(description="See BaseXapiUnnestedObject")
+    objectType: Literal["SubStatement"] = Field(description="Value `SubStatement`")
+    result: BaseXapiResult | None = Field(
+        None, description="Outcome related to the SubStatement"
+    )
+    context: BaseXapiContext | None = Field(
+        None, description="Contextual information for the SubStatement"
+    )
+    timestamp: datetime | None = Field(
+        None, description="Timestamp of when the event occurred"
+    )
+    attachments: list[BaseXapiAttachment] | None = Field(
+        None, description="List of attachments"
+    )
 
-    actor: Union[BaseXapiAgent, BaseXapiGroup]
-    verb: BaseXapiVerb
-    object: BaseXapiUnnestedObject
-    objectType: Literal["SubStatement"]
-    result: Optional[BaseXapiResult] = None
-    context: Optional[BaseXapiContext] = None
-    timestamp: Optional[datetime] = None
-    attachments: Optional[List[BaseXapiAttachment]] = None
 
-
-BaseXapiObject = Union[
-    BaseXapiUnnestedObject,
-    BaseXapiSubStatement,
-    BaseXapiAgent,
-    BaseXapiGroup,
-]
+BaseXapiObject = BaseXapiUnnestedObject | BaseXapiSubStatement
