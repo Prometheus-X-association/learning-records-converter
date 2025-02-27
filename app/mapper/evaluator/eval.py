@@ -58,11 +58,14 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
         :param func: The function implementation
         """
         if not name.isidentifier():
-            self.logger.error(
-                "Skipping registration of invalid function name",
-                {"name": name},
-            )
-            raise ValueError(f"Invalid function name: {name}")
+            msg = "Invalid function name"
+            self.logger.error(msg, {"name": name})
+            raise ValueError(msg)
+
+        if name in self.registered_functions:
+            msg = "Already registered function"
+            self.logger.error(msg, {"name": name})
+            raise ValueError(msg)
 
         self.registered_functions[name] = func
 
@@ -74,6 +77,11 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
         :return: The result of the evaluation
         :raises ExpressionEvaluationError: If evaluation fails
         """
+        if "__" in expression:
+            msg = "Potentially unsafe expression"
+            self.logger.error(msg, {"expression": expression})
+            raise ExpressionEvaluationError(msg)
+
         try:
             globals_dict = self.registered_functions.copy()
             globals_dict["__builtins__"] = {}
