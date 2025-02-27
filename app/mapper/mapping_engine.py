@@ -11,7 +11,6 @@ from app.common.common_types import JsonType
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
-from .available_functions.mapping_runnable_functions import get_available_functions
 from .evaluator.contract import ExpressionEvaluatorContract
 from .models.mapping_models import FinalMappingModel
 from .models.mapping_schema import (
@@ -34,19 +33,12 @@ class MappingEngine:
         """
         Initialize the MappingEngine.
 
+        :param evaluator: ExpressionEvaluatorContract implementation for Python expressions evaluation
         :param logger: LoggerContract implementation for logging
         """
+        self.evaluator = evaluator
         self.logger = logger
         self.log_context: dict[str, str] = {}
-
-        self.evaluator = evaluator
-        available_functions = get_available_functions()
-        self.evaluator.register_functions(available_functions)
-        self.logger.debug(
-            "Registering functions for evaluator",
-            {"functions": list(available_functions.keys())},
-        )
-
         self.profile: str | None = None
 
     def run(
