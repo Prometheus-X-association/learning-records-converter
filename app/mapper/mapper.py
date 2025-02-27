@@ -5,6 +5,7 @@ from extensions.enums import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
+from .evaluator.contract import ExpressionEvaluatorContract
 from .exceptions import MapperError
 from .mapping_engine import MappingEngine
 from .repositories.contracts.repository import MappingRepository
@@ -17,7 +18,12 @@ class Mapper:
     This class uses a MappingRepository to load schemas and a MappingEngine to perform the actual conversion.
     """
 
-    def __init__(self, repository: MappingRepository, logger: LoggerContract) -> None:
+    def __init__(
+        self,
+        repository: MappingRepository,
+        expression_evaluator: ExpressionEvaluatorContract,
+        logger: LoggerContract,
+    ) -> None:
         """
         Initialize the Mapper with a MappingRepository.
 
@@ -25,6 +31,7 @@ class Mapper:
         :param logger: LoggerContract implementation for logging
         """
         self.repository = repository
+        self.expression_evaluator = expression_evaluator
         self.logger = logger
         self.schema = None
 
@@ -69,6 +76,7 @@ class Mapper:
 
         engine = MappingEngine(
             logger=self.logger,
+            evaluator=self.expression_evaluator,
         )
         return engine.run(
             input_trace=input_trace,

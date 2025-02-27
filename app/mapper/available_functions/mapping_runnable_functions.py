@@ -6,11 +6,13 @@ from urllib.parse import urlparse
 from utils.utils_date import parse_date
 from utils.utils_general import is_empty
 
-__all__ = [
-    "is_empty",
-    "match",
-    "parse_date",
-    "path_join",
-    "search",
-    "urlparse",
-]
+
+def get_available_functions() -> dict:
+    return {
+        "is_empty": is_empty,
+        "match": match,
+        "parse_date": parse_date,
+        "path_join": path_join,
+        "search": search,
+        "urlparse": urlparse,
+    }
