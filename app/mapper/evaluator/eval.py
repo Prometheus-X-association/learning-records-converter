@@ -15,6 +15,8 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
     def __init__(self, logger: LoggerContract):
         """
         Initialize the eval() expression evaluator.
+
+        :param logger: LoggerContract implementation for logging
         """
         self.logger = logger
 
