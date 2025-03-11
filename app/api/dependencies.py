@@ -12,7 +12,7 @@ from app.profile_enricher.repositories.jsonld.jsonld_repository import (
 )
 
 
-async def get_mapping_repository(request: Request) -> MappingRepository:
+def get_mapping_repository(request: Request) -> MappingRepository:
     """
     Dependency injection function to get MappingRepository instance.
 
@@ -24,7 +24,7 @@ async def get_mapping_repository(request: Request) -> MappingRepository:
     )
 
 
-async def get_profile_repository(request: Request) -> ProfileRepository:
+def get_profile_repository(request: Request) -> ProfileRepository:
     """
     Dependency injection function to get ProfileRepository instance.
 
@@ -37,7 +37,7 @@ async def get_profile_repository(request: Request) -> ProfileRepository:
     )
 
 
-async def get_expression_evaluator(request: Request) -> ExpressionEvaluatorContract:
+def get_expression_evaluator(request: Request) -> ExpressionEvaluatorContract:
     """
     Dependency injection function to get an ExpressionEvaluator instance.
 
@@ -47,7 +47,7 @@ async def get_expression_evaluator(request: Request) -> ExpressionEvaluatorContr
     return EvalExpressionEvaluator(logger=request.state.logger)
 
 
-async def get_mapper(request: Request) -> Mapper:
+def get_mapper(request: Request) -> Mapper:
     """
     Dependency injection function to get a Mapper instance.
 
@@ -55,13 +55,13 @@ async def get_mapper(request: Request) -> Mapper:
     :return: An instance of Mapper
     """
     return Mapper(
-        repository=await get_mapping_repository(request=request),
-        expression_evaluator=await get_expression_evaluator(request=request),
+        repository=get_mapping_repository(request=request),
+        expression_evaluator=get_expression_evaluator(request=request),
         logger=request.state.logger,
     )
 
 
-async def get_profiler(request: Request) -> Profiler:
+def get_profiler(request: Request) -> Profiler:
     """
     Dependency injection function to get a Profiler instance.
 
@@ -69,5 +69,5 @@ async def get_profiler(request: Request) -> Profiler:
     :return: An instance of Profiler
     """
     return Profiler(
-        repository=await get_profile_repository(request=request),
+        repository=get_profile_repository(request=request),
     )

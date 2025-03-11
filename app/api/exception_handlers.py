@@ -72,7 +72,7 @@ class ExceptionHandler:
             handler=self.global_exception_handler,
         )
 
-    async def known_exception_handler(
+    def known_exception_handler(
         self,
         request: Request,
         exc: Exception,
@@ -99,7 +99,7 @@ class ExceptionHandler:
             ),
         )
 
-    async def global_exception_handler(
+    def global_exception_handler(
         self,
         request: Request,
         exc: Exception,
