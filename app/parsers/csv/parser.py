@@ -1,6 +1,6 @@
 import csv
 from collections import OrderedDict
-from collections.abc import Iterator
+from collections.abc import Generator, Mapping
 from decimal import Decimal, InvalidOperation
 from io import TextIOWrapper
 from typing import Any, BinaryIO
@@ -17,7 +17,7 @@ class CSVParser(Parser):
     Parser for CSV files.
     """
 
-    def parse(self, file: BinaryIO) -> Iterator[Trace]:
+    def parse(self, file: BinaryIO) -> Generator[Trace]:
         """
         Parse the given CSV file and yield parsed rows.
 
@@ -104,7 +104,7 @@ class CSVParser(Parser):
             raise CSVParsingError(msg) from e
 
     @staticmethod
-    def _clean_row(row: dict) -> OrderedDict:
+    def _clean_row(row: Mapping[str, Any]) -> OrderedDict:
         """
         Clean and normalize the values in a row.
 

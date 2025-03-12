@@ -1,5 +1,6 @@
 import json
 from functools import cache
+from os import PathLike
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -90,7 +91,7 @@ class ProfileLoader:
         self.logger.info("Template found", log_context)
         return template
 
-    def read_profile_file(self, file_path: Path) -> JsonType:
+    def read_profile_file(self, file_path: str | PathLike[str]) -> JsonType:
         """
         Load a profile file from the file system.
 
@@ -102,7 +103,7 @@ class ProfileLoader:
         log_context = {"path": file_path}
         self.logger.debug("Read profile file", log_context)
         try:
-            file_content = file_path.read_text(encoding="utf8")
+            file_content = Path(file_path).read_text(encoding="utf8")
             return json.loads(file_content)
         except FileNotFoundError as e:
             msg = "Profile file not found"
@@ -168,7 +169,9 @@ class ProfileLoader:
                 f"Invalid JSON in downloaded profile for {group_name}",
             ) from e
 
-    def save_profile_file(self, file_path: Path, profile_json: JsonType) -> None:
+    def save_profile_file(
+        self, file_path: str | PathLike[str], profile_json: JsonType,
+    ) -> None:
         """
         Save a profile file to the file system.
 
@@ -179,7 +182,7 @@ class ProfileLoader:
         log_context = {"file_path": file_path}
         try:
             json_string = json.dumps(profile_json, ensure_ascii=False, indent=2)
-            file_path.write_text(json_string, encoding="utf-8")
+            Path(file_path).write_text(json_string, encoding="utf-8")
             self.logger.info("Profile saved", log_context)
         except OSError as e:
             self.logger.exception("Failed to save profile", e, log_context)

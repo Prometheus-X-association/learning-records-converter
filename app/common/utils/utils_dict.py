@@ -1,4 +1,6 @@
 import re
+from collections.abc import Mapping, MutableMapping, Sequence
+from os import PathLike
 from pathlib import Path
 from typing import Any, overload
 
@@ -8,25 +10,25 @@ from .utils_general import is_empty
 
 
 @overload
-def remove_empty_elements(dictionary: list) -> list: ...
+def remove_empty_elements(dictionary: Sequence) -> list: ...
 
 
 @overload
-def remove_empty_elements(dictionary: dict) -> dict: ...
+def remove_empty_elements(dictionary: Mapping) -> dict: ...
 
 
-def remove_empty_elements(dictionary: list | dict) -> list | dict:
+def remove_empty_elements(dictionary: Mapping | Sequence) -> dict | list:
     """Remove empty fields.
 
     Args:
-        dictionary : dictionary to remove empty fields
+        dictionary : Sequence or Mapping to remove empty fields
 
     Returns:
-        dictionnary with removed fields
+        dictionary or list with removed fields
     """
-    if not isinstance(dictionary, dict | list):
+    if not isinstance(dictionary, Mapping | Sequence):
         return dictionary
-    if isinstance(dictionary, list):
+    if isinstance(dictionary, Sequence):
         return [
             value
             for value in (remove_empty_elements(value) for value in dictionary)
@@ -42,7 +44,7 @@ def remove_empty_elements(dictionary: list | dict) -> list | dict:
 
 
 def get_value_from_flat_key(
-    dict_element: dict | list,
+    dict_element: Mapping | Sequence,
     flat_key: str,
     default_value=None,
     return_copy=True,
@@ -56,7 +58,7 @@ def get_value_from_flat_key(
         - use default_value really when value does not exist
 
     Args:
-        dict_element (dict): Dict to navigate
+        dict_element (Mapping | Sequence): Dict to navigate
         flat_key (str): Flatten key (key1.key2)
         default_value (Any): Default value if ever nothing is found. Default value is None
         return_copy (bool): Return a copy if type is dict or list. Default value is True
@@ -68,12 +70,12 @@ def get_value_from_flat_key(
     total_list_key_len = len(list_key)
     value = dict_element if not is_empty(dict_element) else {}
     for index, key in enumerate(list_key, start=1):
-        if key.isnumeric() and isinstance(value, list):
+        if key.isnumeric() and isinstance(value, Sequence):
             try:
                 value = value[int(key)]
             except IndexError:
                 value = default_value
-        elif not key.isnumeric() and isinstance(value, dict):
+        elif not key.isnumeric() and isinstance(value, Mapping):
             value = value.get(key, default_value)
         else:
             value = default_value
@@ -81,14 +83,14 @@ def get_value_from_flat_key(
             if index < total_list_key_len:
                 value = default_value
             break
-    if return_copy and isinstance(value, list | dict):
+    if return_copy and isinstance(value, Mapping | Sequence):
         return value.copy()
     return value
 
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: dict,
+    dict_list_element: MutableMapping[str, Any],
     flat_key: str,
     value: Any,
     overwrite: bool = True,
@@ -97,7 +99,7 @@ def set_value_from_flat_key(
 
 @overload
 def set_value_from_flat_key(
-    dict_list_element: list,
+    dict_list_element: Sequence,
     flat_key: str,
     value: Any,
     overwrite: bool = True,
@@ -105,7 +107,7 @@ def set_value_from_flat_key(
 
 
 def set_value_from_flat_key(
-    dict_list_element: dict | list,
+    dict_list_element: MutableMapping[str, Any] | Sequence,
     flat_key: str,
     value: Any,
     overwrite: bool = True,
@@ -119,7 +121,7 @@ def set_value_from_flat_key(
         New argument : preserve_type? : bool -> set only if type is the same.
 
     Args:
-        dict_list_element (Union[dict, list]): Dict of list to navigate.
+        dict_list_element (MutableMapping | Sequence): Dict of list to navigate.
         flat_key (str): Flatten key (key1.key2).
         value (Any): Value to set.
         overwrite (bool, optional): If True, overwrite existing value if any.
@@ -130,7 +132,7 @@ def set_value_from_flat_key(
         ValueError: Raised if error during flat_key splitting.
 
     Returns:
-        Union[dict, list]: The original dict or list, modified if not overwrite.
+        dict | list: The original dict or list, modified if not overwrite.
     """
     # Split the flat_key, but keep keys with brackets intact
     keys = re.split(r"\.(?![^\[]*\])", flat_key)
@@ -174,7 +176,7 @@ def set_value_from_flat_key(
                 # We've reached the final key
                 if subkey:
                     # Handle extension-like keys
-                    if not isinstance(current, dict):
+                    if not isinstance(current, Mapping):
                         current = {}
                         if i == 0:
                             dict_list_element = current
@@ -189,7 +191,7 @@ def set_value_from_flat_key(
                     current[key] = value
             elif subkey:
                 # Handle extension-like keys
-                if not isinstance(current, dict):
+                if not isinstance(current, Mapping):
                     current = {}
                     if i == 0:
                         dict_list_element = current
@@ -204,13 +206,13 @@ def set_value_from_flat_key(
                     if current[key] is None:
                         current[key] = [] if next_key_is_numeric else {}
                 else:
-                    if not isinstance(current, dict):
+                    if not isinstance(current, Mapping):
                         current = {}
                         if i == 0:
                             dict_list_element = current
                     if key not in current or not isinstance(
                         current[key],
-                        dict | list,
+                        Mapping | Sequence,
                     ):
                         current[key] = [] if next_key_is_numeric else {}
                 current = current[key]
@@ -222,17 +224,17 @@ def set_value_from_flat_key(
 
 
 def get_nested_from_flat(
-    flat_field: dict[str, Any],
-    nested_field: dict | list | None = None,
+    flat_field: Mapping[str, Any],
+    nested_field: Mapping | Sequence | None = None,
 ) -> dict | list:
     """Generate nested json from a flatten json.
 
     Args:
-        flat_field (dict):
+        flat_field (Mapping[str, Any]):
             Flatten dict. int values (0, 1, 2) are considered list indexes
             Example: {'url.main': '', 'url.secondary': ''}
-        nested_field (dict, optional):
-            If a nested dict already exists, you might want to update it directly.
+        nested_field (Mapping | Sequence | None, optional):
+            If a nested mapping or sequence already exists, you might want to update it directly.
             Defaults to {}.
         TODO : Check below and set_value_from_flat_key
         # allow_override (bool, optional):
@@ -244,8 +246,8 @@ def get_nested_from_flat(
         #         replaced by an object with 'main' in it.
 
     Returns:
-        dict:
-            Nested dict.
+        dict | list:
+            Nested dict or list.
             Example: {'url': {'main': '', 'secondary': ''}}
     """
     # Sort flatten keys
@@ -270,7 +272,7 @@ def get_nested_from_flat(
     return nested_field
 
 
-def convert_yaml_file_to_json(yaml_path: Path) -> dict:
+def convert_yaml_file_to_json(yaml_path: str | PathLike) -> dict:
     """Convert a YAML file into a dict.
 
     The path to the YAML file is passed to the function and is loaded afterward.
@@ -281,18 +283,18 @@ def convert_yaml_file_to_json(yaml_path: Path) -> dict:
     Returns:
         dict: Converted YAML
     """
-    with yaml_path.open(mode="r") as file:
+    with Path(yaml_path).open(mode="r") as file:
         return yaml.safe_load(file)
 
 
-def deep_merge(target_dict: dict, merge_dct: dict) -> None:
+def deep_merge(target_dict: dict, merge_dct: Mapping) -> None:
     """Recursive dict merge.
 
     Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
     to an arbitrary depth, updating keys. The ``merge_dct`` is merged into ``target_dict``.
 
-    :param target_dict: dict onto which the merge is executed
+    :param target_dict: mutable dict onto which the merge is executed
     :param merge_dct: dct merged into dct
     :return: None.
     """
@@ -306,13 +308,13 @@ def deep_merge(target_dict: dict, merge_dct: dict) -> None:
         elif isinstance(target_value, set) and isinstance(value, set):
             target_value.update(value)
         # If target is a list and merge value is a list, extend it
-        elif isinstance(target_value, list) and isinstance(value, list):
+        elif isinstance(target_value, list) and isinstance(value, Sequence):
             target_value.extend(value)
         # If target is a list and merge value is not a list, append to the list
         elif isinstance(target_value, list):
             target_value.append(value)
         # If target is a dictionary but merge value is a list, wrap target in a list
-        elif isinstance(target_value, dict) and isinstance(value, list):
+        elif isinstance(target_value, dict) and isinstance(value, Sequence):
             target_dict[key] = [target_value, *value]
         # Handle cases where one value is None: keep the non-None value
         elif target_value is None:
