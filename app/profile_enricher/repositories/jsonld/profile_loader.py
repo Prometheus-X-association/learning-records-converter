@@ -170,7 +170,9 @@ class ProfileLoader:
             ) from e
 
     def save_profile_file(
-        self, file_path: str | PathLike[str], profile_json: JsonType,
+        self,
+        file_path: str | PathLike[str],
+        profile_json: JsonType,
     ) -> None:
         """
         Save a profile file to the file system.

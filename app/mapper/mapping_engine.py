@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
 from extensions.enums import CustomTraceFormatStrEnum
@@ -12,9 +12,7 @@ from app.common.common_types import JsonType
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
-# This import is used for the eval method :
-from .available_functions.mapping_runnable_functions import *  # noqa: F403
-from .exceptions import CodeEvaluationError
+from .evaluator.contract import ExpressionEvaluatorContract
 from .models.mapping_models import FinalMappingModel
 from .models.mapping_schema import (
     ConditionOutputMappingModel,
@@ -28,12 +26,18 @@ DEFAULT_CONDITION = "default"
 class MappingEngine:
     """Handles mapping from an input format to an output format using a config model."""
 
-    def __init__(self, logger: LoggerContract) -> None:
+    def __init__(
+        self,
+        evaluator: ExpressionEvaluatorContract,
+        logger: LoggerContract,
+    ) -> None:
         """
         Initialize the MappingEngine.
 
+        :param evaluator: ExpressionEvaluatorContract implementation for Python expressions evaluation
         :param logger: LoggerContract implementation for logging
         """
+        self.evaluator = evaluator
         self.logger = logger
         self.log_context: dict[str, str] = {}
         self.profile: str | None = None
@@ -255,31 +259,15 @@ class MappingEngine:
         :return: The result of applying all transformations
         :raises CodeEvaluationError: If there's an error in the custom transformation
         """
+        result = arguments
         for custom_code in custom_input:
-            try:
-                transformation = self._eval(expr=custom_code)
-                arguments = (
-                    transformation(*arguments)
-                    if callable(transformation)
-                    else transformation
-                )
-            except Exception as e:
-                msg = "Error in custom transformation"
-                self.logger.exception(msg, e, self.log_context)
-                raise CodeEvaluationError(msg) from e
-        return arguments
-
-    @staticmethod
-    def _eval(expr: str) -> Callable | Any:
-        """
-        Evaluate a Python expression.
-
-        TODO : This method should be replaced with a more secure alternative in a production environment.
-
-        :param expr: The expression to evaluate
-        :return: The evaluated expression
-        """
-        return eval(expr)
+            if custom_code.startswith("lambda"):
+                # Use the evaluator for lambda expressions
+                result = self.evaluator.eval_lambda(custom_code, *result)
+            else:
+                # Use the evaluator for regular expressions
+                result = self.evaluator.eval_expression(expression=custom_code)
+        return result
 
     def _apply_switch_transformation(
         self,
@@ -305,24 +293,15 @@ class MappingEngine:
                 )
                 return list_response
 
-            try:
-                lambda_condition = self._eval(condition.condition)
-                if callable(lambda_condition) and lambda_condition(*arguments):
-                    list_response.extend(
-                        self._handle_output(
-                            output_model=condition,
-                            arguments=arguments,
-                        ),
-                    )
-                    return list_response
-            except Exception as e:
-                msg = "Error in lambda condition"
-                self.logger.exception(
-                    msg,
-                    e,
-                    {**self.log_context, "condition": condition.condition},
+            condition_result = self.evaluator.eval_lambda(
+                condition.condition,
+                *arguments,
+            )
+            if condition_result:
+                list_response.extend(
+                    self._handle_output(output_model=condition, arguments=arguments),
                 )
-                raise CodeEvaluationError(msg) from e
+                return list_response
 
         list_response.append(FinalMappingModel(output_field=None, value=None))
         return list_response
