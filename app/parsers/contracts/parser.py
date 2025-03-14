@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections.abc import Iterator
+from collections.abc import Generator
 from typing import BinaryIO
 
 from app.api.schemas import CustomConfigModel
@@ -28,7 +28,7 @@ class Parser(ABC):
         self.parsing_config = parsing_config or CustomConfigModel()
 
     @abstractmethod
-    def parse(self, file: BinaryIO) -> Iterator[Trace]:
+    def parse(self, file: BinaryIO) -> Generator[Trace]:
         """
         Parse the given file and yield parsed data.
 

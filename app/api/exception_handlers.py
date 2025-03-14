@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 
 from app.common.exceptions import InvalidTraceError, TraceError, UnknownFormatError
 from app.infrastructure.logging.types import LogLevel
+from app.mapper.evaluator.exceptions import ExpressionEvaluationError
 from app.mapper.exceptions import (
-    CodeEvaluationError,
     MapperError,
     MappingConfigToModelError,
 )
@@ -38,7 +38,7 @@ class ExceptionHandler:
             # MapperError and its subclasses
             MapperError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             MappingConfigToModelError: status.HTTP_500_INTERNAL_SERVER_ERROR,
-            CodeEvaluationError: status.HTTP_500_INTERNAL_SERVER_ERROR,
+            ExpressionEvaluationError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             # ProfilerError and its subclasses
             ProfilerError: status.HTTP_500_INTERNAL_SERVER_ERROR,
             ProfileNotFoundError: status.HTTP_404_NOT_FOUND,
@@ -72,7 +72,7 @@ class ExceptionHandler:
             handler=self.global_exception_handler,
         )
 
-    async def known_exception_handler(
+    def known_exception_handler(
         self,
         request: Request,
         exc: Exception,
@@ -99,7 +99,7 @@ class ExceptionHandler:
             ),
         )
 
-    async def global_exception_handler(
+    def global_exception_handler(
         self,
         request: Request,
         exc: Exception,

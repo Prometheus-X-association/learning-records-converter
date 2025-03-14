@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from os import PathLike
 
 from app.infrastructure.logging.types import LogLevel
 
@@ -52,7 +53,7 @@ class ConfigContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_profiles_base_path(self) -> str:
+    def get_profiles_base_path(self) -> str | PathLike[str]:
         """
         Get the base path for profile files.
 
@@ -61,7 +62,7 @@ class ConfigContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_and_create_profiles_base_path(self) -> str:
+    def get_and_create_profiles_base_path(self) -> str | PathLike[str]:
         """
         Get the base path for profile files and create the directory if it doesn't exist.
 
