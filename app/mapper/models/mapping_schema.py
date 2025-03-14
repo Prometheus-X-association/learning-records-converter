@@ -18,7 +18,7 @@ class OutputMappingModel(BasicModel):
         examples=["actor.mbox"],
     )
 
-    value: Any | None = Field(
+    value: Any = Field(
         default=None,
         description="Static value",
         examples=["http://example.com/xapi/verbs/completed"],

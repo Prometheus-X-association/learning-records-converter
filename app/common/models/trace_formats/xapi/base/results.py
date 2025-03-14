@@ -1,11 +1,10 @@
 """Base xAPI `Result` definitions."""
 
+import re
 from datetime import timedelta
-from decimal import Decimal
-from typing import Any, Dict, Optional, Union
+from typing import Annotated, Any
 
-from pydantic import Field, StrictBool, model_validator
-from typing_extensions import Annotated
+from pydantic import BeforeValidator, Field, StrictBool, model_validator
 
 from ..config import NonEmptyStrictStr
 
@@ -13,20 +12,37 @@ from ..config import BaseModelWithConfig
 from .common import IRI
 
 
+def ensure_duration_is_valid(value: Any) -> Any:
+    """Check that duration is valid ISO 8601 format string."""
+    if isinstance(value, timedelta):
+        return value
+
+    if not isinstance(value, str):
+        raise ValueError("Duration must be expressed using ISO 8601 format string.")
+
+    if "W" in value and not re.search(r"^P\d+W$", value):
+        raise ValueError("Combining any other unit with weeks is not allowed.")
+
+    return value
+
+
 class BaseXapiResultScore(BaseModelWithConfig):
-    """Pydantic model for result `score` property.
+    """Pydantic model for result `score` property."""
 
-    Attributes:
-        scaled (int): Consists of the normalized score related to the experience.
-        raw (Decimal): Consists of the non-normalized score achieved by the Actor.
-        min (Decimal): Consists of the lowest possible score.
-        max (Decimal): Consists of the highest possible score.
-    """
-
-    scaled: Optional[Annotated[int, Field(ge=-1, le=1)]] = None
-    raw: Optional[Decimal] = None
-    min: Optional[Decimal] = None
-    max: Optional[Decimal] = None
+    scaled: Annotated[float, Field(ge=-1, le=1, strict=True)] | None = Field(
+        None,
+        description="Normalized score related to the experience",
+        examples=[0],
+    )
+    raw: Annotated[float, Field(strict=True)] | None = Field(
+        None, description="Non-normalized score achieved by the Actor", examples=[10]
+    )
+    min: Annotated[float, Field(strict=True)] | None = Field(
+        None, description="Lowest possible score", examples=[0]
+    )
+    max: Annotated[float, Field(strict=True)] | None = Field(
+        None, description="Highest possible score", examples=[20]
+    )
 
     @model_validator(mode="after")
     def check_raw_min_max_relation(self) -> Any:
@@ -43,21 +59,31 @@ class BaseXapiResultScore(BaseModelWithConfig):
 
 
 class BaseXapiResult(BaseModelWithConfig):
-    """Pydantic model for `result` property.
+    """Pydantic model for `result` property."""
 
-    Attributes:
-        score (dict): See BaseXapiResultScore.
-        success (bool): Indicates whether the attempt on the Activity was successful.
-        completion (bool): Indicates whether the Activity was completed.
-        response (str): Consists of the response for the given Activity.
-        duration (timedelta): Consists of the duration over which the Statement
-            occurred.
-        extensions (dict): Consists of a dictionary of other properties as needed.
-    """
-
-    score: Optional[BaseXapiResultScore] = None
-    success: Optional[StrictBool] = None
-    completion: Optional[StrictBool] = None
-    response: Optional[NonEmptyStrictStr] = None
-    duration: Optional[timedelta] = None
-    extensions: Optional[Dict[IRI, Union[str, int, bool, list, dict, None]]] = None
+    score: BaseXapiResultScore | None = Field(
+        None, description="See BaseXapiResultScore"
+    )
+    success: StrictBool | None = Field(
+        None, description="Indicates whether the attempt on the Activity was successful"
+    )
+    completion: StrictBool | None = Field(
+        None, description="Indicates whether the Activity was completed"
+    )
+    response: NonEmptyStrictStr | None = Field(
+        None,
+        description="Response for the given Activity",
+        examples=["Wow, nice work!"],
+    )
+    duration: Annotated[timedelta, BeforeValidator(ensure_duration_is_valid)] | None = (
+        Field(
+            None,
+            description="Duration over which the Statement occurred",
+            examples=["PT1234S"],
+        )
+    )
+    extensions: dict[IRI, str | int | bool | list | dict | None] | None = Field(
+        None,
+        description="Dictionary of other properties as needed",
+        examples=[{"http://example.com/extensions/example-ext": 0}],
+    )
