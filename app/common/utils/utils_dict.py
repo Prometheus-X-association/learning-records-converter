@@ -26,7 +26,7 @@ def remove_empty_elements(dictionary: Mapping | Sequence) -> dict | list:
     Returns:
         dictionary or list with removed fields
     """
-    if not isinstance(dictionary, Mapping | Sequence):
+    if not isinstance(dictionary, Mapping | Sequence) or isinstance(dictionary, str):
         return dictionary
     if isinstance(dictionary, Sequence):
         return [
@@ -83,7 +83,11 @@ def get_value_from_flat_key(
             if index < total_list_key_len:
                 value = default_value
             break
-    if return_copy and isinstance(value, Mapping | Sequence):
+    if (
+        return_copy
+        and isinstance(value, Mapping | Sequence)
+        and not isinstance(value, str)
+    ):
         return value.copy()
     return value
 

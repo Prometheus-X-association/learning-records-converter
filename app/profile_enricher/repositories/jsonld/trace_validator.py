@@ -263,7 +263,7 @@ class TraceValidator:
             item
             for result in results
             for item in (
-                result.value if isinstance(result.value, Sequence) else [result.value]
+                result.value if isinstance(result.value, list) else [result.value]
             )
         ]
 
