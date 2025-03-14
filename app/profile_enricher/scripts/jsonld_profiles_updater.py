@@ -1,3 +1,4 @@
+from os import PathLike
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -19,7 +20,7 @@ class JsonLdProfilesUpdater:
 
     def __init__(
         self,
-        destination_dir: str,
+        destination_dir: str | PathLike[str],
         logger: LoggerContract,
         config: ConfigContract,
     ) -> None:

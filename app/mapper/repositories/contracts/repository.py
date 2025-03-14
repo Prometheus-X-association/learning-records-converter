@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import BinaryIO
 
 from extensions.enums import CustomTraceFormatStrEnum
@@ -41,7 +42,7 @@ class MappingRepository(ABC):
         raise NotImplementedError
 
     @staticmethod
-    def get_mapping_model(config: dict) -> MappingSchema:
+    def get_mapping_model(config: Mapping) -> MappingSchema:
         """
         Load and validate a configuration dict into a MappingSchema.
 

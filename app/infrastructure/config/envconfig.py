@@ -40,14 +40,14 @@ class EnvConfig(ConfigContract):
         origins = self._get("CORS_ALLOWED_ORIGINS", "*")
         return {origin.strip() for origin in origins.split(",")}
 
-    def get_profiles_base_path(self) -> str:
+    def get_profiles_base_path(self) -> str | os.PathLike[str]:
         """Inherited from ConfigContract.get_profiles_base_path."""
         return self._get(
             "PROFILES_BASE_PATH",
             Path("data").joinpath("dases_profiles").as_posix(),
         )
 
-    def get_and_create_profiles_base_path(self) -> str:
+    def get_and_create_profiles_base_path(self) -> str | os.PathLike[str]:
         """Inherited from ConfigContract.get_and_create_profiles_base_path."""
         path = self.get_profiles_base_path()
         try:

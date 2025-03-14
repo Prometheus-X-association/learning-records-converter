@@ -1,3 +1,4 @@
+from collections.abc import Iterable, Mapping, Sequence
 from typing import TYPE_CHECKING, Any
 
 from app.common.common_types import JsonType
@@ -29,7 +30,7 @@ class TraceValidator:
         :param logger: The logger instance for logging operations.
         """
         self.logger = logger
-        self.rule_checks: dict[str, Callable[[list[Any], list[Any]], bool]] = {
+        self.rule_checks: dict[str, Callable[[Iterable[Any], Iterable[Any]], bool]] = {
             "any": self._check_any,
             "all": self._check_all,
             "none": self._check_none,
@@ -103,7 +104,7 @@ class TraceValidator:
 
         :param template: The StatementTemplate containing the rules to apply
         :param trace: The trace data to validate
-        :param rule_types: A list of PresenceTypeEnum values indicating which types of rules to apply
+        :param rule_types: A set of PresenceTypeEnum values indicating which types of rules to apply
         :return: A list of ValidationResult objects representing the outcome of applying the rules
         """
         if not template.rules:
@@ -125,7 +126,7 @@ class TraceValidator:
     def _validate_rule(
         self,
         rule: StatementTemplateRule,
-        values: list[Any],
+        values: Sequence[Any],
         rule_types: set[PresenceTypeEnum],
     ) -> list[ValidationResult]:
         """
@@ -135,7 +136,8 @@ class TraceValidator:
 
         :param rule: The rule to check against
         :param values: The extracted values relevant to the rule
-        :return: List of errors
+        :param rule_types: A set of rule types to check
+        :return: List of validation results
         """
         if rule.presence not in rule_types:
             return []
@@ -193,7 +195,7 @@ class TraceValidator:
         return validation_results
 
     @staticmethod
-    def _check_any(any_values: list[Any], values: list[Any]) -> bool:
+    def _check_any(any_values: Iterable[Any], values: Iterable[Any]) -> bool:
         """
         Check if any of the required values are present.
 
@@ -204,7 +206,7 @@ class TraceValidator:
         return any(v in any_values for v in values)
 
     @staticmethod
-    def _check_all(all_values: list[Any], values: list[Any]) -> bool:
+    def _check_all(all_values: Iterable[Any], values: Iterable[Any]) -> bool:
         """
         Check if all the required values are present.
 
@@ -215,7 +217,7 @@ class TraceValidator:
         return all(v in values for v in all_values)
 
     @staticmethod
-    def _check_none(none_values: list[Any], values: list[Any]) -> bool:
+    def _check_none(none_values: Iterable[Any], values: Iterable[Any]) -> bool:
         """
         Check if none of the prohibited values are present.
 
@@ -261,13 +263,13 @@ class TraceValidator:
             item
             for result in results
             for item in (
-                result.value if isinstance(result.value, list) else [result.value]
+                result.value if isinstance(result.value, Sequence) else [result.value]
             )
         ]
 
-    def _apply_selector(self, values: list[Any], selector: str) -> list[Any]:
+    def _apply_selector(self, values: Sequence[Any], selector: str) -> list[Any]:
         """
-        Apply a selector to a list of values and return the results.
+        Apply a selector to a sequence of values and return the results.
 
         :param values: The values to apply the selector to
         :param selector: The selector to apply
@@ -275,6 +277,6 @@ class TraceValidator:
         """
         result = []
         for value in values:
-            if isinstance(value, dict):
+            if isinstance(value, Mapping):
                 result.extend(self._apply_jsonpath(data=value, path=selector))
         return result

@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from json import dumps
 from typing import Annotated
 
@@ -182,7 +183,7 @@ async def transform_custom_file(
 
     mapper.load_schema_by_file(file=mapping_file.file)
 
-    async def generate_xapi_statements():
+    async def generate_xapi_statements() -> AsyncGenerator:
         for trace in parser.parse(file=data_file.file):
             output_trace = mapper.convert(
                 input_trace=trace,
