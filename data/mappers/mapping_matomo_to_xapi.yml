@@ -22,7 +22,7 @@ mappings:
     output_fields:
       output_field: "actor.account.homePage"
       custom:
-        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+        - "lambda url: url if (url is not None and url.startswith(('http://', 'https://'))) else (None if url is None else 'http://' + url)"
 
   # Object
   - input_fields:
@@ -30,7 +30,7 @@ mappings:
     output_fields:
       output_field: "object.id"
       custom:
-        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+        - "lambda url: url if (url is not None and url.startswith(('http://', 'https://'))) else (None if url is None else 'http://' + url)"
 
   - input_fields:
       - "actionDetails.title"
@@ -119,7 +119,7 @@ mappings:
     output_fields:
       output_field: "context.extensions[http://id.tincanapi.com/extension/referrer]"
       custom:
-        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+        - "lambda url: url if (url is not None and url.startswith(('http://', 'https://'))) else (None if url is None else 'http://' + url)"
 
   # Context IRL
   - input_fields:
@@ -127,7 +127,7 @@ mappings:
     output_fields:
       output_field: "context.extensions[http://id.tincanapi.com/extension/irl]"
       custom:
-        - "lambda url: url if url.startswith(('http://', 'https://')) else 'http://' + url"
+        - "lambda url: url if (url is not None and url.startswith(('http://', 'https://'))) else (None if url is None else 'http://' + url)"
 
   - input_fields:
       - "idVisit"
