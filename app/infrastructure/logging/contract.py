@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from typing import Any
 
 
@@ -6,7 +7,7 @@ class LoggerContract(ABC):
     """Abstract base class for logger implementations at various severity levels, with optional context information."""
 
     @abstractmethod
-    def debug(self, message: str, context: dict[str, Any] | None = None) -> None:
+    def debug(self, message: str, context: Mapping[str, Any] | None = None) -> None:
         """
         Log a debug message.
 
@@ -16,7 +17,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def info(self, message: str, context: dict[str, Any] | None = None) -> None:
+    def info(self, message: str, context: Mapping[str, Any] | None = None) -> None:
         """
         Log an info message.
 
@@ -26,7 +27,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def warning(self, message: str, context: dict[str, Any] | None = None) -> None:
+    def warning(self, message: str, context: Mapping[str, Any] | None = None) -> None:
         """
         Log a warning message.
 
@@ -36,7 +37,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def error(self, message: str, context: dict[str, Any] | None = None) -> None:
+    def error(self, message: str, context: Mapping[str, Any] | None = None) -> None:
         """
         Log an error message.
 
@@ -46,7 +47,7 @@ class LoggerContract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def critical(self, message: str, context: dict[str, Any] | None = None) -> None:
+    def critical(self, message: str, context: Mapping[str, Any] | None = None) -> None:
         """
         Log a critical message.
 
@@ -60,7 +61,7 @@ class LoggerContract(ABC):
         self,
         message: str,
         exc: Exception,
-        context: dict[str, Any] | None = None,
+        context: Mapping[str, Any] | None = None,
     ) -> None:
         """
         Log an exception.

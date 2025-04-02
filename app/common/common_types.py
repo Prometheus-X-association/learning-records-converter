@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Any
 
-type JsonType = dict[str, Any]
+type JsonType = Mapping[str, Any]

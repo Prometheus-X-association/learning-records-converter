@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from json import dumps
 from typing import Annotated
 
@@ -30,7 +31,7 @@ router = APIRouter()
     description="Validate an input trace. If a trace format is provided, it will check only that format. Otherwise, it will attempt to detect the format.",
     status_code=200,
 )
-async def validate_input_trace(
+def validate_input_trace(
     query: ValidateInputTraceRequestModel,
 ) -> ValidateInputTraceResponseModel:
     """
@@ -68,7 +69,7 @@ async def validate_input_trace(
     description="Transform an input trace into a specific output trace.",
     status_code=200,
 )
-async def transform_input_trace(
+def transform_input_trace(
     request: Request,
     query: TransformInputTraceRequestModel,
     mapper: Annotated[Mapper, Depends(get_mapper)],
@@ -173,6 +174,7 @@ async def transform_custom_file(
     :param mapper: The Mapper instance for trace conversion
     :return: A streaming response containing the transformed xAPI statements
     """
+    request.state.logger.info(data_file)
     parser = ParserFactory.get_parser(
         mime_type=data_file.content_type,
         logger=request.state.logger,
@@ -181,7 +183,7 @@ async def transform_custom_file(
 
     mapper.load_schema_by_file(file=mapping_file.file)
 
-    async def generate_xapi_statements():
+    async def generate_xapi_statements() -> AsyncGenerator:
         for trace in parser.parse(file=data_file.file):
             output_trace = mapper.convert(
                 input_trace=trace,

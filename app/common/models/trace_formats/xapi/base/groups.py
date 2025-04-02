@@ -1,8 +1,12 @@
 """Base xAPI `Group` definitions."""
 
-import sys
 from abc import ABC
-from typing import List, Optional, Union
+from typing import Annotated, Literal
+
+from annotated_types import Len
+from pydantic import Field
+
+from ..config import NonEmptyStrictStr
 
 from ..config import BaseModelWithConfig
 from .agents import BaseXapiAgent
@@ -13,50 +17,48 @@ from .ifi import (
     BaseXapiOpenIdIFI,
 )
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
-
-from ..config import NonEmptyStrictStr
-
 
 class BaseXapiGroupCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Group` type property.
 
     It is defined for the Group which performed the action.
-
-    Attributes:
-        objectType (str): Consists of the value `Group`.
-        name (str): Consists of the full name of the Group.
     """
 
-    objectType: Literal["Group"]
-    name: Optional[NonEmptyStrictStr] = None
+    objectType: Literal["Group"] = Field(description="Value `Group`")
+    name: NonEmptyStrictStr | None = Field(
+        None, description="Full name of the Group", examples=["Team Example"]
+    )
 
 
 class BaseXapiAnonymousGroup(BaseXapiGroupCommonProperties):
     """Pydantic model for `Group` type property.
 
     It is defined for Anonymous Group type.
-
-    Attributes:
-        member (list): Consist of a list of the members of this Group.
     """
 
-    member: List[BaseXapiAgent]
+    member: list[BaseXapiAgent] = Field(description="List of the members of this Group")
+
+
+class BaseXapiAuthorityAnonymousGroup(BaseXapiGroupCommonProperties):
+    """Pydantic model for `Group` type property.
+
+    It is defined for Authority Anonymous Group type.
+    """
+
+    member: Annotated[list[BaseXapiAgent], Len(min_length=2, max_length=2)] = Field(
+        description="List of the members of this Group"
+    )
 
 
 class BaseXapiIdentifiedGroup(BaseXapiGroupCommonProperties):
     """Pydantic model for `Group` type property.
 
     It is defined for Identified Group type.
-
-    Attributes:
-        member (list): Consist of a list of the members of this Group.
     """
 
-    member: Optional[List[BaseXapiAgent]]
+    member: list[BaseXapiAgent] | None = Field(
+        None, description="List of the members of this Group"
+    )
 
 
 class BaseXapiIdentifiedGroupWithMbox(BaseXapiIdentifiedGroup, BaseXapiMboxIFI):
@@ -89,10 +91,10 @@ class BaseXapiIdentifiedGroupWithAccount(BaseXapiIdentifiedGroup, BaseXapiAccoun
     """
 
 
-BaseXapiGroup = Union[
-    BaseXapiAnonymousGroup,
-    BaseXapiIdentifiedGroupWithMbox,
-    BaseXapiIdentifiedGroupWithMboxSha1Sum,
-    BaseXapiIdentifiedGroupWithOpenId,
-    BaseXapiIdentifiedGroupWithAccount,
-]
+BaseXapiGroup = (
+    BaseXapiAnonymousGroup
+    | BaseXapiIdentifiedGroupWithMbox
+    | BaseXapiIdentifiedGroupWithMboxSha1Sum
+    | BaseXapiIdentifiedGroupWithOpenId
+    | BaseXapiIdentifiedGroupWithAccount
+)
