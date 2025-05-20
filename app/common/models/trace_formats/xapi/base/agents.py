@@ -1,11 +1,11 @@
 """Base xAPI `Agent` definitions."""
 
-import sys
 from abc import ABC
-from typing import Optional, Union
+from typing import Literal
 
-from ..config import NonEmptyStrictStr
-from ..config import BaseModelWithConfig
+from pydantic import Field
+
+from ..config import BaseModelWithConfig, NonEmptyStrictStr
 
 from .common import IRI
 from .ifi import (
@@ -15,36 +15,29 @@ from .ifi import (
     BaseXapiOpenIdIFI,
 )
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
-
 
 class BaseXapiAgentAccount(BaseModelWithConfig):
-    """Pydantic model for `Agent` type `account` property.
+    """Pydantic model for `Agent` type `account` property."""
 
-    Attributes:
-        homePage (IRI): Consists of the home page of the account's service provider.
-        name (str): Consists of the unique id or name of the Actor's account.
-    """
-
-    homePage: IRI
-    name: NonEmptyStrictStr
+    homePage: IRI = Field(
+        description="Home page of the account's service provider",
+        examples=["http://www.example.com"],
+    )
+    name: NonEmptyStrictStr = Field(
+        description="Unique id or name of the Actor's account", examples=["John Doe"]
+    )
 
 
 class BaseXapiAgentCommonProperties(BaseModelWithConfig, ABC):
     """Pydantic model for core `Agent` type property.
 
     It defines who performed the action.
-
-    Attributes:
-        objectType (str): Consists of the value `Agent`.
-        name (str): Consists of the full name of the Agent.
     """
 
     objectType: Literal["Agent"] = "Agent"
-    name: Optional[NonEmptyStrictStr] = None
+    name: NonEmptyStrictStr | None = Field(
+        None, description="full name of the Agent", examples=["John Doe"]
+    )
 
 
 class BaseXapiAgentWithMbox(BaseXapiAgentCommonProperties, BaseXapiMboxIFI):
@@ -77,9 +70,9 @@ class BaseXapiAgentWithAccount(BaseXapiAgentCommonProperties, BaseXapiAccountIFI
     """
 
 
-BaseXapiAgent = Union[
-    BaseXapiAgentWithMbox,
-    BaseXapiAgentWithMboxSha1Sum,
-    BaseXapiAgentWithOpenId,
-    BaseXapiAgentWithAccount,
-]
+BaseXapiAgent = (
+    BaseXapiAgentWithMbox
+    | BaseXapiAgentWithMboxSha1Sum
+    | BaseXapiAgentWithOpenId
+    | BaseXapiAgentWithAccount
+)

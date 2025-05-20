@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from functools import cache
 from typing import Any
 
@@ -23,7 +24,7 @@ class JSONPathUtils:
             raise ValueError(f"Invalid JSONPath: {path}") from e
 
     @staticmethod
-    def path_exists(path: str, data: dict) -> bool:
+    def path_exists(path: str, data: Mapping[str, Any]) -> bool:
         """
         Check if a value exists at the specified JSONPath.
 
