@@ -11,6 +11,7 @@ def is_empty(x: Any) -> bool:
 
     Returns:
         bool: Element is empty (True) or not (False)
+
     """
     if x is None:
         return True
@@ -28,5 +29,6 @@ def replace_empty(value: Any, replace_value: Any = "") -> Any:
 
     Returns:
         Any: Either the same value or the replacement value if it's empty
+
     """
     return replace_value if is_empty(value) else value

@@ -13,7 +13,7 @@ class ExtendedTypeBaseModel(BaseModel):
     By using this BaseModel, all Fields with models as type will accept and auto detect
     all subclasses from models.
 
-    Example
+    Example:
         class ModelA(BaseModel):
             name: str
 
@@ -30,6 +30,7 @@ class ExtendedTypeBaseModel(BaseModel):
         ModelC(**{"object_a": {"age": 15}})  # OK > ModelB
         ModelC(**{"object_a": {"name": "bob"}})  # OK > ModelA
         ModelC(**{"object_a": {"name": "bob", "age": 15}})  # OK > ModelB
+
     """
 
     @classmethod
@@ -41,6 +42,7 @@ class ExtendedTypeBaseModel(BaseModel):
 
         Returns:
             List[Type[BaseModel]]: All child classes with no depth restriction.
+
         """
         if isinstance(annotation, type) and issubclass(annotation, BaseModel):
             yield annotation
@@ -62,6 +64,7 @@ class ExtendedTypeBaseModel(BaseModel):
 
         Returns:
             Any: Either returns a model instance with the valid data or the exact passed value
+
         """
         for each_type in annotations:
             if issubclass(each_type, BaseModel) and isinstance(value, dict):
@@ -90,6 +93,7 @@ class ExtendedTypeBaseModel(BaseModel):
 
         Returns:
             Any: Either returns a model instance with the valid data or the exact passed value
+
         """
         # Get FieldInfo
         field = cls.model_fields.get(

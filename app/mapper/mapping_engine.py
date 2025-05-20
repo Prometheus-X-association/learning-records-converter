@@ -1,7 +1,6 @@
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
-from extensions.enums import CustomTraceFormatStrEnum
 from utils.utils_dict import (
     get_value_from_flat_key,
     remove_empty_elements,
@@ -9,6 +8,7 @@ from utils.utils_dict import (
 )
 
 from app.common.common_types import JsonType
+from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
@@ -31,8 +31,7 @@ class MappingEngine:
         evaluator: ExpressionEvaluatorContract,
         logger: LoggerContract,
     ) -> None:
-        """
-        Initialize the MappingEngine.
+        """Initialize the MappingEngine.
 
         :param evaluator: ExpressionEvaluatorContract implementation for Python expressions evaluation
         :param logger: LoggerContract implementation for logging
@@ -48,8 +47,7 @@ class MappingEngine:
         mapping_to_apply: MappingSchema,
         output_format: CustomTraceFormatStrEnum,
     ) -> Trace:
-        """
-        Main function : run the mapping process on the input trace.
+        """Main function : run the mapping process on the input trace.
 
         :param input_trace: The input trace to map
         :param mapping_to_apply: The mapping configuration to apply
@@ -85,8 +83,7 @@ class MappingEngine:
         mapping_schema: MappingSchema,
         output_format: CustomTraceFormatStrEnum,
     ) -> JsonType:
-        """
-        Apply the mapping to the input trace.
+        """Apply the mapping to the input trace.
 
         :param input_trace: The prepared input trace
         :param mapping_schema: The mapping schema to apply
@@ -116,8 +113,7 @@ class MappingEngine:
         mapped_data: JsonType,
         mapping_schema: MappingSchema,
     ) -> JsonType:
-        """
-        Apply post-processing to the mapped data.
+        """Apply post-processing to the mapped data.
 
         :param mapped_data: The mapped data to post-process
         :param mapping_schema: The mapping schema to apply
@@ -134,8 +130,7 @@ class MappingEngine:
         output_data: JsonType,
         mapping_schema: MappingSchema,
     ) -> JsonType:
-        """
-        Apply default values to the output data.
+        """Apply default values to the output data.
 
         :param output_data: The output trace to apply default values to
         :param mapping_schema: The mapping schema to apply
@@ -155,8 +150,7 @@ class MappingEngine:
         output_data: JsonType,
         output_format: CustomTraceFormatStrEnum,
     ) -> Trace:
-        """
-        Create the final output trace.
+        """Create the final output trace.
 
         :param output_data: The output data to create the trace from
         :param output_format: The desired output format
@@ -177,8 +171,7 @@ class MappingEngine:
         overwrite: bool,
         arguments: Sequence[Any] | None = None,
     ) -> dict[str, Any]:
-        """
-        Build the output trace based on the output content.
+        """Build the output trace based on the output content.
 
         :param output_content: The output mapping model
         :param output_data: The current output trace
@@ -204,8 +197,7 @@ class MappingEngine:
         output_model: OutputMappingModel,
         arguments: Sequence[Any],
     ) -> list[FinalMappingModel]:
-        """
-        Handle the output based on the OutputMappingModel.
+        """Handle the output based on the OutputMappingModel.
 
         :param output_model: The output mapping model
         :param arguments: Input arguments
@@ -251,8 +243,7 @@ class MappingEngine:
         custom_input: Iterable[str],
         arguments: Sequence[Any],
     ) -> Any:
-        """
-        Apply a series of custom transformations to the input arguments.
+        """Apply a series of custom transformations to the input arguments.
 
         :param custom_input: Iterable of custom transformation strings
         :param arguments: Input arguments for the transformations
@@ -274,8 +265,7 @@ class MappingEngine:
         switch_value: Iterable[ConditionOutputMappingModel],
         arguments: Sequence[Any] | None = None,
     ) -> list[FinalMappingModel]:
-        """
-        Apply a switch transformation based on conditions.
+        """Apply a switch transformation based on conditions.
 
         :param switch_value: Iterable of condition-based output mappings
         :param arguments: Input arguments for the conditions

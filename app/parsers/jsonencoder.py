@@ -4,13 +4,10 @@ from typing import Any
 
 
 class CustomJSONEncoder(JSONEncoder):
-    """
-    A custom JSON encoder that handles Decimal objects.
-    """
+    """A custom JSON encoder that handles Decimal objects."""
 
     def default(self, o: Any):
-        """
-        Convert the object to a JSON serializable format.
+        """Convert the object to a JSON serializable format.
 
         :param o: The object to be serialized
         :return: A JSON serializable representation of the object

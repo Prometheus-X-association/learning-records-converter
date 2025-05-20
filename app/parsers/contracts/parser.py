@@ -8,29 +8,24 @@ from app.infrastructure.logging.contract import LoggerContract
 
 
 class Parser(ABC):
-    """
-    Abstract base class for all parsers.
-    """
+    """Abstract base class for all parsers."""
 
     def __init__(
         self,
         logger: LoggerContract,
         parsing_config: CustomConfigModel | None = None,
-    ):
-        """
-        Initialize the parser with optional configuration.
+    ) -> None:
+        """Initialize the parser with optional configuration.
 
         :param logger: LoggerContract implementation for logging
         :param parsing_config: Configuration for the parser
         """
-
         self.logger = logger
         self.parsing_config = parsing_config or CustomConfigModel()
 
     @abstractmethod
     def parse(self, file: BinaryIO) -> Generator[Trace]:
-        """
-        Parse the given file and yield parsed data.
+        """Parse the given file and yield parsed data.
 
         :param file: The file-like object to parse
         :yield: Parsed data from the file

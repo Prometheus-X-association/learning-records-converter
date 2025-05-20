@@ -18,8 +18,7 @@ class JsonLdProfileRepository(ProfileRepository):
     """A repository for handling JSON-LD profiles."""
 
     def __init__(self, logger: LoggerContract, config: ConfigContract) -> None:
-        """
-        Initialize the JsonLdProfileRepository.
+        """Initialize the JsonLdProfileRepository.
 
         :param logger: LoggerContract implementation for logging
         :param config: ConfigContract implementation for config
@@ -30,8 +29,7 @@ class JsonLdProfileRepository(ProfileRepository):
         self.trace_validator = TraceValidator(logger=logger)
 
     def enrich_trace(self, group_name: str, template_name: str, trace: Trace) -> None:
-        """
-        Enrich a trace based on its profile.
+        """Enrich a trace based on its profile.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
@@ -68,8 +66,7 @@ class JsonLdProfileRepository(ProfileRepository):
         template_name: str,
         trace: Trace,
     ) -> list[ValidationError]:
-        """
-        Validate a trace against its profile rules.
+        """Validate a trace against its profile rules.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
@@ -98,8 +95,7 @@ class JsonLdProfileRepository(ProfileRepository):
         template_name: str,
         trace: Trace,
     ) -> list[ValidationRecommendation]:
-        """
-        Generate recommendations for a trace based on a specific template.
+        """Generate recommendations for a trace based on a specific template.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile

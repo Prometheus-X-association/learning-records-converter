@@ -9,16 +9,14 @@ from .types import LogLevel
 
 
 class JsonLoggingFormatter(logging.Formatter):
-    """
-    Custom formatter that outputs log records in a JSON format.
+    """Custom formatter that outputs log records in a JSON format.
 
     This formatter includes timestamp, log level, message, and any additional context
     provided in the log record.
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        """
-        Format the specified log record as JSON.
+        """Format the specified log record as JSON.
 
         :param record: The log record to format.
         :return: A JSON string representing the formatted log record.
@@ -35,15 +33,13 @@ class JsonLoggingFormatter(logging.Formatter):
 
 
 class JsonLogger(LoggerContract):
-    """
-    Concrete implementation of LoggerContract using Python's built-in logging module.
+    """Concrete implementation of LoggerContract using Python's built-in logging module.
 
     This implementation formats logs as JSON and supports adding context to log messages.
     """
 
     def __init__(self, name: str, level: LogLevel) -> None:
-        """
-        Initialize the JsonLogger.
+        """Initialize the JsonLogger.
 
         :param name: The name of the logger, typically __name__ of the calling module.
         :param level: The minimum log level to output
@@ -61,8 +57,7 @@ class JsonLogger(LoggerContract):
         message: str,
         context: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Internal method to handle logging at different levels.
+        """Internal method to handle logging at different levels.
 
         :param level: The logging level (e.g., logging.INFO, logging.ERROR).
         :param message: The message to log.

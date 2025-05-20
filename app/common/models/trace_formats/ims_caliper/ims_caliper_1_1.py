@@ -1469,6 +1469,7 @@ class IMSCaliperModel(BaseModel):
 
         Returns:
             List[EventModel]: List of data in the correct EventModel instance
+
         """
         # Get FieldInfo
         field = cls.model_fields.get(

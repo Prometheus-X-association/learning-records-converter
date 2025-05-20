@@ -50,7 +50,7 @@ class TestEvalExpressionEvaluator:
     ) -> None:
         """Test that registering an existing function raises an error."""
 
-        def new_isinstance():
+        def new_isinstance() -> int:
             return 42
 
         with pytest.raises(ValueError, match="Already registered function"):
@@ -184,7 +184,7 @@ class TestEvalExpressionEvaluator:
         """Test registering functions with various argument signatures."""
 
         # Test functions with different numbers of arguments
-        def no_args():
+        def no_args() -> int:
             return 42
 
         def var_args(*args):

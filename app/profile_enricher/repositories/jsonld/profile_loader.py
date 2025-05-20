@@ -24,8 +24,7 @@ class ProfileLoader:
     """Class responsible for loading profile's file."""
 
     def __init__(self, logger: LoggerContract, config: ConfigContract) -> None:
-        """
-        Initialize the ProfileLoader.
+        """Initialize the ProfileLoader.
 
         :param logger: The logger instance for logging operations.
         :param config: The configuration instance for accessing app settings.
@@ -43,8 +42,7 @@ class ProfileLoader:
 
     @cache
     def load_template(self, group_name: str, template_name: str) -> StatementTemplate:
-        """
-        Load a template from cache or from file if not cached.
+        """Load a template from cache or from file if not cached.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
@@ -92,8 +90,7 @@ class ProfileLoader:
         return template
 
     def read_profile_file(self, file_path: str | PathLike[str]) -> JsonType:
-        """
-        Load a profile file from the file system.
+        """Load a profile file from the file system.
 
         :param file_path: The file path of the profile
         :return: The loaded profile data
@@ -119,8 +116,7 @@ class ProfileLoader:
             ) from e
 
     def download_profile(self, group_name: str) -> JsonType:
-        """
-        Download a profile file for a given group.
+        """Download a profile file for a given group.
 
         :param group_name: The name of the group whose profile is to be downloaded
         :return: The contents of the downloaded profile as a dictionary
@@ -174,8 +170,7 @@ class ProfileLoader:
         file_path: str | PathLike[str],
         profile_json: JsonType,
     ) -> None:
-        """
-        Save a profile file to the file system.
+        """Save a profile file to the file system.
 
         :param file_path: The file path where to save the profile
         :param profile_json: The profile data to save
@@ -191,8 +186,7 @@ class ProfileLoader:
             raise
 
     def build_profile_model(self, profile_json: JsonType) -> Profile:
-        """
-        Validate the profile JSON against the Profile model.
+        """Validate the profile JSON against the Profile model.
 
         :param profile_json: The profile data in JSON format
         :return: A validated pydantic Profile instance
@@ -212,8 +206,7 @@ class ProfileLoader:
         profile: Profile,
         template_name: str,
     ) -> StatementTemplate | None:
-        """
-        Get a specific template from a profile.
+        """Get a specific template from a profile.
 
         :param profile: The profile containing templates
         :param template_name: The name of the template to retrieve

@@ -24,8 +24,7 @@ class TraceValidator:
     """Class responsible for validating traces against templates."""
 
     def __init__(self, logger: LoggerContract) -> None:
-        """
-        Initialize the TraceValidator.
+        """Initialize the TraceValidator.
 
         :param logger: The logger instance for logging operations.
         """
@@ -41,8 +40,7 @@ class TraceValidator:
         template: StatementTemplate,
         trace: Trace,
     ) -> list[ValidationError]:
-        """
-        Validate a trace against a given template.
+        """Validate a trace against a given template.
 
         :param template: The template to validate against
         :param trace: The trace to validate
@@ -66,8 +64,7 @@ class TraceValidator:
         template: StatementTemplate,
         trace: Trace,
     ) -> list[ValidationRecommendation]:
-        """
-        Generate recommendations for a trace based on a given template.
+        """Generate recommendations for a trace based on a given template.
 
         This method checks the trace against the rules defined in the template
         and generates recommendations for fields that are marked as recommended
@@ -99,8 +96,7 @@ class TraceValidator:
         trace: Trace,
         rule_types: set[PresenceTypeEnum],
     ) -> list[ValidationResult]:
-        """
-        Apply validation rules to a trace based on a given template and rule types.
+        """Apply validation rules to a trace based on a given template and rule types.
 
         :param template: The StatementTemplate containing the rules to apply
         :param trace: The trace data to validate
@@ -129,8 +125,7 @@ class TraceValidator:
         values: Sequence[Any],
         rule_types: set[PresenceTypeEnum],
     ) -> list[ValidationResult]:
-        """
-        Check if a trace follows a specific rule.
+        """Check if a trace follows a specific rule.
 
         See: https://adlnet.github.io/xapi-profiles/xapi-profiles-communication.html#statement-template-valid.
 
@@ -196,8 +191,7 @@ class TraceValidator:
 
     @staticmethod
     def _check_any(any_values: Iterable[Any], values: Iterable[Any]) -> bool:
-        """
-        Check if any of the required values are present.
+        """Check if any of the required values are present.
 
         :param any_values: The required values
         :param values: The values to check
@@ -207,8 +201,7 @@ class TraceValidator:
 
     @staticmethod
     def _check_all(all_values: Iterable[Any], values: Iterable[Any]) -> bool:
-        """
-        Check if all the required values are present.
+        """Check if all the required values are present.
 
         :param all_values: The required values
         :param values: The values to check
@@ -218,8 +211,7 @@ class TraceValidator:
 
     @staticmethod
     def _check_none(none_values: Iterable[Any], values: Iterable[Any]) -> bool:
-        """
-        Check if none of the prohibited values are present.
+        """Check if none of the prohibited values are present.
 
         :param none_values: The prohibited values
         :param values: The values to check
@@ -232,8 +224,7 @@ class TraceValidator:
         rule: StatementTemplateRule,
         trace: Trace,
     ) -> list[Any]:
-        """
-        Extract values from the trace that are relevant to a specific rule.
+        """Extract values from the trace that are relevant to a specific rule.
 
         This method applies the JSONPath specified in the rule to the trace,
         and if a selector is present, further refines the extracted values.
@@ -249,8 +240,7 @@ class TraceValidator:
 
     @staticmethod
     def _apply_jsonpath(data: JsonType, path: str) -> list[Any]:
-        """
-        Apply a JSONPath expression to data and return the results.
+        """Apply a JSONPath expression to data and return the results.
 
         :param data: The data to apply the JSONPath to
         :param path: The JSONPath expression
@@ -268,8 +258,7 @@ class TraceValidator:
         ]
 
     def _apply_selector(self, values: Sequence[Any], selector: str) -> list[Any]:
-        """
-        Apply a selector to a sequence of values and return the results.
+        """Apply a selector to a sequence of values and return the results.
 
         :param values: The values to apply the selector to
         :param selector: The selector to apply

@@ -11,8 +11,7 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_log_level(self) -> LogLevel:
-        """
-        Get the log level.
+        """Get the log level.
 
         :return: The log level as a string (LogLevel type).
         """
@@ -20,16 +19,14 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_environment(self) -> Environment:
-        """
-        Get the current environment.
+        """Get the current environment.
 
         :return: The current environment as a string (Environment type).
         """
         raise NotImplementedError
 
     def is_env_production(self) -> bool:
-        """
-        Check if the current environment is production.
+        """Check if the current environment is production.
 
         :return: True if the environment is production, False otherwise.
         """
@@ -37,16 +34,14 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_download_timeout(self) -> int:
-        """
-        Get the timeout for downloads in seconds.
+        """Get the timeout for downloads in seconds.
 
         :return: The download timeout in seconds.
         """
         raise NotImplementedError
 
     def get_cors_allowed_origins(self) -> set[str]:
-        """
-        Get the allowed origins for CORS.
+        """Get the allowed origins for CORS.
 
         :return: A list of allowed origins URLs.
         """
@@ -54,8 +49,7 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_profiles_base_path(self) -> str | PathLike[str]:
-        """
-        Get the base path for profile files.
+        """Get the base path for profile files.
 
         :return: The base path as a string.
         """
@@ -63,8 +57,7 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_and_create_profiles_base_path(self) -> str | PathLike[str]:
-        """
-        Get the base path for profile files and create the directory if it doesn't exist.
+        """Get the base path for profile files and create the directory if it doesn't exist.
 
         :return: The base path as a string.
         """
@@ -72,8 +65,7 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_profile_url(self, profile_name: str) -> str:
-        """
-        Get the URL for a specific profile.
+        """Get the URL for a specific profile.
 
         :param profile_name: The name of the profile.
         :return: The URL of the profile as a string.
@@ -82,8 +74,7 @@ class ConfigContract(ABC):
 
     @abstractmethod
     def get_profiles_names(self) -> set[str]:
-        """
-        Get the names of all profiles.
+        """Get the names of all profiles.
 
         :return: A list of profile names.
         """
