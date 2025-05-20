@@ -26,7 +26,7 @@ from app.profile_enricher.exceptions import (
 
 
 class ExceptionHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.error_mapping: dict[type[Exception], int] = {
             ValueError: status.HTTP_400_BAD_REQUEST,
             TypeError: status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -53,9 +53,8 @@ class ExceptionHandler:
             InvalidCSVStructureError: status.HTTP_422_UNPROCESSABLE_ENTITY,
         }
 
-    def configure(self, app: FastAPI):
-        """
-        Configure exception handlers for the FastAPI application.
+    def configure(self, app: FastAPI) -> None:
+        """Configure exception handlers for the FastAPI application.
 
         :param app: The FastAPI application instance
         """
@@ -77,8 +76,7 @@ class ExceptionHandler:
         request: Request,
         exc: Exception,
     ) -> JSONResponse:
-        """
-        Handle known exceptions and return appropriate JSON responses.
+        """Handle known exceptions and return appropriate JSON responses.
 
         :param request: The request that caused the exception
         :param exc: The exception that was raised
@@ -104,8 +102,7 @@ class ExceptionHandler:
         request: Request,
         exc: Exception,
     ) -> JSONResponse:
-        """
-        Global exception handler for unhandled exceptions.
+        """Global exception handler for unhandled exceptions.
 
         :param request: The request that caused the exception
         :param exc: The unhandled exception
@@ -128,8 +125,7 @@ class ExceptionHandler:
         status_code: int,
         request: Request,
     ) -> dict[str, str]:
-        """
-        Generate an error detail dictionary based on the exception, status code, and environment.
+        """Generate an error detail dictionary based on the exception, status code, and environment.
 
         In production, internal server errors are given a generic message.
 

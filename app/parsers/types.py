@@ -3,9 +3,7 @@ from enum import Enum, StrEnum
 
 
 class DelimiterEnum(StrEnum):
-    """
-    Enumeration of possible delimiters.
-    """
+    """Enumeration of possible delimiters."""
 
     COLON = ":"
     COMMA = ","
@@ -16,14 +14,14 @@ class DelimiterEnum(StrEnum):
 
 
 class QuotingEnum(Enum):
-    """
-    Enumeration of quoting options.
+    """Enumeration of quoting options.
 
     Attributes:
         ALL (int): Quote all fields.
         MINIMAL (int): Quote fields only if they contain special characters.
         NONE (int): Never quote fields.
         NONNUMERIC (int): Quote all non-numeric fields.
+
     """
 
     ALL = csv.QUOTE_ALL

@@ -34,8 +34,7 @@ router = APIRouter()
 def validate_input_trace(
     query: ValidateInputTraceRequestModel,
 ) -> ValidateInputTraceResponseModel:
-    """
-    Validate or identify a trace.
+    """Validate or identify a trace.
 
     ---
     post:
@@ -75,8 +74,7 @@ def transform_input_trace(
     mapper: Annotated[Mapper, Depends(get_mapper)],
     profiler: Annotated[Profiler, Depends(get_profiler)],
 ) -> TransformInputTraceResponseModel:
-    """
-    Transform and enrich a trace from one format to another.
+    """Transform and enrich a trace from one format to another.
 
     ---
     post:
@@ -158,12 +156,11 @@ async def transform_custom_file(
     request: Request,
     data_file: UploadFile,
     mapping_file: UploadFile,
-    config: Json[CustomConfigModel] | None = Form(default=None),
-    output_format: CustomTraceFormatStrEnum = Form(default=DEFAULT_OUTPUT_FORMAT),
-    mapper: Mapper = Depends(get_mapper),
+    mapper: Annotated[Mapper, Depends(get_mapper)],
+    config: Annotated[Json[CustomConfigModel] | None, Form()] = None,
+    output_format: Annotated[CustomTraceFormatStrEnum, Form()] = DEFAULT_OUTPUT_FORMAT,
 ) -> StreamingResponse:
-    """
-    Transform a custom file using a provided mapping file and parsing configuration.
+    """Transform a custom file using a provided mapping file and parsing configuration.
     This method processes an uploaded file, applies a custom mapping, and streams the
     transformed data as xAPI statements.
     :param request: The request object
@@ -172,7 +169,7 @@ async def transform_custom_file(
     :param config: Optional custom configuration for parsing
     :param output_format: The desired output format for the transformation
     :param mapper: The Mapper instance for trace conversion
-    :return: A streaming response containing the transformed xAPI statements
+    :return: A streaming response containing the transformed xAPI statements.
     """
     request.state.logger.info(data_file)
     parser = ParserFactory.get_parser(

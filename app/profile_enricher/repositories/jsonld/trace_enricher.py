@@ -16,8 +16,7 @@ class TraceEnricher:
     """Class responsible for enriching traces based on templates."""
 
     def __init__(self, logger: LoggerContract) -> None:
-        """
-        Initialize the TraceEnricher.
+        """Initialize the TraceEnricher.
 
         :param logger: The logger instance for logging operations.
         """
@@ -29,8 +28,7 @@ class TraceEnricher:
         template: StatementTemplate,
         trace: Trace,
     ) -> JsonType:
-        """
-        Get enriched data based on the given template.
+        """Get enriched data based on the given template.
 
         :param group_name: The group name of the template
         :param template: The template to use for enrichment
@@ -67,8 +65,7 @@ class TraceEnricher:
         return get_nested_from_flat(flat_field=enriched_data)
 
     def _enrich_with_rules(self, template: StatementTemplate, trace: Trace) -> JsonType:
-        """
-        Get enriched data based on the template's rules than contain only one value.
+        """Get enriched data based on the template's rules than contain only one value.
 
         :param template: The template to use for enrichment.
         :param trace: The trace that needs to be enriched.

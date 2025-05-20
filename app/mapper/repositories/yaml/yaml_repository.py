@@ -2,13 +2,13 @@ from pathlib import Path
 from typing import BinaryIO
 
 from enums import TraceFormatEnum
-from extensions.enums import (
-    CustomTraceFormatOutputMappingEnum,
-    CustomTraceFormatStrEnum,
-)
 from utils.utils_dict import convert_yaml_file_to_json
 from yaml import safe_load
 
+from app.common.extensions.enums import (
+    CustomTraceFormatOutputMappingEnum,
+    CustomTraceFormatStrEnum,
+)
 from app.infrastructure.logging.contract import LoggerContract
 from app.mapper.exceptions import MappingConfigToModelError
 from app.mapper.models.mapping_schema import MappingSchema
@@ -16,15 +16,13 @@ from app.mapper.repositories.contracts.repository import MappingRepository
 
 
 class YamlMappingRepository(MappingRepository):
-    """
-    A concrete implementation of MappingRepository that uses YAML configuration files for mapping.
+    """A concrete implementation of MappingRepository that uses YAML configuration files for mapping.
 
     This class handles the loading of mapping schemas from YAML files based on input and output formats.
     """
 
     def __init__(self, logger: LoggerContract) -> None:
-        """
-        Initialize the YamlMappingRepository.
+        """Initialize the YamlMappingRepository.
 
         :param logger: An instance of LoggerContract for logging
         """
@@ -35,8 +33,7 @@ class YamlMappingRepository(MappingRepository):
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
     ) -> MappingSchema:
-        """
-        Load a mapping schema for the given input and output formats from a YAML file.
+        """Load a mapping schema for the given input and output formats from a YAML file.
 
         :param input_format: The format of the input trace
         :param output_format: The desired output format
@@ -61,8 +58,7 @@ class YamlMappingRepository(MappingRepository):
         return mapping_model
 
     def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
-        """
-        Load a mapping schema from a YAML file.
+        """Load a mapping schema from a YAML file.
 
         This method reads a YAML file, parses its contents, and creates a MappingSchema object.
 
@@ -87,8 +83,7 @@ class YamlMappingRepository(MappingRepository):
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
     ) -> Path:
-        """
-        Retrieve the correct mapping configuration file path based on input and output formats.
+        """Retrieve the correct mapping configuration file path based on input and output formats.
 
         :param input_format: The format of the input trace
         :param output_format: The desired output format

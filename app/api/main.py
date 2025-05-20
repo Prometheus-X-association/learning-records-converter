@@ -16,8 +16,7 @@ config = EnvConfig()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> dict[str, Any]:
-    """
-    Lifespan context manager for the FastAPI application.
+    """Lifespan context manager for the FastAPI application.
 
     :param _app: The FastAPI application instance
     :yield: A dictionary containing logger and config objects

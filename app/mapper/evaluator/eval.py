@@ -8,13 +8,10 @@ from .exceptions import ExpressionEvaluationError
 
 
 class EvalExpressionEvaluator(ExpressionEvaluatorContract):
-    """
-    Simple implementation of expression evaluation using eval().
-    """
+    """Simple implementation of expression evaluation using eval()."""
 
-    def __init__(self, logger: LoggerContract):
-        """
-        Initialize the eval() expression evaluator.
+    def __init__(self, logger: LoggerContract) -> None:
+        """Initialize the eval() expression evaluator.
 
         :param logger: LoggerContract implementation for logging
         """
@@ -53,8 +50,7 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
         }
 
     def register_function(self, name: str, func: Callable) -> None:
-        """
-        Register a function to be available during expression evaluation.
+        """Register a function to be available during expression evaluation.
 
         :param name: The name under which the function will be available
         :param func: The function implementation
@@ -72,8 +68,7 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
         self.registered_functions[name] = func
 
     def eval_expression(self, expression: str) -> Any:
-        """
-        Evaluate a simple expression using eval().
+        """Evaluate a simple expression using eval().
 
         :param expression: The expression to evaluate
         :return: The result of the evaluation
@@ -95,8 +90,7 @@ class EvalExpressionEvaluator(ExpressionEvaluatorContract):
             raise ExpressionEvaluationError(msg) from e
 
     def eval_lambda(self, lambda_expr: str, *args) -> Any:
-        """
-        Evaluate a lambda expression with the given arguments.
+        """Evaluate a lambda expression with the given arguments.
 
         :param lambda_expr: The lambda expression as a string (e.g., "lambda x, y: x + y")
         :param args: Arguments to pass to the lambda function

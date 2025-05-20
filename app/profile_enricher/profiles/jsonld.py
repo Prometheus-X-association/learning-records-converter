@@ -1,5 +1,4 @@
-"""
-This module defines models and enums for xAPI profiles, including concepts, extensions, document resources, and statement templates.
+"""This module defines models and enums for xAPI profiles, including concepts, extensions, document resources, and statement templates.
 
 It uses Pydantic for validation and includes:
 - Enums for profile element types.

@@ -2,16 +2,15 @@ from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from typing import BinaryIO
 
-from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import ValidationError
 
+from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.mapper.exceptions import MappingConfigToModelError
 from app.mapper.models.mapping_schema import MappingSchema
 
 
 class MappingRepository(ABC):
-    """
-    Abstract base class for mapping repositories.
+    """Abstract base class for mapping repositories.
 
     This class defines the interface for loading and checking the existence of mapping schemas.
     """
@@ -22,8 +21,7 @@ class MappingRepository(ABC):
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
     ) -> MappingSchema:
-        """
-        Load a mapping schema for the given input and output formats.
+        """Load a mapping schema for the given input and output formats.
 
         :param input_format: The format of the input trace
         :param output_format: The desired output format
@@ -33,8 +31,7 @@ class MappingRepository(ABC):
 
     @abstractmethod
     def load_schema_by_file(self, mapping_file: BinaryIO) -> MappingSchema:
-        """
-        Load a mapping schema from a file.
+        """Load a mapping schema from a file.
 
         :param mapping_file: A file-like object containing the mapping schema
         :return: The parsed mapping schema
@@ -43,8 +40,7 @@ class MappingRepository(ABC):
 
     @staticmethod
     def get_mapping_model(config: Mapping) -> MappingSchema:
-        """
-        Load and validate a configuration dict into a MappingSchema.
+        """Load and validate a configuration dict into a MappingSchema.
 
         :param config: The mapping configuration dictionary
         :return: A validated MappingSchema instance

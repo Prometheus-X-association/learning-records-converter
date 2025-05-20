@@ -13,8 +13,7 @@ from app.profile_enricher.repositories.jsonld.jsonld_repository import (
 
 
 def get_mapping_repository(request: Request) -> MappingRepository:
-    """
-    Dependency injection function to get MappingRepository instance.
+    """Dependency injection function to get MappingRepository instance.
 
     :param request: The FastAPI request object
     :return: An instance of MappingRepository
@@ -25,8 +24,7 @@ def get_mapping_repository(request: Request) -> MappingRepository:
 
 
 def get_profile_repository(request: Request) -> ProfileRepository:
-    """
-    Dependency injection function to get ProfileRepository instance.
+    """Dependency injection function to get ProfileRepository instance.
 
     :param request: The FastAPI request object
     :return: An instance of ProfileRepository
@@ -38,8 +36,7 @@ def get_profile_repository(request: Request) -> ProfileRepository:
 
 
 def get_expression_evaluator(request: Request) -> ExpressionEvaluatorContract:
-    """
-    Dependency injection function to get an ExpressionEvaluator instance.
+    """Dependency injection function to get an ExpressionEvaluator instance.
 
     :param request: The FastAPI request object
     :return: An instance of ExpressionEvaluatorContract
@@ -48,8 +45,7 @@ def get_expression_evaluator(request: Request) -> ExpressionEvaluatorContract:
 
 
 def get_mapper(request: Request) -> Mapper:
-    """
-    Dependency injection function to get a Mapper instance.
+    """Dependency injection function to get a Mapper instance.
 
     :param request: The FastAPI request object
     :return: An instance of Mapper
@@ -62,8 +58,7 @@ def get_mapper(request: Request) -> Mapper:
 
 
 def get_profiler(request: Request) -> Profiler:
-    """
-    Dependency injection function to get a Profiler instance.
+    """Dependency injection function to get a Profiler instance.
 
     :param request: The FastAPI request object
     :return: An instance of Profiler

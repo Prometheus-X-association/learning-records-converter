@@ -13,8 +13,7 @@ from .repositories.contracts.repository import MappingRepository
 
 
 class Mapper:
-    """
-    Class responsible for orchestrating the mapping process.
+    """Class responsible for orchestrating the mapping process.
 
     This class uses a MappingRepository to load schemas and a MappingEngine to perform the actual conversion.
     """
@@ -25,8 +24,7 @@ class Mapper:
         expression_evaluator: ExpressionEvaluatorContract,
         logger: LoggerContract,
     ) -> None:
-        """
-        Initialize the Mapper with a MappingRepository.
+        """Initialize the Mapper with a MappingRepository.
 
         :param repository: The repository to use for loading mapping schemas
         :param expression_evaluator: ExpressionEvaluatorContract implementation for Python expressions evaluation
@@ -44,9 +42,8 @@ class Mapper:
             {"functions": list(available_functions.keys())},
         )
 
-    def load_schema_by_file(self, file: BinaryIO):
-        """
-        Load a mapping schema from a file.
+    def load_schema_by_file(self, file: BinaryIO) -> None:
+        """Load a mapping schema from a file.
 
         :param file: A file-like object containing the mapping schema
         """
@@ -56,9 +53,8 @@ class Mapper:
         self,
         input_format: CustomTraceFormatStrEnum,
         output_format: CustomTraceFormatStrEnum,
-    ):
-        """
-        Load a mapping schema based on input and output formats.
+    ) -> None:
+        """Load a mapping schema based on input and output formats.
 
         :param input_format: The format of the input trace
         :param output_format: The desired output format
@@ -73,8 +69,7 @@ class Mapper:
         input_trace: Trace,
         output_format: CustomTraceFormatStrEnum,
     ) -> Trace:
-        """
-        Convert an input trace to the specified output format.
+        """Convert an input trace to the specified output format.
 
         :param input_trace: The input trace to be converted
         :param output_format: The desired output format
