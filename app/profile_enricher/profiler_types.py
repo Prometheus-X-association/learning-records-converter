@@ -4,8 +4,7 @@ from typing import Any
 
 @dataclass(frozen=True)
 class ValidationResult:
-    """
-    Represents a result of trace validation against a profile rule.
+    """Represents a result of trace validation against a profile rule.
 
     This class encapsulates information about a validation result, which can be
     either an error or an unmet recommendation.

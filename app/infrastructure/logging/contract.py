@@ -8,8 +8,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def debug(self, message: str, context: Mapping[str, Any] | None = None) -> None:
-        """
-        Log a debug message.
+        """Log a debug message.
 
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
@@ -18,8 +17,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def info(self, message: str, context: Mapping[str, Any] | None = None) -> None:
-        """
-        Log an info message.
+        """Log an info message.
 
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
@@ -28,8 +26,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def warning(self, message: str, context: Mapping[str, Any] | None = None) -> None:
-        """
-        Log a warning message.
+        """Log a warning message.
 
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
@@ -38,8 +35,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def error(self, message: str, context: Mapping[str, Any] | None = None) -> None:
-        """
-        Log an error message.
+        """Log an error message.
 
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
@@ -48,8 +44,7 @@ class LoggerContract(ABC):
 
     @abstractmethod
     def critical(self, message: str, context: Mapping[str, Any] | None = None) -> None:
-        """
-        Log a critical message.
+        """Log a critical message.
 
         :param message: The message to log
         :param context: Additional contextual information to include with the log.
@@ -63,8 +58,7 @@ class LoggerContract(ABC):
         exc: Exception,
         context: Mapping[str, Any] | None = None,
     ) -> None:
-        """
-        Log an exception.
+        """Log an exception.
 
         :param message: A descriptive message about the exception
         :param exc: The exception object

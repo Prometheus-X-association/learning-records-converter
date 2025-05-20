@@ -9,7 +9,7 @@ from utils.utils_general import is_empty
 
 
 def get_available_functions() -> dict[str, Callable]:
-    """Returns a list of functions available in mapping trace formats"""
+    """Returns a list of functions available in mapping trace formats."""
     return {
         "is_empty": is_empty,
         "match": match,

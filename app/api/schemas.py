@@ -1,7 +1,7 @@
-from extensions.enums import CustomTraceFormatStrEnum
 from pydantic import BaseModel, Field
 
 from app.common.common_types import JsonType
+from app.common.extensions.enums.custom_trace_formats import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
 from app.parsers.types import DelimiterEnum, QuotingEnum
 from app.profile_enricher.profiler_types import ValidationRecommendation
@@ -19,8 +19,7 @@ class InputTraceRequestModel(BaseModel):
     )
 
     def get_trace(self) -> Trace:
-        """
-        Create a Trace instance from the input data.
+        """Create a Trace instance from the input data.
 
         If an input_format is provided, it uses that format.
         Otherwise, it attempts to detect the format automatically.

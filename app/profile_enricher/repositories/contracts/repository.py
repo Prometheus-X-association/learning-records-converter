@@ -8,16 +8,14 @@ from app.profile_enricher.profiler_types import (
 
 
 class ProfileRepository(ABC):
-    """
-    Abstract base class for profile repositories.
+    """Abstract base class for profile repositories.
 
     Defines the interface for enriching and validating traces based on profiles.
     """
 
     @abstractmethod
     def enrich_trace(self, group_name: str, template_name: str, trace: Trace) -> None:
-        """
-        Enrich a trace based on its profile.
+        """Enrich a trace based on its profile.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
@@ -32,8 +30,7 @@ class ProfileRepository(ABC):
         template_name: str,
         trace: Trace,
     ) -> list[ValidationError]:
-        """
-        Validate a trace against its profile rules.
+        """Validate a trace against its profile rules.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile
@@ -49,8 +46,7 @@ class ProfileRepository(ABC):
         template_name: str,
         trace: Trace,
     ) -> list[ValidationRecommendation]:
-        """
-        Generate recommendations for a trace based on a specific template.
+        """Generate recommendations for a trace based on a specific template.
 
         :param group_name: The group name of the profile
         :param template_name: The template name within the profile

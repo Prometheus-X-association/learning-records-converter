@@ -24,8 +24,7 @@ class JsonLdProfilesUpdater:
         logger: LoggerContract,
         config: ConfigContract,
     ) -> None:
-        """
-        Initialize the JsonLdProfilesUpdater.
+        """Initialize the JsonLdProfilesUpdater.
 
         :param destination_dir: The directory where profiles will be saved.
         :param logger: LoggerContract implementation for logging
@@ -53,8 +52,7 @@ class JsonLdProfilesUpdater:
                 )
 
     def update_profile(self, profile_name: str) -> None:
-        """
-        Update a single profile based on the given environment variable.
+        """Update a single profile based on the given environment variable.
 
         :param profile_name: The profile name.
         """
@@ -80,8 +78,7 @@ class JsonLdProfilesUpdater:
 
 
 def main(destination_dir: str | None = None) -> None:
-    """
-    Main function to run the profile updater.
+    """Main function to run the profile updater.
 
     :param destination_dir: Optional directory where profiles will be saved
                             If not provided, a default directory is used

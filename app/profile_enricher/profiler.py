@@ -9,16 +9,14 @@ class Profiler:
     """A class to manage profile-based operations on traces."""
 
     def __init__(self, repository: ProfileRepository) -> None:
-        """
-        Initialize the Profiler with a ProfileRepository.
+        """Initialize the Profiler with a ProfileRepository.
 
         :param repository: The repository to use for profile operations
         """
         self.repository = repository
 
     def enrich_trace(self, trace: Trace) -> None:
-        """
-        Enrich a trace.
+        """Enrich a trace.
 
         :param trace: The original trace to enrich
         """
@@ -33,8 +31,7 @@ class Profiler:
         )
 
     def validate_trace(self, trace: Trace) -> list[ValidationError]:
-        """
-        Validate a trace.
+        """Validate a trace.
 
         :param trace: The trace to validate
         :return: A list of ValidationError objects
@@ -50,8 +47,7 @@ class Profiler:
         )
 
     def get_recommendations(self, trace: Trace) -> list[ValidationRecommendation]:
-        """
-        Generate recommendations for a trace.
+        """Generate recommendations for a trace.
 
         :param trace: The trace data to generate recommendations for
         :return: A list of ValidationRecommendation objects
@@ -68,8 +64,7 @@ class Profiler:
 
     @staticmethod
     def _parse_profile(profile: str) -> tuple[str, str]:
-        """
-        Parse a profile identifier in the format 'group_name.template_name'.
+        """Parse a profile identifier in the format 'group_name.template_name'.
 
         :param profile: The profile identifier
         :return: The group_name and the template_name
