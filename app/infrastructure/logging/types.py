@@ -3,9 +3,7 @@ from enum import Enum
 
 
 class LogLevel(Enum):
-    """
-    Represents the different log levels.
-    """
+    """Represents the different log levels."""
 
     DEBUG = logging.DEBUG
     INFO = logging.INFO

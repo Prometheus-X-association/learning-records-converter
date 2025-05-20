@@ -1,4 +1,4 @@
-from extensions.enums.custom_trace_formats import (
+from .custom_trace_formats import (
     CustomTraceFormatModelEnum,
     CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,

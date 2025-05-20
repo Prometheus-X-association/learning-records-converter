@@ -11,14 +11,11 @@ MIME_TO_PARSER: dict[str, type[Parser]] = {
 
 
 class ParserFactory:
-    """
-    A factory class for creating parser instances based on MIME types.
-    """
+    """A factory class for creating parser instances based on MIME types."""
 
     @staticmethod
     def register_parser(mime_type: str, parser_class: type[Parser]) -> None:
-        """
-        Register a new parser class for a specific MIME type.
+        """Register a new parser class for a specific MIME type.
 
         :param mime_type: The MIME type to associate with the parser
         :param parser_class: The parser class to register
@@ -31,8 +28,7 @@ class ParserFactory:
         logger: LoggerContract,
         parsing_config: CustomConfigModel | None = None,
     ) -> Parser:
-        """
-        Get a parser instance for the specified MIME type.
+        """Get a parser instance for the specified MIME type.
 
         :param mime_type: The MIME type of the content to parse
         :param logger: LoggerContract implementation for logging

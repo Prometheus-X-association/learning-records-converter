@@ -7,8 +7,7 @@ from app.infrastructure.logging.contract import LoggerContract
 
 @pytest.fixture
 def mock_logger() -> Mock:
-    """
-    Create a mock logger.
+    """Create a mock logger.
 
     :return: A mock logger conforming to LoggerContract
     """

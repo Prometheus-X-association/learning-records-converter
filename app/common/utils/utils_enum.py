@@ -23,6 +23,7 @@ def extend_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], 
     Args:
         args (List[Enum]): Enums to inherit
         enum_class (type[Enum]): Type of Enum to create
+
     """
 
     def wrapper(added_enum):
@@ -45,6 +46,7 @@ def str_enum(*args, enum_class: type[Enum] = Enum) -> Callable[[type[Enum]], Any
     Args:
         args (List[Enum]): Enums to inherit
         enum_class (type[Enum]): Type of Enum to create
+
     """
 
     def wrapper(added_enum):

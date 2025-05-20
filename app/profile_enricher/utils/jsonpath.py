@@ -11,8 +11,7 @@ class JSONPathUtils:
     @staticmethod
     @cache
     def parse_jsonpath(path: str) -> jsonpath_ng.JSONPath:
-        """
-        Parse and cache a JSONPath expression.
+        """Parse and cache a JSONPath expression.
 
         :param path: The JSONPath expression to parse
         :return: Parsed JSONPath object
@@ -25,8 +24,7 @@ class JSONPathUtils:
 
     @staticmethod
     def path_exists(path: str, data: Mapping[str, Any]) -> bool:
-        """
-        Check if a value exists at the specified JSONPath.
+        """Check if a value exists at the specified JSONPath.
 
         :param data: The data to check
         :param path: The JSONPath expression
@@ -36,8 +34,7 @@ class JSONPathUtils:
 
     @staticmethod
     def path_to_dict(path: str, value: str) -> dict[str, Any]:
-        """
-        Transform a jsonpath to a dict with the passed value.
+        """Transform a jsonpath to a dict with the passed value.
 
         :param path: The JSON path
         :param value: The value to be set at the specified path

@@ -25,6 +25,7 @@ def remove_empty_elements(dictionary: Mapping | Sequence) -> dict | list:
 
     Returns:
         dictionary or list with removed fields
+
     """
     if not isinstance(dictionary, Mapping | Sequence) or isinstance(dictionary, str):
         return dictionary
@@ -65,6 +66,7 @@ def get_value_from_flat_key(
 
     Returns:
         Any: Value or None if nothing was found.
+
     """
     list_key = flat_key.split(".")
     total_list_key_len = len(list_key)
@@ -116,8 +118,7 @@ def set_value_from_flat_key(
     value: Any,
     overwrite: bool = True,
 ) -> dict | list:
-    """
-    Set recursively a value into a dict element by using a flatten key (keys separated with dotes).
+    """Set recursively a value into a dict element by using a flatten key (keys separated with dotes).
 
     Integer (numeric) are considered as list indexes.
 
@@ -137,6 +138,7 @@ def set_value_from_flat_key(
 
     Returns:
         dict | list: The original dict or list, modified if not overwrite.
+
     """
     # Split the flat_key, but keep keys with brackets intact
     keys = re.split(r"\.(?![^\[]*\])", flat_key)
@@ -253,6 +255,7 @@ def get_nested_from_flat(
         dict | list:
             Nested dict or list.
             Example: {'url': {'main': '', 'secondary': ''}}
+
     """
     # Sort flatten keys
     flat_field = dict(sorted(flat_field.items()))
@@ -286,6 +289,7 @@ def convert_yaml_file_to_json(yaml_path: str | PathLike) -> dict:
 
     Returns:
         dict: Converted YAML
+
     """
     with Path(yaml_path).open(mode="r") as file:
         return yaml.safe_load(file)

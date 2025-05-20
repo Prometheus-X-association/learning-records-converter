@@ -77,8 +77,7 @@ class EnvConfig(ConfigContract):
 
     @staticmethod
     def _get(key: str, default: str | None = None) -> str:
-        """
-        Get a value from environment variables with a default.
+        """Get a value from environment variables with a default.
 
         :param key: The key of the environment variable.
         :param default: The default value if the key is not found.

@@ -13,13 +13,10 @@ from app.parsers.types import DelimiterEnum
 
 
 class CSVParser(Parser):
-    """
-    Parser for CSV files.
-    """
+    """Parser for CSV files."""
 
     def parse(self, file: BinaryIO) -> Generator[Trace]:
-        """
-        Parse the given CSV file and yield parsed rows.
+        """Parse the given CSV file and yield parsed rows.
 
         :param file: The CSV file to parse
         :yield: Parsed rows from the CSV file
@@ -43,8 +40,7 @@ class CSVParser(Parser):
         self.logger.info("Parsing end", {"config": self.parsing_config.model_dump()})
 
     def _open_file(self, file: BinaryIO) -> TextIOWrapper:
-        """
-        Open the binary file as a text file with the specified encoding.
+        """Open the binary file as a text file with the specified encoding.
 
         :param file: The binary file to open
         :return: A TextIOWrapper object
@@ -58,8 +54,7 @@ class CSVParser(Parser):
             raise CSVParsingError(msg) from e
 
     def _detect_csv_properties(self, file: TextIOWrapper) -> tuple[csv.Dialect, bool]:
-        """
-        Detect CSV dialect and presence of a header.
+        """Detect CSV dialect and presence of a header.
 
         :param file: The CSV file
         :return: Tuple of (detected dialect, has_header)
@@ -84,8 +79,7 @@ class CSVParser(Parser):
         file: TextIOWrapper,
         dialect: csv.Dialect,
     ) -> csv.DictReader:
-        """
-        Create a CSV DictReader with the detected dialect and configuration.
+        """Create a CSV DictReader with the detected dialect and configuration.
 
         :param file: The CSV file
         :param dialect: The detected CSV dialect
@@ -105,8 +99,7 @@ class CSVParser(Parser):
 
     @staticmethod
     def _clean_row(row: Mapping[str, Any]) -> OrderedDict:
-        """
-        Clean and normalize the values in a row.
+        """Clean and normalize the values in a row.
 
         :param row: The row to clean
         :return: The cleaned row with normalized values
@@ -117,8 +110,7 @@ class CSVParser(Parser):
 
     @staticmethod
     def _normalize_value(value: Any) -> Any:
-        """
-        Normalize a single value.
+        """Normalize a single value.
 
         :param value: The value to normalize
         :return: The normalized value
@@ -144,8 +136,7 @@ class CSVParser(Parser):
             return value
 
     def _get_csv_params(self, detected_dialect: csv.Dialect) -> dict[str, Any]:
-        """
-        Get CSV parameters based on the detected dialect and configuration.
+        """Get CSV parameters based on the detected dialect and configuration.
 
         :param detected_dialect: The detected CSV dialect
         :return: CSV parameters to use for parsing
@@ -169,8 +160,7 @@ class CSVParser(Parser):
         file: TextIOWrapper,
         has_header: bool,
     ) -> None:
-        """
-        Validate the structure of the CSV file.
+        """Validate the structure of the CSV file.
 
         :param reader: The CSV DictReader
         :param has_header: Whether the CSV has a header

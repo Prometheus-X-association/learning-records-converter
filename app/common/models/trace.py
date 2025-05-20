@@ -1,13 +1,15 @@
-from extensions.enums import CustomTraceFormatModelEnum, CustomTraceFormatStrEnum
 from pydantic import BaseModel, model_validator
 
 from app.common.common_types import JsonType
 from app.common.exceptions import InvalidTraceError, UnknownFormatError
+from app.common.extensions.enums import (
+    CustomTraceFormatModelEnum,
+    CustomTraceFormatStrEnum,
+)
 
 
 class Trace(BaseModel):
-    """
-    Represents a trace in a specific format.
+    """Represents a trace in a specific format.
 
     This class encapsulates the trace data and its associated format.
     It provides a method for automatic format detection.
@@ -20,8 +22,7 @@ class Trace(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_data_and_format(cls, values: dict) -> dict:
-        """
-        Validates the input data and format.
+        """Validates the input data and format.
         If no format is provided, it attempts to detect the format automatically.
 
         :param values: Keyword arguments containing the trace data, format, and optional profile
@@ -53,8 +54,7 @@ class Trace(BaseModel):
         trace_data: JsonType,
         trace_format: CustomTraceFormatStrEnum,
     ) -> bool:
-        """
-        Validate the input data against a specified format.
+        """Validate the input data against a specified format.
 
         :param trace_data: The input trace data to validate
         :param trace_format: The format to validate against
@@ -72,8 +72,7 @@ class Trace(BaseModel):
 
     @classmethod
     def detect_format(cls, data: JsonType) -> CustomTraceFormatStrEnum | None:
-        """
-        Attempt to detect the format of the input trace data.
+        """Attempt to detect the format of the input trace data.
 
         This method tries to validate the data against all known formats.
 
