@@ -1,4 +1,4 @@
-from enums.trace_formats import (
+from app.common.enums.trace_formats import (
     TraceFormatEnum,
     TraceFormatModelEnum,
     TraceFormatOutputMappingEnum,
