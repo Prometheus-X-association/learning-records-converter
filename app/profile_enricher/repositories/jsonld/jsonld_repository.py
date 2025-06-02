@@ -1,6 +1,5 @@
-from utils.utils_dict import deep_merge
-
 from app.common.models.trace import Trace
+from app.common.utils.utils_dict import deep_merge
 from app.infrastructure.config.contract import ConfigContract
 from app.infrastructure.logging.contract import LoggerContract
 from app.profile_enricher.profiler_types import (

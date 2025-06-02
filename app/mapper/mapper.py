@@ -1,7 +1,6 @@
 from typing import BinaryIO
 
-from extensions.enums import CustomTraceFormatStrEnum
-
+from app.common.extensions.enums import CustomTraceFormatStrEnum
 from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 

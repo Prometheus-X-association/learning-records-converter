@@ -1,14 +1,14 @@
 from pathlib import Path
 from typing import BinaryIO
 
-from enums import TraceFormatEnum
-from utils.utils_dict import convert_yaml_file_to_json
 from yaml import safe_load
 
+from app.common.enums import TraceFormatEnum
 from app.common.extensions.enums import (
     CustomTraceFormatOutputMappingEnum,
     CustomTraceFormatStrEnum,
 )
+from app.common.utils.utils_dict import convert_yaml_file_to_json
 from app.infrastructure.logging.contract import LoggerContract
 from app.mapper.exceptions import MappingConfigToModelError
 from app.mapper.models.mapping_schema import MappingSchema
