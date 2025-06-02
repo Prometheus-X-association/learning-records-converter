@@ -3,9 +3,10 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import TYPE_CHECKING, Literal, get_args, get_origin
 
-from models.trace_formats.base import ExtendedTypeBaseModel
 from pydantic import BaseModel, Field, field_validator
 from pydantic.fields import FieldInfo
+
+from app.common.models.trace_formats.base import ExtendedTypeBaseModel
 
 if TYPE_CHECKING:
     from pydantic_core.core_schema import ValidationInfo
