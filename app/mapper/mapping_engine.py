@@ -1,15 +1,14 @@
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
-from utils.utils_dict import (
+from app.common.common_types import JsonType
+from app.common.extensions.enums import CustomTraceFormatStrEnum
+from app.common.models.trace import Trace
+from app.common.utils.utils_dict import (
     get_value_from_flat_key,
     remove_empty_elements,
     set_value_from_flat_key,
 )
-
-from app.common.common_types import JsonType
-from app.common.extensions.enums import CustomTraceFormatStrEnum
-from app.common.models.trace import Trace
 from app.infrastructure.logging.contract import LoggerContract
 
 from .evaluator.contract import ExpressionEvaluatorContract

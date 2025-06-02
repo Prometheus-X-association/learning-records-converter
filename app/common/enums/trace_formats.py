@@ -5,7 +5,7 @@ Use app/extension/enums/custom_trace_formats.py if you need to add additional ma
 
 from enum import Enum
 
-from models.trace_formats import (
+from app.common.models.trace_formats import (
     BaseXapiStatement,
     CustomDataModel,
     IMSCaliperSensorModel1_1,
