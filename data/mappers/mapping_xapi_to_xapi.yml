@@ -197,7 +197,8 @@ mappings:
         - condition: '
             lambda verb_id, obj_type, mime_type:
               verb_id.endswith((
-               "id.tincanapi.com/verb/downloaded"
+               "id.tincanapi.com/verb/downloaded",
+               "w3id.org/xapi/netc/verbs/downloaded"
               )) and 
               (obj_type.endswith((
                 "activitystrea.ms/schema/1.0/audio",
@@ -221,7 +222,8 @@ mappings:
         - condition: '
             lambda verb_id, obj_type, mime_type:
               verb_id.endswith((
-                "id.tincanapi.com/verb/downloaded"
+                "id.tincanapi.com/verb/downloaded",
+                "w3id.org/xapi/netc/verbs/downloaded"
               )) and  
               (obj_type.endswith((
                 "id.tincanapi.com/activitytype/document",
@@ -244,6 +246,7 @@ mappings:
             lambda verb_id, obj_type, mime_type:
               verb_id.endswith((
                 "id.tincanapi.com/verb/downloaded",
+                "w3id.org/xapi/netc/verbs/downloaded",
                 "w3id.org/xapi/acrossx/verbs/watched",
                 "activitystrea.ms/watch",
                 "activitystrea.ms/schema/1.0/watch",
@@ -270,7 +273,8 @@ mappings:
         - condition: '
             lambda verb_id, obj_type, mime_type:
               verb_id.endswith((
-                "id.tincanapi.com/verb/downloaded"
+                "id.tincanapi.com/verb/downloaded",
+                "w3id.org/xapi/netc/verbs/downloaded"
               )) and  
               obj_type.endswith((
                 "activitystrea.ms/schema/1.0/file",
@@ -411,148 +415,91 @@ mappings:
           profile: "virtual-classroom.posted-public-message"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact",
+                "w3id.org/xapi/virtual-classroom/verbs/reacted",
                 "id.tincanapi.com/verb/requested-attention"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == True
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              ))
           '
           profile: "virtual-classroom.raised-hand"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact",
-                "id.tincanapi.com/verb/requested-attention"
+                "w3id.org/xapi/dod-isd/verbs/unreacted"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/hand-raised" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/hand-raised"] == False
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom"
+              ))
           '
           profile: "virtual-classroom.lowered-hand"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "activitystrea.ms/share"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == True
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/screen"
+              ))
           '
           profile: "virtual-classroom.shared-screen"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "http://activitystrea.ms/unshare"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/screen-shared" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/screen-shared"] == False
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/screen"
+              ))
           '
           profile: "virtual-classroom.unshared-screen"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "w3id.org/xapi/virtual-classroom/verbs/stopped"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == False
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/micro"
+              ))
           '
           profile: "virtual-classroom.muted"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "activitystrea.ms/start"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/micro-activated" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/micro-activated"] == True
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/micro"
+              ))
           '
           profile: "virtual-classroom.unmuted"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "http://activitystrea.ms/start"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == True
-              )
+                "w3id.org/xapi/virtual-classroom/activity-types/camera"
+              ))
           '
           profile: "virtual-classroom.started-camera"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
-                "adlnet.gov/expapi/verbs/interacted",
-                "activitystrea.ms/schema/1.0/interact",
-                "activitystrea.ms/interact"
+                "w3id.org/xapi/virtual-classroom/verbs/stopped"
               )) and 
               obj_type.endswith((
-                "w3id.org/xapi/virtual-classroom/activity-types/virtual-classroom",
-                "adlnet.gov/expapi/activities/meeting",
-                "id.tincanapi.com/activitytype/tutor-session"
-              )) and (
-                "https://w3id.org/xapi/virtual-classroom/extensions/camera-activated" in context_extensions
-                and context_extensions["https://w3id.org/xapi/virtual-classroom/extensions/camera-activated"] == False
-              )
+                 "w3id.org/xapi/virtual-classroom/activity-types/camera"
+              ))
           '
           profile: "virtual-classroom.stopped-camera"
 
