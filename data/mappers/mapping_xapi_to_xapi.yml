@@ -297,11 +297,10 @@ mappings:
   - input_fields:
       - "verb.id"
       - "object.definition.type"
-      - "context.extensions"
     output_fields:
       switch:
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "adlnet.gov/expapi/verbs/initialized"
               )) and  
@@ -314,7 +313,7 @@ mappings:
           profile: "virtual-classroom.initialized"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "adlnet.gov/expapi/verbs/terminated",
                 "activitystrea.ms/terminate",
@@ -329,7 +328,7 @@ mappings:
           profile: "virtual-classroom.terminated"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "adlnet.gov/expapi/verbs/attended",
                 "activitystrea.ms/schema/1.0/join",
@@ -350,7 +349,7 @@ mappings:
           profile: "virtual-classroom.joined"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "activitystrea.ms/schema/1.0/leave",
                 "activitystrea.ms/leave",
@@ -366,7 +365,7 @@ mappings:
           profile: "virtual-classroom.left"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "adlnet.gov/expapi/verbs/asked",
                 "activitystrea.ms/schema/1.0/start",
@@ -384,7 +383,7 @@ mappings:
           profile: "virtual-classroom.started-poll"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "adlnet.gov/expapi/verbs/answered",
                 "adlnet.gov/expapi/verbs/responded",
@@ -402,7 +401,7 @@ mappings:
           profile: "virtual-classroom.answered-poll"
 
         - condition: '
-            lambda verb_id, obj_type, context_extensions:
+            lambda verb_id, obj_type:
               verb_id.endswith((
                 "w3id.org/xapi/acrossx/verbs/posted",
                 "id.tincanapi.com/verb/replied"
