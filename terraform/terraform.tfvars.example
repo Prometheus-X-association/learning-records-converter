@@ -1,0 +1,4 @@
+deploy_to_aws      = true
+deploy_to_scaleway = false
+
+docker_image = "ghcr.io/your-org/lrc:latest"
